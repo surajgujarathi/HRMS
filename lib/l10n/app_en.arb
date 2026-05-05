@@ -1,0 +1,21 @@
+{
+  "welcome_title": "Welcome to\nOpzento HR",
+  "welcome_subtitle": "Experience a seamless way to manage all your HR tasks in one place.",
+  "login": "Login",
+  "username": "Username",
+  "password": "Password",
+  "remember_me": "Remember me",
+  "forgot_password": "Forgot?",
+  "sign_in": "SIGN IN",
+  "skip": "Skip",
+  "next_step": "Next Step",
+  "get_started": "Get Started",
+  "attendance_payroll": "Attendance &\nPayroll Made Easy",
+  "attendance_payroll_subtitle": "Monitor your attendance and manage payroll with precision and ease.",
+  "sign_in_continue": "Sign in to continue",
+  "powered_by": "POWERED BY",
+  "language": "Language",
+  "error_empty_fields": "Please enter username and password",
+  "error_enter_username": "Please enter username",
+  "error_enter_password": "Please enter password"
+}

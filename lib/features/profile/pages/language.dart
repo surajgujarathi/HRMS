@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_app/core/localization/locale_cubit.dart';
 
 class LanguagePage extends StatefulWidget {
   const LanguagePage({super.key});
@@ -8,37 +11,31 @@ class LanguagePage extends StatefulWidget {
 }
 
 class _LanguageSelectionScreenState extends State<LanguagePage> {
-  int selectedIndex = 3; // Default selected Telugu
-
   final List<Map<String, String>> languages = [
-    {"native": "हिन्दी", "english": "Hindi"},
-    {"native": "मराठी", "english": "Marathi"},
-    {"native": "தமிழ்", "english": "Tamil"},
-    {"native": "తెలుగు", "english": "Telugu"},
-    {"native": "বাংলা", "english": "Bengali"},
-    {"native": "ಕನ್ನಡ", "english": "Kannada"},
-    {"native": "ગુજરાતી", "english": "Gujarati"},
-    {"native": "ਪੰਜਾਬੀ", "english": "Punjabi"},
+    {"native": "English", "english": "English", "code": "en"},
+    {"native": "हिन्दी", "english": "Hindi", "code": "hi"},
+    {"native": "తెలుగు", "english": "Telugu", "code": "te"},
   ];
 
   @override
   Widget build(BuildContext context) {
+    final currentLang = context.watch<LocaleCubit>().state;
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(l10n.language),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        foregroundColor: Colors.black,
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
-              const SizedBox(height: 30),
-
-              /// Title
-              const Text(
-                "Select Your Language",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-              ),
-
-              const SizedBox(height: 30),
+              const SizedBox(height: 10),
 
               /// Language List
               Expanded(
@@ -46,50 +43,58 @@ class _LanguageSelectionScreenState extends State<LanguagePage> {
                   itemCount: languages.length,
                   itemBuilder: (context, index) {
                     final lang = languages[index];
-                    final isSelected = selectedIndex == index;
+                    final isSelected = currentLang == lang["code"];
 
                     return GestureDetector(
                       onTap: () {
-                        setState(() {
-                          selectedIndex = index;
-                        });
+                        context.read<LocaleCubit>().changeLanguage(lang["code"]!);
                       },
                       child: Container(
-                        margin: const EdgeInsets.only(bottom: 10),
+                        margin: const EdgeInsets.only(bottom: 12),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
-                          vertical: 8,
+                          vertical: 16,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(18),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
+                          color: isSelected ? const Color(0xFFE3F2FD) : Colors.grey.shade50,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: isSelected ? const Color(0xFF1976D2) : Colors.transparent,
+                            width: 1.5,
+                          ),
                         ),
                         child: Row(
                           children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: isSelected ? const Color(0xFF1976D2) : Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.language,
+                                color: isSelected ? Colors.white : Colors.blueGrey,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     lang["native"]!,
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: isSelected ? const Color(0xFF1976D2) : Colors.black87,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
                                   Text(
                                     lang["english"]!,
-                                    style: const TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 14,
+                                    style: TextStyle(
+                                      color: Colors.blueGrey.withOpacity(0.6),
+                                      fontSize: 13,
                                     ),
                                   ),
                                 ],
@@ -98,52 +103,16 @@ class _LanguageSelectionScreenState extends State<LanguagePage> {
 
                             /// Check Icon
                             if (isSelected)
-                              Container(
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFF5B8BD9),
-                                  shape: BoxShape.circle,
-                                ),
-                                padding: const EdgeInsets.all(6),
-                                child: const Icon(
-                                  Icons.check,
-                                  color: Colors.white,
-                                  size: 18,
-                                ),
+                              const Icon(
+                                Icons.check_circle,
+                                color: Color(0xFF1976D2),
+                                size: 24,
                               ),
                           ],
                         ),
                       ),
                     );
                   },
-                ),
-              ),
-
-              /// Save Button
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.only(bottom: 25),
-                child: ElevatedButton(
-                  onPressed: () {
-                    final selectedLanguage =
-                        languages[selectedIndex]["english"];
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("$selectedLanguage language selected"),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    backgroundColor: const Color(0xFF5B8BD9),
-                  ),
-                  child: const Text(
-                    "Save",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
                 ),
               ),
             ],

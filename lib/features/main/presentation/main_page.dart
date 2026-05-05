@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/core/constants/app_colors.dart';
 import 'package:flutter_app/features/attendance/attendance_page.dart';
 import 'package:flutter_app/features/chat/chat_screen.dart';
 import 'package:flutter_app/features/home/presentation/home_page.dart';
@@ -30,9 +31,9 @@ class MainPage extends StatelessWidget {
             ),
 
             bottomNavigationBar: NavigationBar(
-              backgroundColor: const Color.fromARGB(255, 242, 249, 250),
+              backgroundColor: AppColors.navBg,
               selectedIndex: state.selectedIndex,
-              indicatorColor: Color.fromARGB(255, 156, 204, 223),
+              indicatorColor: AppColors.navIndicator,
               onDestinationSelected: (index) {
                 context.read<MainCubit>().changeTab(index);
               },
@@ -69,12 +70,3 @@ class MainPage extends StatelessWidget {
     );
   }
 }
-
-//   static final List<Widget> _pages = [
-//     HomePage(),
-//     AttendanceScreen(),
-//     // PayrollScreen(),
-//     // ChatScreen(),
-//     // ProfileScreen(),
-//   ];
-// }

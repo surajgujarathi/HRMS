@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/routes.dart';
 import 'package:flutter_app/core/utils/shared_pref.dart';
+import 'package:flutter_app/core/constants/app_colors.dart';
 import 'package:flutter_app/core/widget/custome_search_bar.dart';
 import 'package:flutter_app/features/home/widgets/action_card.dart';
 import 'package:flutter_app/features/home/widgets/anniversary.dart';
@@ -13,17 +14,13 @@ import 'package:flutter_app/features/home/widgets/check_in_out.dart';
 import 'package:flutter_app/features/home/widgets/circular.dart';
 
 class HomePage extends StatelessWidget {
-  static const Color bgColor = Color(0xFFF3EEFC); // light lavender
-  static const Color primaryPurple = Color(0xFF8F7AE6);
-  static const Color lightPurple = Color(0xFFEDE9FF);
-
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         leadingWidth: 200,
 
@@ -32,19 +29,31 @@ class HomePage extends StatelessWidget {
           child: Row(
             children: [
               Transform.scale(
-                scale: 0.6, // 👈 reduce size
+                scale: 0.6,
                 child: Image.asset(
                   'assets/images/opsen.png',
                   fit: BoxFit.contain,
                 ),
               ),
-              Text(
-                'OpzentoHR',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black87,
-                  letterSpacing: 0.5,
+              Expanded(
+                child: FutureBuilder<dynamic>(
+                  future: SharedPref().getObject('employee_data'),
+                  builder: (context, snapshot) {
+                    String name = "User";
+                    if (snapshot.hasData && snapshot.data is Map) {
+                      name = snapshot.data['name']?.toString().split(' ').first ?? "User";
+                    }
+                    return Text(
+                      'Welcome, $name',
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black87,
+                        letterSpacing: 0.5,
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -66,7 +75,7 @@ class HomePage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: PopupMenuButton<String>(
-              color: Colors.white,
+              color: AppColors.white,
               offset: const Offset(0, 45), // position below avatar
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -116,31 +125,50 @@ class HomePage extends StatelessWidget {
                     );
                   }
                   
-                  ImageProvider profileImage;
                   final picData = snapshot.data;
                   debugPrint('Home Profile Pic Data Status: ${picData != null ? "Present (length: ${picData.length})" : "Null"}');
 
                   if (snapshot.hasData && picData != null && picData.isNotEmpty && picData != 'false') {
                     try {
-                      profileImage = MemoryImage(base64Decode(picData));
+                      final bytes = base64Decode(picData);
+                      return CircleAvatar(
+                        radius: 18,
+                        backgroundColor: AppColors.lightPurple,
+                        child: ClipOval(
+                          child: Image.memory(
+                            bytes,
+                            width: 36,
+                            height: 36,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              debugPrint('Error decoding profile image: $error');
+                              return const Icon(Icons.person, size: 22, color: AppColors.primaryPurple);
+                            },
+                          ),
+                        ),
+                      );
                     } catch (e) {
-                      debugPrint('Error decoding profile pic: $e');
-                      profileImage = const AssetImage('assets/images/praveen.png');
+                      debugPrint('Error base64 decoding profile pic: $e');
+                      return const CircleAvatar(
+                        radius: 18,
+                        backgroundColor: AppColors.lightPurple,
+                        child: Icon(Icons.person, size: 22, color: AppColors.primaryPurple),
+                      );
                     }
                   } else {
-                    profileImage = const AssetImage('assets/images/praveen.png');
+                    return const CircleAvatar(
+                      radius: 18,
+                      backgroundColor: AppColors.lightPurple,
+                      child: Icon(Icons.person, size: 22, color: AppColors.primaryPurple),
+                    );
                   }
-                  return CircleAvatar(
-                    radius: 18,
-                    backgroundImage: profileImage,
-                  );
                 },
               ),
             ),
           ),
         ],
       ),
-      backgroundColor: const Color(0xFFF4F2FB),
+      backgroundColor: AppColors.lavenderBg,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 6, 16, 16),

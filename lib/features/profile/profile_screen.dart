@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/features/auth/login/cubit/login_cubit.dart';
 import 'package:flutter_app/routes.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -216,10 +218,13 @@ class ProfileScreen extends StatelessWidget {
                     titleColor: Colors.red,
                     iconColor: Colors.red,
                     onTap: () async {
-                      // await context.read<ProfileCubit>().logout();
-                      Navigator.of(
-                        context,
-                      ).pushNamedAndRemoveUntil('/login', (route) => false);
+                      await context.read<LoginCubit>().logout();
+                      if (context.mounted) {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          Routes.login,
+                          (route) => false,
+                        );
+                      }
                     },
                   ),
                 ],

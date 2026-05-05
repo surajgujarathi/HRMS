@@ -29,10 +29,29 @@ class AppColors {
   // 🟣 Payroll / Misc
   static const Color violet = Color(0xFF7E57C2);
 
+  // 🎨 Basic Colors
+
+  static const Color grey = Colors.grey;
+  static const Color red = Colors.redAccent;
+
+
   // ⚫ Text
   static const Color textPrimary = Colors.black87;
   static const Color textSecondary = Colors.grey;
+  static const Color textDark = Color(0xFF1E293B);
+  static const Color textGrey = Color(0xFF64748B);
 
   // 🌫 Shadow
   static const Color shadow = Colors.black12;
+
+  // 🔐 Login Screen
+  static const Color loginBg = Color(0xFFF8FAFC);
+  static const Color indigo = Color(0xFF1E3A8A);
+  static const Color brightBlue = Color(0xFF3B82F6);
+  static const Color inputBg = Color(0xFFF1F5F9);
+  static const Color iconGrey = Color(0xFF94A3B8);
+
+  // 🏠 Main Navigation
+  static const Color navBg = Color.fromARGB(255, 242, 249, 250);
+  static const Color navIndicator = Color.fromARGB(255, 156, 204, 223);
 }

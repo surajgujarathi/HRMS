@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:odoo_rpc/odoo_rpc.dart';
 import 'package:flutter_app/core/utils/shared_pref.dart';
+import 'package:flutter_app/network/odoo_service.dart';
+import 'package:odoo_rpc/odoo_rpc.dart';
 import 'profile_state.dart';
 import 'package:flutter/foundation.dart';
 
@@ -12,16 +13,18 @@ class ProfileCubit extends Cubit<ProfileState> {
 
     try {
       final prefs = SharedPref();
-      
+
       // 1. Try to get cached data first to save a network call
       final cachedData = await prefs.getObject('employee_data');
       if (cachedData != null && cachedData is Map && cachedData.isNotEmpty) {
         debugPrint('Using cached profile data');
-        emit(state.copyWith(
-          status: ProfileStatus.success,
-          employeeData: cachedData as Map<String, dynamic>,
-        ));
-        // We can still fetch in background if we want to refresh, 
+        emit(
+          state.copyWith(
+            status: ProfileStatus.success,
+            employeeData: cachedData as Map<String, dynamic>,
+          ),
+        );
+        // We can still fetch in background if we want to refresh,
         // but for now, let's just return to satisfy the user's point.
         return;
       }
@@ -32,7 +35,10 @@ class ProfileCubit extends Cubit<ProfileState> {
       final employeeId = await prefs.getString('employee_id');
       final sessionData = await prefs.getObject('session');
 
-      if (baseUrl == null || db == null || employeeId == null || sessionData == null) {
+      if (baseUrl == null ||
+          db == null ||
+          employeeId == null ||
+          sessionData == null) {
         throw Exception("Missing session data. Please log in again.");
       }
 
@@ -40,51 +46,59 @@ class ProfileCubit extends Cubit<ProfileState> {
       // OdooSession usually has a fromJson factory in recent versions
       final session = OdooSession(
         id: sessionData['id']?.toString() ?? '',
-        userId: sessionData['userId'] is int ? sessionData['userId'] : int.parse(sessionData['userId']?.toString() ?? '0'),
-        partnerId: sessionData['partnerId'] is int ? sessionData['partnerId'] : int.parse(sessionData['partnerId']?.toString() ?? '0'),
-        companyId: sessionData['companyId'] is int ? sessionData['companyId'] : int.parse(sessionData['companyId']?.toString() ?? '0'),
-        allowedCompanies: const <Company>[], 
+        userId: sessionData['userId'] is int
+            ? sessionData['userId']
+            : int.parse(sessionData['userId']?.toString() ?? '0'),
+        partnerId: sessionData['partnerId'] is int
+            ? sessionData['partnerId']
+            : int.parse(sessionData['partnerId']?.toString() ?? '0'),
+        companyId: sessionData['companyId'] is int
+            ? sessionData['companyId']
+            : int.parse(sessionData['companyId']?.toString() ?? '0'),
+        allowedCompanies: const <Company>[],
         userLogin: sessionData['userLogin']?.toString() ?? '',
         userName: sessionData['userName']?.toString() ?? '',
         userLang: sessionData['userLang']?.toString() ?? "en_US",
         userTz: sessionData['userTz']?.toString() ?? "UTC",
-        isSystem: sessionData['isSystem'] is bool ? sessionData['isSystem'] : false,
+        isSystem: sessionData['isSystem'] is bool
+            ? sessionData['isSystem']
+            : false,
         dbName: sessionData['dbName']?.toString() ?? db,
         serverVersion: sessionData['serverVersion']?.toString() ?? "",
       );
 
-      final client = OdooClient(baseUrl, sessionId: session);
+      final odooService = OdooService(baseUrl, session: session);
 
-      debugPrint('Fetching profile from server for employeeId: $employeeId');
-      
-      final employeeResponse = await client.callKw({
-        'model': 'hr.employee',
-        'method': 'fetch_all_employees_info',
-        'args': [int.parse(employeeId), session.userId],
-        'kwargs': {},
-      });
+      try {
+        debugPrint('Fetching profile from server for employeeId: $employeeId');
 
-      debugPrint('Profile Data Received: $employeeResponse');
+        final employeeResponse = await odooService.fetchEmployeeDetails(
+          int.parse(employeeId),
+          session.userId,
+        );
 
-      if (employeeResponse == null) {
-        throw Exception("Failed to fetch employee details");
+        debugPrint('Profile Data Received: $employeeResponse');
+
+        final freshData = employeeResponse;
+        await prefs.saveObject('employee_data', freshData);
+
+        emit(
+          state.copyWith(
+            status: ProfileStatus.success,
+            employeeData: freshData,
+          ),
+        );
+      } finally {
+        odooService.close();
       }
-
-      final freshData = employeeResponse as Map<String, dynamic>;
-      await prefs.saveObject('employee_data', freshData);
-
-      emit(state.copyWith(
-        status: ProfileStatus.success,
-        employeeData: freshData,
-      ));
-
-      client.close();
     } catch (e) {
       debugPrint('Profile Fetch Error: $e');
-      emit(state.copyWith(
-        status: ProfileStatus.failure,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(
+          status: ProfileStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
     }
   }
 }

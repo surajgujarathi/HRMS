@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_app/features/profile/pages/personal_information.dart';
-import 'package:flutter_app/features/admin_pannel/presentaion/admin_page.dart';
 import 'package:flutter_app/features/auth/login_screen.dart';
 import 'package:flutter_app/features/main/presentation/main_page.dart';
 import 'package:flutter_app/features/onboard/onboard_page.dart';
@@ -47,7 +46,7 @@ class Routes {
     return {
       onboarding: (c) => const OnboardingScreen(),
       login: (c) => const LoginScreen(),
-      admin: (c) => AdminPanelScreen(),
+     
       main: (c) => MainPage(),
       leave: (c) => LeavePage(),
       myPay: (c) => PayrollScreen(),

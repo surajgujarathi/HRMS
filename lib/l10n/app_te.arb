@@ -1,0 +1,21 @@
+{
+  "welcome_title": "Opzento HR\nకి స్వాగతం",
+  "welcome_subtitle": "మీ అన్ని HR పనులను ఒకే చోట నిర్వహించుకోండి.",
+  "login": "లాగిన్",
+  "username": "వినియోగదారు పేరు",
+  "password": "పాస్వర్డ్",
+  "remember_me": "నన్ను గుర్తుంచుకో",
+  "forgot_password": "మర్చిపోయారా?",
+  "sign_in": "సైన్ ఇన్",
+  "skip": "దాటవేయి",
+  "next_step": "తదుపరి దశ",
+  "get_started": "ప్రారంభించండి",
+  "attendance_payroll": "హాజరు మరియు\nపేరోల్ సులభం",
+  "attendance_payroll_subtitle": "మీ హాజరును పర్యవేక్షించండి మరియు పేరోల్‌ను ఖచ్చితత్వంతో నిర్వహించండి.",
+  "sign_in_continue": "కొనసాగించడానికి సైన్ ఇన్ చేయండి",
+  "powered_by": "పవర్డ్ బై",
+  "language": "భాష",
+  "error_empty_fields": "దయచేసి వినియోగదారు పేరు మరియు పాస్‌వర్డ్ నమోదు చేయండి",
+  "error_enter_username": "దయచేసి వినియోగదారు పేరు నమోదు చేయండి",
+  "error_enter_password": "దయచేసి పాస్‌వర్డ్ నమోదు చేయండి"
+}

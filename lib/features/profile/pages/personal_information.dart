@@ -88,15 +88,28 @@ class ProfileFullDetailsPage extends StatelessWidget {
   }
 
   Widget _buildHeader(Map<String, dynamic> data) {
-    ImageProvider profileImage;
-    if (data['profile_pic'] != null && data['profile_pic'] != false && data['profile_pic'].toString().isNotEmpty) {
+    Widget avatarChild;
+    final picData = data['profile_pic'];
+
+    if (picData != null && picData != false && picData.toString().isNotEmpty) {
       try {
-        profileImage = MemoryImage(base64Decode(data['profile_pic']));
+        final bytes = base64Decode(picData.toString());
+        avatarChild = ClipOval(
+          child: Image.memory(
+            bytes,
+            width: 100,
+            height: 100,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return Icon(Icons.person, size: 60, color: Colors.blue.shade300);
+            },
+          ),
+        );
       } catch (e) {
-        profileImage = const AssetImage('assets/images/praveen.png');
+        avatarChild = Icon(Icons.person, size: 60, color: Colors.blue.shade300);
       }
     } else {
-      profileImage = const AssetImage('assets/images/praveen.png');
+      avatarChild = Icon(Icons.person, size: 60, color: Colors.blue.shade300);
     }
 
     return Container(
@@ -119,8 +132,8 @@ class ProfileFullDetailsPage extends StatelessWidget {
             ),
             child: CircleAvatar(
               radius: 50,
-              backgroundColor: Colors.grey.shade200,
-              backgroundImage: profileImage,
+              backgroundColor: Colors.grey.shade100,
+              child: avatarChild,
             ),
           ),
           const SizedBox(height: 16),
