@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_app/features/profile/cubit/profile_cubit.dart';
 import 'package:flutter_app/features/profile/cubit/profile_state.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class ProfileFullDetailsPage extends StatelessWidget {
   const ProfileFullDetailsPage({super.key});
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocProvider(
       create: (context) => ProfileCubit()..fetchProfile(),
       child: Scaffold(
@@ -20,18 +21,18 @@ class ProfileFullDetailsPage extends StatelessWidget {
             icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 20),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text(
-            "Personal Details",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
+          title: Text(
+            l10n.personal_details,
+            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
           ),
           centerTitle: true,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.edit_outlined, color: Colors.blue),
-              onPressed: () {},
-            ),
-            const SizedBox(width: 8),
-          ],
+          // actions: [
+          //   IconButton(
+          //     icon: const Icon(Icons.edit_outlined, color: Colors.blue),
+          //     onPressed: () {},
+          //   ),
+          //   const SizedBox(width: 8),
+          // ],
         ),
         body: BlocBuilder<ProfileCubit, ProfileState>(
           builder: (context, state) {
@@ -45,36 +46,46 @@ class ProfileFullDetailsPage extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 40),
                 child: Column(
                   children: [
-                    _buildHeader(data),
-                    _buildSectionTitle("Personal Information"),
+                    _buildHeader(data, l10n),
+                    _buildSectionTitle(l10n.personal_information),
                     _buildInfoCard([
-                      _buildInfoRow("Employee Code", data['employee_code']),
-                      _buildInfoRow("Full Name", data['name']),
-                      _buildInfoRow("Gender", data['gender']),
-                      _buildInfoRow("Date of Birth", data['birthday']),
-                      _buildInfoRow("Marital Status", data['marital']),
-                      _buildInfoRow("Aadhar No", data['aadhar_no'] == false ? "N/A" : data['aadhar_no']),
-                      _buildInfoRow("PAN No", data['pan_no'] == false ? "N/A" : data['pan_no']),
+                      _buildInfoRow(l10n.employee_code, data['employee_code']),
+                      _buildInfoRow(l10n.full_name, data['name']),
+                      _buildInfoRow(l10n.gender, data['gender']),
+                      _buildInfoRow(l10n.date_of_birth, data['birthday']),
+                      _buildInfoRow(l10n.marital_status, data['marital']),
+                      _buildInfoRow(l10n.blood_group, data['blood_group']),
+                      _buildInfoRow(l10n.identification_id, data['identification_id']),
+                      _buildInfoRow(l10n.passport_no, data['passport_id']),
+                      _buildInfoRow(l10n.aadhar_no, data['aadhar_no']),
+                      _buildInfoRow(l10n.pan_no, data['pan_no']),
                     ]),
-                    _buildSectionTitle("Work Information"),
+                    _buildSectionTitle(l10n.work_information),
                     _buildInfoCard([
-                      _buildInfoRow("Job Title", data['job_title']),
-                      _buildInfoRow("Department", data['department_name']),
-                      _buildInfoRow("Work Location", data['work_location_name']),
-                      _buildInfoRow("Manager", data['manager']),
-                      _buildInfoRow("Date of Joining", data['doj']),
-                      _buildInfoRow("Work Email", data['work_email']),
-                      _buildInfoRow("Work Phone", data['work_phone']),
+                      _buildInfoRow(l10n.job_title, data['job_title']),
+                      _buildInfoRow(l10n.department, data['department_name']),
+                      _buildInfoRow(l10n.work_location, data['work_location_name']),
+                      _buildInfoRow(l10n.manager, data['manager']),
+                      _buildInfoRow(l10n.date_of_joining, data['doj']),
+                      _buildInfoRow(l10n.work_email, data['work_email']),
+                      _buildInfoRow(l10n.work_phone, data['work_phone']),
+                      _buildInfoRow(l10n.employment_type, data['employment_type']),
                     ]),
-                    _buildSectionTitle("Bank Details"),
+                    _buildSectionTitle(l10n.emergency_contact),
                     _buildInfoCard([
-                      _buildInfoRow("Bank Name", data['bank_name']),
-                      _buildInfoRow("IFSC Code", data['bank_ifsc']),
-                      _buildInfoRow("Account ID", data['bank_account_id']),
+                      _buildInfoRow(l10n.contact_name, data['emergency_contact']),
+                      _buildInfoRow(l10n.contact_phone, data['emergency_phone']),
                     ]),
-                    _buildSectionTitle("Address"),
+                    _buildSectionTitle(l10n.bank_details),
                     _buildInfoCard([
-                      _buildInfoRow("Residential Address", data['address']),
+                      _buildInfoRow(l10n.bank_name, data['bank_name']),
+                      _buildInfoRow(l10n.ifsc_code, data['bank_ifsc']),
+                      _buildInfoRow(l10n.account_id, data['bank_account_id']),
+                    ]),
+                    _buildSectionTitle(l10n.address),
+                    _buildInfoCard([
+                      _buildInfoRow(l10n.residential_address, data['address']),
+                      _buildInfoRow(l10n.permanent_address, data['permanent_address']),
                     ]),
                   ],
                 ),
@@ -87,7 +98,7 @@ class ProfileFullDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(Map<String, dynamic> data) {
+  Widget _buildHeader(Map<String, dynamic> data, AppLocalizations l10n) {
     Widget avatarChild;
     final picData = data['profile_pic'];
 
@@ -144,7 +155,7 @@ class ProfileFullDetailsPage extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            data['job_title'] ?? "Employee",
+            data['job_title'] ?? l10n.employee,
             style: TextStyle(fontSize: 14, color: Colors.blue.shade700, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 12),

@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/features/auth/login/cubit/login_cubit.dart';
 import 'package:flutter_app/routes.dart';
 import 'package:flutter_app/core/utils/shared_pref.dart';
 import 'package:flutter_app/core/constants/app_colors.dart';
@@ -10,8 +11,9 @@ import 'package:flutter_app/features/home/widgets/action_card.dart';
 import 'package:flutter_app/features/home/widgets/anniversary.dart';
 import 'package:flutter_app/features/home/widgets/birth_days.dart';
 
-import 'package:flutter_app/features/home/widgets/check_in_out.dart';
+import 'package:flutter_app/features/attendance/widgets/check_in_out.dart';
 import 'package:flutter_app/features/home/widgets/circular.dart';
+import 'package:flutter_bloc/flutter_bloc.dart' show ReadContext;
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -87,6 +89,13 @@ class HomePage extends StatelessWidget {
                   // Logout logic here
                   // Navigator.pushReplacement(context,
                   //   MaterialPageRoute(builder: (_) => LoginPage()));
+                  context.read<LoginCubit>().logout();
+                    if (context.mounted) {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          Routes.login,
+                          (route) => false,
+                        );
+                      }
                 }
               },
               itemBuilder: (context) => const [
@@ -128,9 +137,12 @@ class HomePage extends StatelessWidget {
                   final picData = snapshot.data;
                   debugPrint('Home Profile Pic Data Status: ${picData != null ? "Present (length: ${picData.length})" : "Null"}');
 
-                  if (snapshot.hasData && picData != null && picData.isNotEmpty && picData != 'false') {
+                  if (snapshot.hasData && picData != null && picData.length > 50 && picData != 'false') {
                     try {
-                      final bytes = base64Decode(picData);
+                      // Clean the string (remove any newlines or spaces)
+                      final cleanedPicData = picData.trim().replaceAll('\n', '').replaceAll('\r', '');
+                      final bytes = base64Decode(cleanedPicData);
+                      
                       return CircleAvatar(
                         radius: 18,
                         backgroundColor: AppColors.lightPurple,
@@ -140,8 +152,9 @@ class HomePage extends StatelessWidget {
                             width: 36,
                             height: 36,
                             fit: BoxFit.cover,
+                            gaplessPlayback: true, // Prevents flickering
                             errorBuilder: (context, error, stackTrace) {
-                              debugPrint('Error decoding profile image: $error');
+                              // If Image.memory fails to decode valid bytes
                               return const Icon(Icons.person, size: 22, color: AppColors.primaryPurple);
                             },
                           ),

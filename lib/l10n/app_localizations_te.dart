@@ -66,4 +66,169 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get error_enter_password => 'దయచేసి పాస్‌వర్డ్ నమోదు చేయండి';
+
+  @override
+  String get personal_details => 'వ్యక్తిగత వివరాలు';
+
+  @override
+  String get personal_information => 'వ్యక్తిగత సమాచారం';
+
+  @override
+  String get employee_code => 'ఉద్యోగి కోడ్';
+
+  @override
+  String get full_name => 'పూర్తి పేరు';
+
+  @override
+  String get gender => 'లింగం';
+
+  @override
+  String get date_of_birth => 'పుట్టిన తేదీ';
+
+  @override
+  String get marital_status => 'వైవాహిక స్థితి';
+
+  @override
+  String get blood_group => 'బ్లడ్ గ్రూప్';
+
+  @override
+  String get identification_id => 'గుర్తింపు ఐడి';
+
+  @override
+  String get passport_no => 'పాస్‌పోర్ట్ నంబర్';
+
+  @override
+  String get aadhar_no => 'ఆధార్ నంబర్';
+
+  @override
+  String get pan_no => 'పాన్ నంబర్';
+
+  @override
+  String get work_information => 'పని సమాచారం';
+
+  @override
+  String get job_title => 'ఉద్యోగ హోదా';
+
+  @override
+  String get department => 'విభాగం';
+
+  @override
+  String get work_location => 'పని ప్రదేశం';
+
+  @override
+  String get manager => 'మేनेజర్';
+
+  @override
+  String get date_of_joining => 'చేరిన తేదీ';
+
+  @override
+  String get work_email => 'పని ఇమెయిల్';
+
+  @override
+  String get work_phone => 'పని ఫోన్';
+
+  @override
+  String get employment_type => 'ఉద్యోగ రకం';
+
+  @override
+  String get emergency_contact => 'అత్యవసర సంప్రదింపు';
+
+  @override
+  String get contact_name => 'సంప్రదింపు పేరు';
+
+  @override
+  String get contact_phone => 'సంప్రదింపు ఫోన్';
+
+  @override
+  String get bank_details => 'బ్యాంక్ వివరాలు';
+
+  @override
+  String get bank_name => 'బ్యాంక్ పేరు';
+
+  @override
+  String get ifsc_code => 'IFSC కోడ్';
+
+  @override
+  String get account_id => 'ఖాతా ఐడి';
+
+  @override
+  String get address => 'చిరునామా';
+
+  @override
+  String get residential_address => 'నివాస చిరునామా';
+
+  @override
+  String get permanent_address => 'శాశ్వత చిరునామా';
+
+  @override
+  String get employee => 'ఉద్యోగి';
+
+  @override
+  String get time => 'సమయం';
+
+  @override
+  String get date => 'తేదీ';
+
+  @override
+  String get working_hours => 'పని గంటలు';
+
+  @override
+  String get check_in => 'చెక్ ఇన్';
+
+  @override
+  String get check_out => 'చెక్ అవుట్';
+
+  @override
+  String get checking_in => 'చెక్ ఇన్ అవుతోంది...';
+
+  @override
+  String get checking_out => 'చెక్ అవుట్ అవుతోంది...';
+
+  @override
+  String get checked_in_success => 'చెక్ ఇన్ విజయవంతమైంది';
+
+  @override
+  String get checked_out_success => 'చెక్ అవుట్ విజయవంతమైంది';
+
+  @override
+  String get session_expired => 'సెషన్ ముగిసింది';
+
+  @override
+  String get session_info_missing => 'సెషన్ సమాచారం లేదు';
+
+  @override
+  String get attendance_report => 'హాజరు నివేదిక';
+
+  @override
+  String get from => 'నుండి';
+
+  @override
+  String get to => 'వరకు';
+
+  @override
+  String get completed => 'పూర్తయింది';
+
+  @override
+  String get still_working => 'ఇంకా పని చేస్తున్నారు';
+
+  @override
+  String get in_label => 'ఇన్';
+
+  @override
+  String get out => 'అవుట్';
+
+  @override
+  String get break_time => 'విరామం';
+
+  @override
+  String get overtime => 'ఓవర్ టైమ్';
+
+  @override
+  String get validated_overtime => 'ధృవీకరించబడిన ఓటీ';
+
+  @override
+  String get location => 'స్థానం';
+
+  @override
+  String get no_records_found => 'ఈ కాలానికి రికార్డులు కనుగొనబడలేదు';
 }

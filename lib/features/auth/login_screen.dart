@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/core/widget/custome_textfield.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_app/l10n/app_localizations.dart';
 import 'package:flutter_app/core/constants/app_images.dart';
@@ -7,7 +8,7 @@ import 'package:flutter_app/features/auth/login/cubit/login_cubit.dart';
 import 'package:flutter_app/features/auth/login/cubit/login_state.dart';
 import 'package:flutter_app/features/main/presentation/main_page.dart';
 import 'package:flutter_app/core/localization/locale_cubit.dart';
-import 'package:flutter_app/core/widget/custome_textfield.dart';
+import 'package:flutter_app/features/main/presentation/main_page.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});

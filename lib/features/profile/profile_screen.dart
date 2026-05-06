@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/features/auth/login/cubit/login_cubit.dart';
+import 'package:flutter_app/features/profile/cubit/profile_cubit.dart';
+import 'package:flutter_app/features/profile/cubit/profile_state.dart';
 import 'package:flutter_app/routes.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -8,111 +11,94 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          SizedBox(height: 50),
-          // ---------- HEADER ----------
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //   children: const [
-          //     Text(
-          //       "Profile",
-          //       style: TextStyle(
-          //         color: Colors.white,
-          //         fontSize: 20,
-          //         fontWeight: FontWeight.w600,
-          //       ),
-          //     ),
-          //     CircleAvatar(
-          //       radius: 22,
-          //       backgroundColor: Colors.white,
-          //       child: Icon(Icons.person, color: Colors.black),
-          //     ),
-          //   ],
-          // ),
+    return BlocProvider(
+      create: (context) => ProfileCubit()..fetchProfile(),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: BlocBuilder<ProfileCubit, ProfileState>(
+          builder: (context, state) {
+            if (state.status == ProfileStatus.loading) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          // ---------- CONTENT ----------
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  // ---------- USER CARD ----------
-                  _WhiteCard(
+            final data = state.employeeData ?? {};
+
+            return Column(
+              children: [
+                const SizedBox(height: 50),
+                // ---------- CONTENT ----------
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
-                        Row(
-                          children: const [
-                            CircleAvatar(
-                              radius: 28,
-                              backgroundImage: NetworkImage(
-                                "https://i.pravatar.cc/150",
-                              ),
-                            ),
-                            SizedBox(width: 12),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Praveen Kumar Thalapaneni",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
+                        // ---------- USER CARD ----------
+                        _WhiteCard(
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  _buildAvatar(data['profile_pic'], radius: 28),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          data['name'] ?? "User",
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          data['job_title'] ?? "Employee",
+                                          style: const TextStyle(color: Colors.grey),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  "IT Executive",
-                                  style: TextStyle(color: Colors.grey),
+                                ],
+                              ),
+                              const Divider(height: 24),
+                              _InfoLine(data['employee_code'] ?? "N/A"),
+                              _InfoLine(data['department_name'] ?? "N/A"),
+                              _InfoLine("Joining: ${data['doj'] ?? 'N/A'}"),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // ---------- MANAGER ----------
+                        if (data['manager'] != null && data['manager'] != false)
+                          _WhiteCard(
+                            title: "Reporting Manager",
+                            child: Row(
+                              children: [
+                                _buildAvatar(null, radius: 20), // Manager pic usually not in same record
+                                const SizedBox(width: 12),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      data['manager'] ?? "N/A",
+                                      style: const TextStyle(fontWeight: FontWeight.w600),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    const Text(
+                                      "Manager",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                        const Divider(height: 24),
-                        const _InfoLine("FTP/HRD/2024/1137"),
-                        const _InfoLine("IT Department"),
-                        _InfoLine("Joining: 23/10/2024"),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // ---------- MANAGER ----------
-                  _WhiteCard(
-                    title: "Reporting Manager",
-                    child: Row(
-                      children: const [
-                        CircleAvatar(
-                          radius: 20,
-                          backgroundImage: NetworkImage(
-                            "https://i.pravatar.cc/100",
                           ),
-                        ),
-                        SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              " Sham Prasad Podaralla",
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                            SizedBox(height: 2),
-                            Text(
-                              "CSIO",
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
 
                   const SizedBox(height: 12),
 
@@ -226,13 +212,40 @@ class ProfileScreen extends StatelessWidget {
                         );
                       }
                     },
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
-            ),
-          ),
-        ],
+                ),
+              ],
+          );
+          },
+        ),
       ),
+    );
+  }
+
+  Widget _buildAvatar(dynamic picData, {double radius = 28}) {
+    if (picData != null && picData != false && picData.toString().isNotEmpty) {
+      try {
+        final bytes = base64Decode(picData.toString());
+        return CircleAvatar(
+          radius: radius,
+          backgroundColor: Colors.grey.shade100,
+          backgroundImage: MemoryImage(bytes),
+        );
+      } catch (e) {
+        return CircleAvatar(
+          radius: radius,
+          backgroundColor: Colors.grey.shade100,
+          child: Icon(Icons.person, size: radius * 1.2, color: Colors.blue.shade300),
+        );
+      }
+    }
+    return CircleAvatar(
+      radius: radius,
+      backgroundColor: Colors.grey.shade100,
+      child: Icon(Icons.person, size: radius * 1.2, color: Colors.blue.shade300),
     );
   }
 }

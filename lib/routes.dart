@@ -16,7 +16,7 @@ import 'package:flutter_app/features/profile/pages/training_learning.dart';
 import 'package:flutter_app/features/screens/ai_chat_bot_page.dart';
 import 'package:flutter_app/features/screens/company_cal.dart';
 import 'package:flutter_app/features/screens/doc_box_page.dart';
-import 'package:flutter_app/features/screens/in_out_page.dart';
+import 'package:flutter_app/features/attendance/presentation/attendance_report.dart';
 import 'package:flutter_app/features/screens/leave_page.dart';
 
 class Routes {

@@ -47,6 +47,7 @@ dependencies:
   animations: ^2.0.11
   flutter_secure_storage: ^10.0.0
   odoo_rpc: ^0.7.1
+  geolocator: ^13.0.2
  
 
 dev_dependencies:

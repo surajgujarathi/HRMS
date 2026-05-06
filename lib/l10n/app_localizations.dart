@@ -213,6 +213,336 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter password'**
   String get error_enter_password;
+
+  /// No description provided for @personal_details.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Details'**
+  String get personal_details;
+
+  /// No description provided for @personal_information.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Information'**
+  String get personal_information;
+
+  /// No description provided for @employee_code.
+  ///
+  /// In en, this message translates to:
+  /// **'Employee Code'**
+  String get employee_code;
+
+  /// No description provided for @full_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get full_name;
+
+  /// No description provided for @gender.
+  ///
+  /// In en, this message translates to:
+  /// **'Gender'**
+  String get gender;
+
+  /// No description provided for @date_of_birth.
+  ///
+  /// In en, this message translates to:
+  /// **'Date of Birth'**
+  String get date_of_birth;
+
+  /// No description provided for @marital_status.
+  ///
+  /// In en, this message translates to:
+  /// **'Marital Status'**
+  String get marital_status;
+
+  /// No description provided for @blood_group.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood Group'**
+  String get blood_group;
+
+  /// No description provided for @identification_id.
+  ///
+  /// In en, this message translates to:
+  /// **'Identification ID'**
+  String get identification_id;
+
+  /// No description provided for @passport_no.
+  ///
+  /// In en, this message translates to:
+  /// **'Passport No'**
+  String get passport_no;
+
+  /// No description provided for @aadhar_no.
+  ///
+  /// In en, this message translates to:
+  /// **'Aadhar No'**
+  String get aadhar_no;
+
+  /// No description provided for @pan_no.
+  ///
+  /// In en, this message translates to:
+  /// **'PAN No'**
+  String get pan_no;
+
+  /// No description provided for @work_information.
+  ///
+  /// In en, this message translates to:
+  /// **'Work Information'**
+  String get work_information;
+
+  /// No description provided for @job_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Job Title'**
+  String get job_title;
+
+  /// No description provided for @department.
+  ///
+  /// In en, this message translates to:
+  /// **'Department'**
+  String get department;
+
+  /// No description provided for @work_location.
+  ///
+  /// In en, this message translates to:
+  /// **'Work Location'**
+  String get work_location;
+
+  /// No description provided for @manager.
+  ///
+  /// In en, this message translates to:
+  /// **'Manager'**
+  String get manager;
+
+  /// No description provided for @date_of_joining.
+  ///
+  /// In en, this message translates to:
+  /// **'Date of Joining'**
+  String get date_of_joining;
+
+  /// No description provided for @work_email.
+  ///
+  /// In en, this message translates to:
+  /// **'Work Email'**
+  String get work_email;
+
+  /// No description provided for @work_phone.
+  ///
+  /// In en, this message translates to:
+  /// **'Work Phone'**
+  String get work_phone;
+
+  /// No description provided for @employment_type.
+  ///
+  /// In en, this message translates to:
+  /// **'Employment Type'**
+  String get employment_type;
+
+  /// No description provided for @emergency_contact.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency Contact'**
+  String get emergency_contact;
+
+  /// No description provided for @contact_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Name'**
+  String get contact_name;
+
+  /// No description provided for @contact_phone.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Phone'**
+  String get contact_phone;
+
+  /// No description provided for @bank_details.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank Details'**
+  String get bank_details;
+
+  /// No description provided for @bank_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank Name'**
+  String get bank_name;
+
+  /// No description provided for @ifsc_code.
+  ///
+  /// In en, this message translates to:
+  /// **'IFSC Code'**
+  String get ifsc_code;
+
+  /// No description provided for @account_id.
+  ///
+  /// In en, this message translates to:
+  /// **'Account ID'**
+  String get account_id;
+
+  /// No description provided for @address.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get address;
+
+  /// No description provided for @residential_address.
+  ///
+  /// In en, this message translates to:
+  /// **'Residential Address'**
+  String get residential_address;
+
+  /// No description provided for @permanent_address.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanent Address'**
+  String get permanent_address;
+
+  /// No description provided for @employee.
+  ///
+  /// In en, this message translates to:
+  /// **'Employee'**
+  String get employee;
+
+  /// No description provided for @time.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get time;
+
+  /// No description provided for @date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get date;
+
+  /// No description provided for @working_hours.
+  ///
+  /// In en, this message translates to:
+  /// **'Working Hours'**
+  String get working_hours;
+
+  /// No description provided for @check_in.
+  ///
+  /// In en, this message translates to:
+  /// **'Check In'**
+  String get check_in;
+
+  /// No description provided for @check_out.
+  ///
+  /// In en, this message translates to:
+  /// **'Check Out'**
+  String get check_out;
+
+  /// No description provided for @checking_in.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking In...'**
+  String get checking_in;
+
+  /// No description provided for @checking_out.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking Out...'**
+  String get checking_out;
+
+  /// No description provided for @checked_in_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Checked in successfully'**
+  String get checked_in_success;
+
+  /// No description provided for @checked_out_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Checked out successfully'**
+  String get checked_out_success;
+
+  /// No description provided for @session_expired.
+  ///
+  /// In en, this message translates to:
+  /// **'Session expired'**
+  String get session_expired;
+
+  /// No description provided for @session_info_missing.
+  ///
+  /// In en, this message translates to:
+  /// **'Session info missing'**
+  String get session_info_missing;
+
+  /// No description provided for @attendance_report.
+  ///
+  /// In en, this message translates to:
+  /// **'Attendance Report'**
+  String get attendance_report;
+
+  /// No description provided for @from.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get from;
+
+  /// No description provided for @to.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get to;
+
+  /// No description provided for @completed.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completed;
+
+  /// No description provided for @still_working.
+  ///
+  /// In en, this message translates to:
+  /// **'Still Working'**
+  String get still_working;
+
+  /// No description provided for @in_label.
+  ///
+  /// In en, this message translates to:
+  /// **'In'**
+  String get in_label;
+
+  /// No description provided for @out.
+  ///
+  /// In en, this message translates to:
+  /// **'Out'**
+  String get out;
+
+  /// No description provided for @break_time.
+  ///
+  /// In en, this message translates to:
+  /// **'Break'**
+  String get break_time;
+
+  /// No description provided for @overtime.
+  ///
+  /// In en, this message translates to:
+  /// **'Overtime'**
+  String get overtime;
+
+  /// No description provided for @validated_overtime.
+  ///
+  /// In en, this message translates to:
+  /// **'Validated OT'**
+  String get validated_overtime;
+
+  /// No description provided for @location.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get location;
+
+  /// No description provided for @no_records_found.
+  ///
+  /// In en, this message translates to:
+  /// **'No records found for this period'**
+  String get no_records_found;
 }
 
 class _AppLocalizationsDelegate
