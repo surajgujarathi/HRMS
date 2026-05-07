@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/features/profile/models/employee_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_app/features/profile/cubit/profile_cubit.dart';
 import 'package:flutter_app/features/profile/cubit/profile_state.dart';
@@ -40,52 +41,54 @@ class ProfileFullDetailsPage extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             } else if (state.status == ProfileStatus.failure) {
               return Center(child: Text("Error: ${state.errorMessage}"));
-            } else if (state.status == ProfileStatus.success && state.employeeData != null) {
-              final data = state.employeeData!;
+            } else if (state.status == ProfileStatus.success && state.employee != null) {
+              final employee = state.employee!;
               return SingleChildScrollView(
                 padding: const EdgeInsets.only(bottom: 40),
                 child: Column(
                   children: [
-                    _buildHeader(data, l10n),
+                    _buildHeader(employee, l10n),
                     _buildSectionTitle(l10n.personal_information),
                     _buildInfoCard([
-                      _buildInfoRow(l10n.employee_code, data['employee_code']),
-                      _buildInfoRow(l10n.full_name, data['name']),
-                      _buildInfoRow(l10n.gender, data['gender']),
-                      _buildInfoRow(l10n.date_of_birth, data['birthday']),
-                      _buildInfoRow(l10n.marital_status, data['marital']),
-                      _buildInfoRow(l10n.blood_group, data['blood_group']),
-                      _buildInfoRow(l10n.identification_id, data['identification_id']),
-                      _buildInfoRow(l10n.passport_no, data['passport_id']),
-                      _buildInfoRow(l10n.aadhar_no, data['aadhar_no']),
-                      _buildInfoRow(l10n.pan_no, data['pan_no']),
+                      _buildInfoRow(l10n.employee_code, employee.employeeCode),
+                      _buildInfoRow(l10n.full_name, employee.name),
+                      _buildInfoRow(l10n.gender, employee.gender),
+                      _buildInfoRow(l10n.date_of_birth, employee.birthday?.toString().split(' ')[0]),
+                      _buildInfoRow(l10n.marital_status, employee.marital),
+                      _buildInfoRow(l10n.blood_group, employee.bloodGroup),
+                      _buildInfoRow(l10n.identification_id, employee.identificationId),
+                      _buildInfoRow(l10n.passport_no, employee.passportId),
+                      _buildInfoRow(l10n.aadhar_no, employee.aadharNo),
+                      _buildInfoRow(l10n.pan_no, employee.panNo),
                     ]),
                     _buildSectionTitle(l10n.work_information),
                     _buildInfoCard([
-                      _buildInfoRow(l10n.job_title, data['job_title']),
-                      _buildInfoRow(l10n.department, data['department_name']),
-                      _buildInfoRow(l10n.work_location, data['work_location_name']),
-                      _buildInfoRow(l10n.manager, data['manager']),
-                      _buildInfoRow(l10n.date_of_joining, data['doj']),
-                      _buildInfoRow(l10n.work_email, data['work_email']),
-                      _buildInfoRow(l10n.work_phone, data['work_phone']),
-                      _buildInfoRow(l10n.employment_type, data['employment_type']),
+                      _buildInfoRow(l10n.job_title, employee.jobTitle),
+                      _buildInfoRow(l10n.department, employee.departmentId?.name),
+                      _buildInfoRow(l10n.company, employee.companyId?.name),
+                      _buildInfoRow(l10n.work_location, employee.workLocationId?.name),
+                      _buildInfoRow(l10n.manager, employee.parentId?.name),
+                      _buildInfoRow(l10n.coach, employee.coachId?.name),
+                      _buildInfoRow(l10n.date_of_joining, employee.doj?.toString().split(' ')[0]),
+                      _buildInfoRow(l10n.work_email, employee.workEmail),
+                      _buildInfoRow(l10n.work_phone, employee.workPhone),
+                      _buildInfoRow(l10n.employment_type, employee.empType?.name),
                     ]),
                     _buildSectionTitle(l10n.emergency_contact),
                     _buildInfoCard([
-                      _buildInfoRow(l10n.contact_name, data['emergency_contact']),
-                      _buildInfoRow(l10n.contact_phone, data['emergency_phone']),
+                      _buildInfoRow(l10n.contact_name, employee.emergencyContact),
+                      _buildInfoRow(l10n.contact_phone, employee.emergencyPhone),
                     ]),
                     _buildSectionTitle(l10n.bank_details),
                     _buildInfoCard([
-                      _buildInfoRow(l10n.bank_name, data['bank_name']),
-                      _buildInfoRow(l10n.ifsc_code, data['bank_ifsc']),
-                      _buildInfoRow(l10n.account_id, data['bank_account_id']),
+                      _buildInfoRow(l10n.bank_name, employee.bankName),
+                      _buildInfoRow(l10n.ifsc_code, employee.bankIfsc),
+                      _buildInfoRow(l10n.account_id, employee.bankAccountId),
                     ]),
                     _buildSectionTitle(l10n.address),
                     _buildInfoCard([
-                      _buildInfoRow(l10n.residential_address, data['address']),
-                      _buildInfoRow(l10n.permanent_address, data['permanent_address']),
+                      _buildInfoRow(l10n.residential_address, employee.address),
+                      _buildInfoRow(l10n.permanent_address, employee.permanentAddress),
                     ]),
                   ],
                 ),
@@ -98,29 +101,32 @@ class ProfileFullDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(Map<String, dynamic> data, AppLocalizations l10n) {
-    Widget avatarChild;
-    final picData = data['profile_pic'];
+  Widget _buildHeader(Employee employee, AppLocalizations l10n) {
+    Widget? avatarChild;
+    final picData = employee.image1920;
 
-    if (picData != null && picData != false && picData.toString().isNotEmpty) {
+    if (picData != null && picData.isNotEmpty) {
       try {
-        final bytes = base64Decode(picData.toString());
-        avatarChild = ClipOval(
-          child: Image.memory(
-            bytes,
-            width: 100,
-            height: 100,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Icon(Icons.person, size: 60, color: Colors.blue.shade300);
-            },
-          ),
-        );
+        final bytes = base64Decode(picData);
+        // Check if it's an SVG (Odoo default avatars are often SVGs)
+        final header = String.fromCharCodes(bytes.take(10));
+
+        if (!header.contains('<?xml') && !header.contains('<svg')) {
+          avatarChild = ClipOval(
+            child: Image.memory(
+              bytes,
+              width: 100,
+              height: 100,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(Icons.person, size: 60, color: Colors.blue.shade300);
+              },
+            ),
+          );
+        }
       } catch (e) {
-        avatarChild = Icon(Icons.person, size: 60, color: Colors.blue.shade300);
+        debugPrint('Error decoding avatar: $e');
       }
-    } else {
-      avatarChild = Icon(Icons.person, size: 60, color: Colors.blue.shade300);
     }
 
     return Container(
@@ -144,27 +150,27 @@ class ProfileFullDetailsPage extends StatelessWidget {
             child: CircleAvatar(
               radius: 50,
               backgroundColor: Colors.grey.shade100,
-              child: avatarChild,
+              child: avatarChild ?? Icon(Icons.person, size: 60, color: Colors.blue.shade300),
             ),
           ),
           const SizedBox(height: 16),
           Text(
-            data['name'] ?? "N/A",
+            employee.name ?? "N/A",
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
           ),
           const SizedBox(height: 4),
           Text(
-            data['job_title'] ?? l10n.employee,
+            employee.jobTitle ?? l10n.employee,
             style: TextStyle(fontSize: 14, color: Colors.blue.shade700, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildHeaderStat(Icons.business_center_outlined, data['department_name'] ?? "N/A"),
+              _buildHeaderStat(Icons.business_center_outlined, employee.departmentId?.name ?? "N/A"),
               Container(width: 1, height: 15, color: Colors.grey.shade300, margin: const EdgeInsets.symmetric(horizontal: 16)),
-              _buildHeaderStat(Icons.location_on_outlined, data['work_location_name'] ?? "N/A"),
+              _buildHeaderStat(Icons.location_on_outlined, employee.workLocationId?.name ?? "N/A"),
             ],
           ),
         ],

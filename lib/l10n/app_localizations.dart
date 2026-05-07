@@ -543,6 +543,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No records found for this period'**
   String get no_records_found;
+
+  /// No description provided for @company.
+  ///
+  /// In en, this message translates to:
+  /// **'Company'**
+  String get company;
+
+  /// No description provided for @coach.
+  ///
+  /// In en, this message translates to:
+  /// **'Coach'**
+  String get coach;
 }
 
 class _AppLocalizationsDelegate

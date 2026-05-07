@@ -231,4 +231,10 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get no_records_found => 'इस अवधि के लिए कोई रिकॉर्ड नहीं मिला';
+
+  @override
+  String get company => 'Company';
+
+  @override
+  String get coach => 'Coach';
 }

@@ -4,6 +4,7 @@ import 'package:flutter_app/network/odoo_service.dart';
 import 'package:odoo_rpc/odoo_rpc.dart';
 import 'profile_state.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_app/features/profile/models/employee_model.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
   ProfileCubit() : super(const ProfileState());
@@ -18,18 +19,21 @@ class ProfileCubit extends Cubit<ProfileState> {
       final cachedData = await prefs.getObject('employee_data');
       if (cachedData != null && cachedData is Map && cachedData.isNotEmpty) {
         debugPrint('Using cached profile data');
-        emit(
-          state.copyWith(
-            status: ProfileStatus.success,
-            employeeData: cachedData as Map<String, dynamic>,
-          ),
-        );
-        // We can still fetch in background if we want to refresh,
-        // but for now, let's just return to satisfy the user's point.
-        return;
+        try {
+          final employee = Employee.fromJson(cachedData as Map<String, dynamic>);
+          emit(
+            state.copyWith(
+              status: ProfileStatus.success,
+              employee: employee,
+            ),
+          );
+          // Optional: still fetch from server to refresh
+        } catch (e) {
+          debugPrint('Error parsing cached employee data: $e');
+        }
       }
 
-      // 2. If no cache, fetch from server
+      // 2. Fetch from server
       final baseUrl = await prefs.getString('baseUrl');
       final db = await prefs.getString('db');
       final employeeId = await prefs.getString('employee_id');
@@ -42,8 +46,6 @@ class ProfileCubit extends Cubit<ProfileState> {
         throw Exception("Missing session data. Please log in again.");
       }
 
-      // Reconstruction of OdooSession from saved data
-      // OdooSession usually has a fromJson factory in recent versions
       final session = OdooSession(
         id: sessionData['id']?.toString() ?? '',
         userId: sessionData['userId'] is int
@@ -77,15 +79,49 @@ class ProfileCubit extends Cubit<ProfileState> {
           session.userId,
         );
 
-        debugPrint('Profile Data Received: $employeeResponse');
+        debugPrint('Profile Data Received (Main): $employeeResponse');
 
-        final freshData = employeeResponse;
-        await prefs.saveObject('employee_data', freshData);
+        // Fetch Resume and Skills in parallel
+        final results = await Future.wait([
+          odooService.getResumeLines(int.parse(employeeId)),
+          odooService.getEmployeeSkills(int.parse(employeeId)),
+        ]);
+
+        final resumeData = results[0];
+        final skillsData = results[1];
+
+        debugPrint('Resume Data Received: $resumeData');
+        debugPrint('Skills Data Received: $skillsData');
+
+        // Merge data into the response map
+        final fullData = Map<String, dynamic>.from(employeeResponse);
+        fullData['resume_line_ids'] = resumeData;
+        fullData['employee_skill_ids'] = skillsData;
+
+        final employee = Employee.fromJson(fullData);
+        
+        // Detailed debug print for the user
+        debugPrint('--- EMPLOYEE DATA DEBUG ---');
+        debugPrint('ID: ${employee.id}');
+        debugPrint('Name: ${employee.name}');
+        debugPrint('Code: ${employee.employeeCode}');
+        debugPrint('Manager: ${employee.parentId?.name}');
+        debugPrint('Coach: ${employee.coachId?.name}');
+        debugPrint('Department: ${employee.departmentId?.name}');
+        debugPrint('Company: ${employee.companyId?.name}');
+        debugPrint('Location: ${employee.workLocationId?.name}');
+        debugPrint('Resume Lines Count: ${employee.resumeLines.length}');
+        debugPrint('Skills Count: ${employee.skills.length}');
+        debugPrint('Gender: ${employee.gender}');
+        debugPrint('DOJ: ${employee.doj}');
+        debugPrint('---------------------------');
+
+        await prefs.saveObject('employee_data', fullData);
 
         emit(
           state.copyWith(
             status: ProfileStatus.success,
-            employeeData: freshData,
+            employee: employee,
           ),
         );
       } finally {

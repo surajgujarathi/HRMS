@@ -231,4 +231,10 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get no_records_found => 'ఈ కాలానికి రికార్డులు కనుగొనబడలేదు';
+
+  @override
+  String get company => 'Company';
+
+  @override
+  String get coach => 'Coach';
 }

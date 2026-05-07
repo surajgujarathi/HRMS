@@ -109,7 +109,9 @@ class OdooService {
       'args': args,
       'kwargs': kwargs ?? {},
     };
+    debugPrint('OdooService: executeModelMethod payload=$payload');
     return _client.callKw(payload);
+    
   }
 
   /// Alternative way to call a method using a pre-built payload.
@@ -200,6 +202,51 @@ class OdooService {
     }
 
     return response;
+  }
+
+  /// Fetches resume lines for a specific employee.
+  Future<List<dynamic>> getResumeLines(int employeeId) async {
+    debugPrint('OdooService: getResumeLines employeeId=$employeeId');
+    final response = await executeModelMethod(
+      'hr.resume.line',
+      'search_read',
+      [],
+      kwargs: {
+        'domain': [['employee_id', '=', employeeId]],
+        'fields': [
+          'id',
+          'name',
+          'line_type_id',
+          'date_start',
+          'date_end',
+          'display_type',
+          'description',
+        ],
+      },
+    );
+    return response is List ? response : [];
+  }
+
+  /// Fetches skills for a specific employee.
+  Future<List<dynamic>> getEmployeeSkills(int employeeId) async {
+    debugPrint('OdooService: getEmployeeSkills employeeId=$employeeId');
+    final response = await executeModelMethod(
+      'hr.employee.skill',
+      'search_read',
+      [],
+      kwargs: {
+        'domain': [['employee_id', '=', employeeId]],
+        'fields': [
+          'id',
+          'skill_type_id',
+          'skill_id',
+          'skill_level_id',
+          'level_progress',
+          'color',
+        ],
+      },
+    );
+    return response is List ? response : [];
   }
 
   /// Closes the Odoo client connection.

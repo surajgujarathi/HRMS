@@ -43,6 +43,11 @@ class AttendanceReportCubit extends Cubit<AttendanceReportState> {
         toDate: state.toDate,
       );
 
+      debugPrint('AttendanceReportCubit: Raw results count=${results.length}');
+      for (var record in results) {
+        debugPrint('Record ID: ${record['id']}, In: ${record['check_in']}, Out: ${record['check_out']}, Worked: ${record['worked_hours']}');
+      }
+
       // Emit success state with the retrieved records
       emit(state.copyWith(
         status: ReportStatus.success,

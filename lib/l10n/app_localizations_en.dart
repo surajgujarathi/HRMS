@@ -231,4 +231,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get no_records_found => 'No records found for this period';
+
+  @override
+  String get company => 'Company';
+
+  @override
+  String get coach => 'Coach';
 }

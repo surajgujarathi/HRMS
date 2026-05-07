@@ -72,5 +72,7 @@
   "overtime": "Overtime",
   "validated_overtime": "Validated OT",
   "location": "Location",
-  "no_records_found": "No records found for this period"
+  "no_records_found": "No records found for this period",
+  "company": "Company",
+  "coach": "Coach"
 }

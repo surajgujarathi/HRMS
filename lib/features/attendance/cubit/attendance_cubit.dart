@@ -82,20 +82,19 @@ class AttendanceCubit extends Cubit<AttendanceState> {
         todayHours: _formatHours(baseHours + _calculateCurrentSessionHours()),
       ));
 
-      if (isCheckedIn) {
-        _startTicker(); // Start the real-time timer if checked in
-      }
+      _startTicker(); // Always start ticker to keep UI clock updated
     } catch (e) {
       debugPrint('AttendanceCubit: Error loading status: $e');
       emit(state.copyWith(status: AttendanceStatus.failure, errorMessage: e.toString()));
     }
   }
 
-  /// Starts a periodic timer to update the displayed working hours every second.
+  /// Starts a periodic timer to update the displayed working hours and UI clock every second.
   void _startTicker() {
     _ticker?.cancel();
     _ticker = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!isClosed && state.isCheckedIn) {
+      if (!isClosed) {
+        // Even if not checked in, we emit state to trigger UI rebuild for the current time clock
         final totalHours = state.baseHours + _calculateCurrentSessionHours();
         emit(state.copyWith(
           todayHours: _formatHours(totalHours),

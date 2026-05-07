@@ -21,7 +21,10 @@ class ProfileScreen extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
 
-            final data = state.employeeData ?? {};
+            final employee = state.employee;
+            if (employee == null) {
+              return const Center(child: Text("No employee data found"));
+            }
 
             return Column(
               children: [
@@ -38,14 +41,14 @@ class ProfileScreen extends StatelessWidget {
                             children: [
                               Row(
                                 children: [
-                                  _buildAvatar(data['profile_pic'], radius: 28),
+                                  _buildAvatar(employee.image1920, radius: 28),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          data['name'] ?? "User",
+                                          employee.name ?? "User",
                                           style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w600,
@@ -53,7 +56,7 @@ class ProfileScreen extends StatelessWidget {
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          data['job_title'] ?? "Employee",
+                                          employee.jobTitle ?? "Employee",
                                           style: const TextStyle(color: Colors.grey),
                                         ),
                                       ],
@@ -62,9 +65,9 @@ class ProfileScreen extends StatelessWidget {
                                 ],
                               ),
                               const Divider(height: 24),
-                              _InfoLine(data['employee_code'] ?? "N/A"),
-                              _InfoLine(data['department_name'] ?? "N/A"),
-                              _InfoLine("Joining: ${data['doj'] ?? 'N/A'}"),
+                              _InfoLine(employee.employeeCode ?? "N/A"),
+                              _InfoLine(employee.departmentId?.name ?? "N/A"),
+                              _InfoLine("Joining: ${employee.doj != null ? employee.doj!.toString().split(' ')[0] : 'N/A'}"),
                             ],
                           ),
                         ),
@@ -72,18 +75,18 @@ class ProfileScreen extends StatelessWidget {
                         const SizedBox(height: 12),
 
                         // ---------- MANAGER ----------
-                        if (data['manager'] != null && data['manager'] != false)
+                        if (employee.parentId != null)
                           _WhiteCard(
                             title: "Reporting Manager",
                             child: Row(
                               children: [
-                                _buildAvatar(null, radius: 20), // Manager pic usually not in same record
+                                _buildAvatar(null, radius: 20),
                                 const SizedBox(width: 12),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      data['manager'] ?? "N/A",
+                                      employee.parentId!.name,
                                       style: const TextStyle(fontWeight: FontWeight.w600),
                                     ),
                                     const SizedBox(height: 2),
@@ -100,7 +103,98 @@ class ProfileScreen extends StatelessWidget {
                             ),
                           ),
 
-                  const SizedBox(height: 12),
+                        if (employee.coachId != null) ...[
+                          const SizedBox(height: 12),
+                          _WhiteCard(
+                            title: "Coach",
+                            child: Row(
+                              children: [
+                                _buildAvatar(null, radius: 20),
+                                const SizedBox(width: 12),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      employee.coachId!.name,
+                                      style: const TextStyle(fontWeight: FontWeight.w600),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    const Text(
+                                      "Coach",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+
+                        const SizedBox(height: 12),
+
+                        // ---------- RESUME SECTION ----------
+                        if (employee.resumeLines.isNotEmpty)
+                          _WhiteCard(
+                            title: "Resume",
+                            child: Column(
+                              children: employee.resumeLines.map((line) => Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(line.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                                    if (line.lineTypeId != null)
+                                      Text(line.lineTypeId!.name, style: const TextStyle(fontSize: 12, color: Colors.blue)),
+                                    Text(
+                                      "${line.dateStart?.toString().split(' ')[0] ?? ''} - ${line.dateEnd?.toString().split(' ')[0] ?? 'Present'}",
+                                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                    ),
+                                    if (line.description != null)
+                                      Text(line.description!, style: const TextStyle(fontSize: 12)),
+                                    const Divider(),
+                                  ],
+                                ),
+                              )).toList(),
+                            ),
+                          ),
+
+                        const SizedBox(height: 12),
+
+                        // ---------- SKILLS SECTION ----------
+                        if (employee.skills.isNotEmpty)
+                          _WhiteCard(
+                            title: "Skills",
+                            child: Column(
+                              children: employee.skills.map((skill) => Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(skill.skillId?.name ?? "Skill", style: const TextStyle(fontWeight: FontWeight.w500)),
+                                        Text("${skill.levelProgress}%", style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    LinearProgressIndicator(
+                                      value: skill.levelProgress / 100.0,
+                                      backgroundColor: Colors.grey.shade200,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        skill.color != 0 ? Color(skill.color) : Colors.blue,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )).toList(),
+                            ),
+                          ),
+
+                        const SizedBox(height: 12),
 
                   // ---------- SETTINGS ----------
                   // ---------- SETTINGS ----------
@@ -226,26 +320,41 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildAvatar(dynamic picData, {double radius = 28}) {
+    Widget? avatarImage;
     if (picData != null && picData != false && picData.toString().isNotEmpty) {
       try {
         final bytes = base64Decode(picData.toString());
-        return CircleAvatar(
-          radius: radius,
-          backgroundColor: Colors.grey.shade100,
-          backgroundImage: MemoryImage(bytes),
-        );
+        // Check if it's an SVG (Odoo default avatars are often SVGs)
+        final header = String.fromCharCodes(bytes.take(10));
+        if (!header.contains('<?xml') && !header.contains('<svg')) {
+          avatarImage = ClipOval(
+            child: Image.memory(
+              bytes,
+              width: radius * 2,
+              height: radius * 2,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Icon(
+                Icons.person,
+                size: radius * 1.2,
+                color: Colors.blue.shade300,
+              ),
+            ),
+          );
+        }
       } catch (e) {
-        return CircleAvatar(
-          radius: radius,
-          backgroundColor: Colors.grey.shade100,
-          child: Icon(Icons.person, size: radius * 1.2, color: Colors.blue.shade300),
-        );
+        debugPrint('Error decoding avatar: $e');
       }
     }
+
     return CircleAvatar(
       radius: radius,
       backgroundColor: Colors.grey.shade100,
-      child: Icon(Icons.person, size: radius * 1.2, color: Colors.blue.shade300),
+      child: avatarImage ??
+          Icon(
+            Icons.person,
+            size: radius * 1.2,
+            color: Colors.blue.shade300,
+          ),
     );
   }
 }

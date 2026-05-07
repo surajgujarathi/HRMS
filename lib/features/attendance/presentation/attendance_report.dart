@@ -326,11 +326,11 @@ class _AttendanceCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildTimeInfo(l10n.in_label, DateFormat.jm().format(checkIn), AppColors.blue, 
+                    _buildTimeInfo(l10n.in_label, DateFormat('hh:mm:ss a').format(checkIn), AppColors.blue, 
                       subtitle: hasInLoc ? '${inLat.toStringAsFixed(2)}, ${inLong.toStringAsFixed(2)}' : null),
                     _buildTimeInfo(
                       l10n.out, 
-                      isClosed ? DateFormat.jm().format(checkOut) : '--:--', 
+                      isClosed ? DateFormat('hh:mm:ss a').format(checkOut) : '--:--', 
                       isClosed ? AppColors.dangerRed : AppColors.textSecondary,
                       subtitle: hasOutLoc ? '${outLat.toStringAsFixed(2)}, ${outLong.toStringAsFixed(2)}' : null
                     ),
