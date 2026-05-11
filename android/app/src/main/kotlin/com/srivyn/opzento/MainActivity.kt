@@ -1,4 +1,4 @@
-package com.example.flutter_app
+package com.srivyn.opzento
 
 import io.flutter.embedding.android.FlutterActivity
 

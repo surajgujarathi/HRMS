@@ -5,6 +5,7 @@ import 'package:flutter_app/l10n/app_localizations.dart';
 import 'package:flutter_app/splashscreen/splashscreen.dart';
 import 'package:flutter_app/features/auth/login/cubit/login_cubit.dart';
 import 'package:flutter_app/core/localization/locale_cubit.dart';
+import 'package:flutter_app/features/leave/cubit/leave_cubit.dart';
 import 'package:flutter_app/routes.dart';
 
 void main() {
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => LoginCubit()),
         BlocProvider(create: (context) => LocaleCubit()),
+        BlocProvider(create: (context) => LeaveCubit()),
       ],
       child: BlocBuilder<LocaleCubit, String>(
         builder: (context, langCode) {

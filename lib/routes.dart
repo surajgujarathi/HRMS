@@ -18,6 +18,8 @@ import 'package:flutter_app/features/screens/company_cal.dart';
 import 'package:flutter_app/features/screens/doc_box_page.dart';
 import 'package:flutter_app/features/attendance/presentation/attendance_report.dart';
 import 'package:flutter_app/features/screens/leave_page.dart';
+import 'package:flutter_app/features/leave/presentation/leave_list_screen.dart';
+import 'package:flutter_app/features/leave/presentation/apply_leave_screen.dart';
 
 class Routes {
   Routes._();
@@ -25,6 +27,8 @@ class Routes {
   static String login = '/login';
   static String admin = '/admin';
   static String main = '/main';
+  static String leaveList = '/leave-list';
+  static String applyLeave = '/apply-leave';
   static String leave = '/leave';
   static String myPay = '/myPay';
   static String inOutReport = '/inout-report';
@@ -48,6 +52,8 @@ class Routes {
       login: (c) => const LoginScreen(),
      
       main: (c) => MainPage(),
+      leaveList: (c) => const LeaveListScreen(),
+      applyLeave: (c) => const ApplyLeaveScreen(),
       leave: (c) => LeavePage(),
       myPay: (c) => PayrollScreen(),
       inOutReport: (c) => InOutReportPage(),

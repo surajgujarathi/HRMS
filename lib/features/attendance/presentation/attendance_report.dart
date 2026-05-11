@@ -253,6 +253,13 @@ class _AttendanceCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(20),
+         border: Border(
+        
+          left: BorderSide(
+            color: Colors.primaries[record.hashCode % Colors.primaries.length],
+            width: 4,
+          ),
+        ),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow,

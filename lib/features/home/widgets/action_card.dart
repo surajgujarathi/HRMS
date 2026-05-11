@@ -12,7 +12,7 @@ class AttendanceActions extends StatelessWidget {
         'title': 'Leaves',
         'icon': Icons.edit_calendar,
         'color': const Color(0xFF8E7CF0),
-        'routeName': Routes.leavebalance,
+        'routeName': Routes.leaveList,
       },
       {
         'title': 'MyPay',
@@ -27,19 +27,13 @@ class AttendanceActions extends StatelessWidget {
         'routeName': Routes.inOutReport,
       },
       {
-        'title': 'Fix Attendance',
-        'icon': Icons.calendar_today,
-        'color': const Color(0xFF6C63FF),
-        'routeName': Routes.leave,
-      },
-      {
         'title': 'Doc Box',
         'icon': Icons.swap_horiz,
         'color': const Color(0xFFFF4081),
         'routeName': Routes.docbox,
       },
       {
-        'title': 'Company Calendor',
+        'title': 'Company Calendar',
         'icon': Icons.calendar_month,
         'color': const Color(0xFF00ACC1),
         'routeName': Routes.companyCalendar,

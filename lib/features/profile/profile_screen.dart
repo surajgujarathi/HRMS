@@ -223,14 +223,14 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   Divider(),
 
-                  _SettingTile(
-                    icon: Icons.bar_chart_outlined,
-                    title: "Performance Reviews",
-                    onTap: () {
-                      Navigator.pushNamed(context, Routes.performRev);
-                    },
-                  ),
-                  Divider(),
+                  // _SettingTile(
+                  //   icon: Icons.bar_chart_outlined,
+                  //   title: "Performance Reviews",
+                  //   onTap: () {
+                  //     Navigator.pushNamed(context, Routes.performRev);
+                  //   },
+                  // ),
+                  // Divider(),
 
                   _SettingTile(
                     icon: Icons.calendar_month_outlined,

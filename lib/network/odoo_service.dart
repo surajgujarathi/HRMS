@@ -10,7 +10,6 @@ class OdooService {
     : _client = OdooClient(baseUrl, sessionId: session);
 
   /// Authenticates the user with the Odoo backend.
-  /// [db] is the database name, [username] and [password] are the user credentials.
   Future<OdooSession> authenticate(
     String db,
     String username,
@@ -44,7 +43,6 @@ class OdooService {
   }
 
   /// Fetches detailed employee information from the backend.
-  /// Uses a custom Odoo method 'fetch_all_employees_info'.
   Future<Map<String, dynamic>> fetchEmployeeDetails(
     int employeeId,
     int userId,
@@ -109,16 +107,11 @@ class OdooService {
       'args': args,
       'kwargs': kwargs ?? {},
     };
-    debugPrint('OdooService: executeModelMethod payload=$payload');
     return _client.callKw(payload);
-    
   }
 
   /// Alternative way to call a method using a pre-built payload.
   Future<dynamic> callKw(Map<String, dynamic> payload) async {
-    debugPrint(
-      'OdooService: callKw payload=${payload['model']}/${payload['method']}',
-    );
     return executeModelMethod(
       payload['model'] as String,
       payload['method'] as String,
@@ -128,7 +121,6 @@ class OdooService {
   }
 
   /// Performs mobile check-in or check-out.
-  /// Sends location (lat/long) and IP address to the server.
   Future<Map<String, dynamic>> mobileCheckInOut({
     required int employeeId,
     required bool isCheckIn,
@@ -136,17 +128,12 @@ class OdooService {
     required double latitude,
     required String ipAddress,
   }) async {
-    debugPrint(
-      'OdooService: mobileCheckInOut employeeId=$employeeId isCheckIn=$isCheckIn long=$longitude lat=$latitude IP=$ipAddress',
-    );
     final response = await executeModelMethod(
       'hr.employee',
       'mobile_check_in_out',
       [employeeId, isCheckIn, longitude, latitude, ipAddress],
       kwargs: {},
     );
-
-    debugPrint('OdooService: mobileCheckInOut response=$response');
 
     if (response == null || response is! Map<String, dynamic>) {
       throw Exception('Failed to perform check in/out');
@@ -156,17 +143,11 @@ class OdooService {
   }
 
   /// Fetches attendance records for a specific employee within a date range.
-  /// Includes additional fields: overtime_hours, validated_overtime_hours, and GPS coordinates.
   Future<List<dynamic>> getAttendanceReport({
     required int employeeId,
     required DateTime fromDate,
     required DateTime toDate,
   }) async {
-    debugPrint(
-      'OdooService: getAttendanceReport empId=$employeeId from=$fromDate to=$toDate',
-    );
-    
-    // Odoo needs date in yyyy-MM-dd format for domain filtering
     final String fromStr = DateFormat('yyyy-MM-dd 00:00:00').format(fromDate);
     final String toStr = DateFormat('yyyy-MM-dd 23:59:59').format(toDate);
 
@@ -180,7 +161,6 @@ class OdooService {
           ['check_in', '>=', fromStr],
           ['check_in', '<=', toStr],
         ],
-        // Fetching required fields for the detailed attendance report
         'fields': [
           'id',
           'check_in',
@@ -193,20 +173,15 @@ class OdooService {
           'out_latitude',
           'out_longitude'
         ],
-        'order': 'check_in desc', // Show most recent records first
+        'order': 'check_in desc',
       },
     );
 
-    if (response == null || response is! List) {
-      return [];
-    }
-
-    return response;
+    return response is List ? response : [];
   }
 
   /// Fetches resume lines for a specific employee.
   Future<List<dynamic>> getResumeLines(int employeeId) async {
-    debugPrint('OdooService: getResumeLines employeeId=$employeeId');
     final response = await executeModelMethod(
       'hr.resume.line',
       'search_read',
@@ -229,7 +204,6 @@ class OdooService {
 
   /// Fetches skills for a specific employee.
   Future<List<dynamic>> getEmployeeSkills(int employeeId) async {
-    debugPrint('OdooService: getEmployeeSkills employeeId=$employeeId');
     final response = await executeModelMethod(
       'hr.employee.skill',
       'search_read',
@@ -247,6 +221,99 @@ class OdooService {
       },
     );
     return response is List ? response : [];
+  }
+
+  /// Fetches leave requests for a specific employee.
+  Future<List<dynamic>> fetchMyLeaves(int employeeId) async {
+    final response = await executeModelMethod(
+      'hr.leave',
+      'search_read',
+      [],
+      kwargs: {
+        'domain': [['employee_id', '=', employeeId]],
+        'fields': [
+          'id',
+          'display_name',
+          'holiday_status_id',
+          'payslip_state',
+          'request_date_from',
+          'request_date_to',
+          'duration_display',
+          'name',
+          'supported_attachment_ids',
+          'request_unit_half',
+          'request_date_from_period',
+          'request_unit_hours',
+          'request_hour_from',
+          'request_hour_to',
+          'state',
+        ],
+        'order': 'request_date_from desc',
+      },
+    );
+    return response is List ? response : [];
+  }
+
+  /// Fetches available leave types.
+  Future<List<dynamic>> fetchLeaveTypes({int? employeeId}) async {
+    final response = await executeModelMethod(
+      'hr.leave.type',
+      'search_read',
+      [],
+      kwargs: {
+        'fields': ['id', 'name', 'virtual_remaining_leaves', 'max_leaves'],
+        'context': employeeId != null ? {'employee_id': employeeId} : {},
+      },
+    );
+    debugPrint('OdooService: fetchLeaveTypes RAW RESPONSE: $response');
+    return response is List ? response : [];
+  }
+
+  /// Creates a new leave request.
+  Future<int> createLeaveRequest(Map<String, dynamic> data) async {
+    final response = await executeModelMethod(
+      'hr.leave',
+      'create',
+      [data],
+    );
+    return response is int ? response : 0;
+  }
+
+  /// Executes a leave action (submit, cancel, etc.)
+  Future<dynamic> executeLeaveAction(int leaveId, String action) async {
+    debugPrint('OdooService: executeLeaveAction leaveId=$leaveId action=$action');
+    
+    // Odoo 18 action_cancel returns a wizard (hr.holidays.cancel.leave)
+    // We need to create the wizard and call its action_cancel_leave method
+    if (action == 'action_cancel') {
+      try {
+        debugPrint('OdooService: Handling cancellation wizard for Odoo 18');
+        final wizardId = await executeModelMethod(
+          'hr.holidays.cancel.leave',
+          'create',
+          [{'leave_id': leaveId, 'reason': 'Cancelled via Mobile App'}],
+        );
+        
+        if (wizardId is int) {
+          return await executeModelMethod(
+            'hr.holidays.cancel.leave',
+            'action_cancel_leave',
+            [[wizardId]],
+          );
+        }
+      } catch (e) {
+        debugPrint('OdooService: Wizard cancellation failed, trying direct action: $e');
+        // Fallback to direct action if wizard fails (some setups might differ)
+      }
+    }
+
+    final response = await executeModelMethod(
+      'hr.leave',
+      action,
+      [[leaveId]],
+    );
+    debugPrint('OdooService: action response: $response');
+    return response;
   }
 
   /// Closes the Odoo client connection.
