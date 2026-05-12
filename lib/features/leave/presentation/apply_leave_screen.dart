@@ -98,16 +98,16 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8F9FE),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.close_rounded, color: Colors.black87),
+            icon: Icon(Icons.close_rounded, color: Theme.of(context).colorScheme.onSurface),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text("Request Time Off", 
-            style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)
+          title: Text("Request Time Off", 
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)
           ),
           centerTitle: true,
         ),
@@ -154,7 +154,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
       children: [
         Icon(icon, size: 20, color: AppColors.primaryPurple),
         const SizedBox(width: 8),
-        Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
+        Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
       ],
     );
   }
@@ -165,16 +165,19 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
     }
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)],
+        boxShadow: [BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.02), blurRadius: 10)],
       ),
       child: DropdownButtonFormField<LeaveType>(
         value: _selectedType,
+        dropdownColor: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
           hintText: "Select leave type",
+          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
         ),
         items: state.leaveTypes
             .where((type) => type.remainingLeaves > 0)
@@ -206,7 +209,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
           lastDate: DateTime.now().add(const Duration(days: 365)),
           builder: (context, child) => Theme(
             data: Theme.of(context).copyWith(
-              colorScheme: const ColorScheme.light(primary: AppColors.primaryPurple),
+              colorScheme: Theme.of(context).colorScheme.copyWith(primary: AppColors.primaryPurple),
             ),
             child: child!,
           ),
@@ -216,17 +219,17 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)],
+          boxShadow: [BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.02), blurRadius: 10)],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: TextStyle(fontSize: 12, color: Colors.grey.shade500)),
+            Text(label, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5))),
             const SizedBox(height: 6),
             Text(DateFormat('dd MMM yyyy').format(date), 
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87)
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)
             ),
           ],
         ),
@@ -240,12 +243,12 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)],
+            boxShadow: [BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.02), blurRadius: 10)],
           ),
           child: SwitchListTile(
-            title: const Text("Half Day", style: TextStyle(fontWeight: FontWeight.w600)),
+            title: Text("Half Day", style: TextStyle(fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface)),
             value: _isHalfDay,
             activeColor: AppColors.primaryPurple,
             onChanged: (val) => setState(() {
@@ -276,12 +279,12 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
           padding: const EdgeInsets.symmetric(vertical: 12),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primaryPurple : Colors.white,
+            color: isSelected ? AppColors.primaryPurple : Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: isSelected ? AppColors.primaryPurple : Colors.grey.shade200),
+            border: Border.all(color: isSelected ? AppColors.primaryPurple : Theme.of(context).dividerColor.withOpacity(0.2)),
           ),
           child: Text(label, 
-            style: TextStyle(color: isSelected ? Colors.white : Colors.grey.shade600, fontWeight: FontWeight.bold, fontSize: 13)
+            style: TextStyle(color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontWeight: FontWeight.bold, fontSize: 13)
           ),
         ),
       ),
@@ -291,16 +294,17 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
   Widget _buildDescriptionField() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)],
+        boxShadow: [BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.02), blurRadius: 10)],
       ),
       child: TextFormField(
         controller: _descriptionController,
         maxLines: 4,
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
           hintText: "Reason for time off...",
-          hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), fontSize: 14),
           contentPadding: const EdgeInsets.all(16),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
         ),

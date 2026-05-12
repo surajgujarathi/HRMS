@@ -73,11 +73,12 @@ class _LeavePageState extends State<LeavePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         "Apply Leave",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -85,6 +86,8 @@ class _LeavePageState extends State<LeavePage> {
                       /// Leave Type Dropdown
                       DropdownButtonFormField<String>(
                         value: selectedType,
+                        dropdownColor: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                         items: leaveBalance.keys
                             .map(
                               (e) => DropdownMenuItem(value: e, child: Text(e)),
@@ -97,7 +100,8 @@ class _LeavePageState extends State<LeavePage> {
                         },
                         decoration: InputDecoration(
                           labelText: "Leave Type",
-                          border: OutlineInputBorder(),
+                          labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                       const SizedBox(height: 15),
@@ -105,10 +109,12 @@ class _LeavePageState extends State<LeavePage> {
                       /// From Date
                       TextField(
                         readOnly: true,
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                         decoration: InputDecoration(
                           labelText: "From Date",
+                          labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                           border: OutlineInputBorder(),
-                          suffixIcon: Icon(Icons.calendar_today),
+                          suffixIcon: Icon(Icons.calendar_today, color: Theme.of(context).primaryColor),
                         ),
                         controller: TextEditingController(
                           text: fromDate == null
@@ -132,10 +138,12 @@ class _LeavePageState extends State<LeavePage> {
                       /// To Date
                       TextField(
                         readOnly: true,
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                         decoration: InputDecoration(
                           labelText: "To Date",
+                          labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                           border: OutlineInputBorder(),
-                          suffixIcon: Icon(Icons.calendar_today),
+                          suffixIcon: Icon(Icons.calendar_today, color: Theme.of(context).primaryColor),
                         ),
                         controller: TextEditingController(
                           text: toDate == null
@@ -156,15 +164,20 @@ class _LeavePageState extends State<LeavePage> {
                       ),
                       const SizedBox(height: 15),
 
-                      Text("Total Days: $days"),
+                      Text(
+                        "Total Days: $days",
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                      ),
                       const SizedBox(height: 15),
 
                       /// Reason
                       TextField(
                         controller: reasonController,
                         maxLines: 3,
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                         decoration: InputDecoration(
                           labelText: "Reason",
+                          labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                           border: OutlineInputBorder(),
                         ),
                       ),

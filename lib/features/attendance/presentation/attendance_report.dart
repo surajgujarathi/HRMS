@@ -17,7 +17,7 @@ class InOutReportPage extends StatelessWidget {
       // Initialize the cubit and fetch the initial report
       create: (context) => AttendanceReportCubit()..fetchReport(),
       child: Scaffold(
-        backgroundColor: AppColors.lavenderBg,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Column(
           children: [
             const _ReportHeader(), // Sticky header with date range selector
@@ -26,12 +26,12 @@ class InOutReportPage extends StatelessWidget {
                 builder: (context, state) {
                   // Show loading spinner while fetching data
                   if (state.status == ReportStatus.loading) {
-                    return const Center(child: CircularProgressIndicator(color: AppColors.primaryPurple));
+                    return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColor));
                   }
                   
                   // Show empty state if no records exist for the selected range
                   if (state.records.isEmpty) {
-                    return _buildEmptyState(l10n);
+                    return _buildEmptyState(context, l10n);
                   }
                   
                   // Display the list of attendance records
@@ -53,16 +53,16 @@ class InOutReportPage extends StatelessWidget {
   }
 
   /// Helper widget to show when no records are found.
-  Widget _buildEmptyState(AppLocalizations l10n) {
+  Widget _buildEmptyState(BuildContext context, AppLocalizations l10n) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.history_toggle_off, size: 80, color: AppColors.textSecondary.withOpacity(0.3)),
+          Icon(Icons.history_toggle_off, size: 80, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
           const SizedBox(height: 16),
           Text(
             l10n.no_records_found,
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 16, fontWeight: FontWeight.w500),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w500),
           ),
         ],
       ),
@@ -251,10 +251,9 @@ class _AttendanceCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-         border: Border(
-        
+        border: Border(
           left: BorderSide(
             color: Colors.primaries[record.hashCode % Colors.primaries.length],
             width: 4,
@@ -262,7 +261,7 @@ class _AttendanceCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow,
+            color: Theme.of(context).shadowColor.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -294,13 +293,13 @@ class _AttendanceCard extends StatelessWidget {
                     children: [
                       Text(
                         DateFormat('EEEE, dd MMM').format(checkIn),
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Theme.of(context).colorScheme.onSurface),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         isClosed ? l10n.completed : l10n.still_working,
                         style: TextStyle(
-                          color: isClosed ? AppColors.textSecondary : AppColors.orange,
+                          color: isClosed ? Theme.of(context).colorScheme.onSurface.withOpacity(0.6) : AppColors.orange,
                           fontSize: 12,
                         ),
                       ),
@@ -312,7 +311,7 @@ class _AttendanceCard extends StatelessWidget {
                   children: [
                     Text(
                       '${workedHours.toStringAsFixed(2)} hrs',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.primaryPurple),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Theme.of(context).primaryColor),
                     ),
                     if (overtimeHours > 0)
                       Text(
@@ -333,15 +332,15 @@ class _AttendanceCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildTimeInfo(l10n.in_label, DateFormat('hh:mm:ss a').format(checkIn), AppColors.blue, 
+                    _buildTimeInfo(context, l10n.in_label, DateFormat('hh:mm:ss a').format(checkIn), AppColors.blue, 
                       subtitle: hasInLoc ? '${inLat.toStringAsFixed(2)}, ${inLong.toStringAsFixed(2)}' : null),
                     _buildTimeInfo(
+                      context,
                       l10n.out, 
                       isClosed ? DateFormat('hh:mm:ss a').format(checkOut) : '--:--', 
-                      isClosed ? AppColors.dangerRed : AppColors.textSecondary,
+                      isClosed ? AppColors.dangerRed : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       subtitle: hasOutLoc ? '${outLat.toStringAsFixed(2)}, ${outLong.toStringAsFixed(2)}' : null
                     ),
-                    // _buildTimeInfo(l10n.break_time, '0.00h', AppColors.violet),
                   ],
                 ),
                 // Show Validated Overtime row if applicable
@@ -370,12 +369,12 @@ class _AttendanceCard extends StatelessWidget {
   }
 
   /// Helper to build a column for time info (Label, Time, and optional Subtitle like GPS).
-  Widget _buildTimeInfo(String label, String time, Color color, {String? subtitle}) {
+  Widget _buildTimeInfo(BuildContext context, String label, String time, Color color, {String? subtitle}) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+          Text(label, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 11)),
           const SizedBox(height: 4),
           Text(
             time,
@@ -385,7 +384,7 @@ class _AttendanceCard extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               subtitle,
-              style: TextStyle(color: AppColors.textSecondary.withOpacity(0.6), fontSize: 9),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), fontSize: 9),
               overflow: TextOverflow.ellipsis,
             ),
           ],

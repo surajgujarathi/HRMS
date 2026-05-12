@@ -14,17 +14,17 @@ class ProfileFullDetailsPage extends StatelessWidget {
     return BlocProvider(
       create: (context) => ProfileCubit()..fetchProfile(),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F7FA),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 20),
+            icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).colorScheme.onSurface, size: 20),
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
             l10n.personal_details,
-            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 18),
           ),
           centerTitle: true,
           // actions: [
@@ -47,48 +47,48 @@ class ProfileFullDetailsPage extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 40),
                 child: Column(
                   children: [
-                    _buildHeader(employee, l10n),
-                    _buildSectionTitle(l10n.personal_information),
-                    _buildInfoCard([
-                      _buildInfoRow(l10n.employee_code, employee.employeeCode),
-                      _buildInfoRow(l10n.full_name, employee.name),
-                      _buildInfoRow(l10n.gender, employee.gender),
-                      _buildInfoRow(l10n.date_of_birth, employee.birthday?.toString().split(' ')[0]),
-                      _buildInfoRow(l10n.marital_status, employee.marital),
-                      _buildInfoRow(l10n.blood_group, employee.bloodGroup),
-                      _buildInfoRow(l10n.identification_id, employee.identificationId),
-                      _buildInfoRow(l10n.passport_no, employee.passportId),
-                      _buildInfoRow(l10n.aadhar_no, employee.aadharNo),
-                      _buildInfoRow(l10n.pan_no, employee.panNo),
+                    _buildHeader(context, employee, l10n),
+                    _buildSectionTitle(context, l10n.personal_information),
+                    _buildInfoCard(context, [
+                      _buildInfoRow(context, l10n.employee_code, employee.employeeCode),
+                      _buildInfoRow(context, l10n.full_name, employee.name),
+                      _buildInfoRow(context, l10n.gender, employee.gender),
+                      _buildInfoRow(context, l10n.date_of_birth, employee.birthday?.toString().split(' ')[0]),
+                      _buildInfoRow(context, l10n.marital_status, employee.marital),
+                      _buildInfoRow(context, l10n.blood_group, employee.bloodGroup),
+                      _buildInfoRow(context, l10n.identification_id, employee.identificationId),
+                      _buildInfoRow(context, l10n.passport_no, employee.passportId),
+                      _buildInfoRow(context, l10n.aadhar_no, employee.aadharNo),
+                      _buildInfoRow(context, l10n.pan_no, employee.panNo),
                     ]),
-                    _buildSectionTitle(l10n.work_information),
-                    _buildInfoCard([
-                      _buildInfoRow(l10n.job_title, employee.jobTitle),
-                      _buildInfoRow(l10n.department, employee.departmentId?.name),
-                      _buildInfoRow(l10n.company, employee.companyId?.name),
-                      _buildInfoRow(l10n.work_location, employee.workLocationId?.name),
-                      _buildInfoRow(l10n.manager, employee.parentId?.name),
-                      _buildInfoRow(l10n.coach, employee.coachId?.name),
-                      _buildInfoRow(l10n.date_of_joining, employee.doj?.toString().split(' ')[0]),
-                      _buildInfoRow(l10n.work_email, employee.workEmail),
-                      _buildInfoRow(l10n.work_phone, employee.workPhone),
-                      _buildInfoRow(l10n.employment_type, employee.empType?.name),
+                    _buildSectionTitle(context, l10n.work_information),
+                    _buildInfoCard(context, [
+                      _buildInfoRow(context, l10n.job_title, employee.jobTitle),
+                      _buildInfoRow(context, l10n.department, employee.departmentId?.name),
+                      _buildInfoRow(context, l10n.company, employee.companyId?.name),
+                      _buildInfoRow(context, l10n.work_location, employee.workLocationId?.name),
+                      _buildInfoRow(context, l10n.manager, employee.parentId?.name),
+                      _buildInfoRow(context, l10n.coach, employee.coachId?.name),
+                      _buildInfoRow(context, l10n.date_of_joining, employee.doj?.toString().split(' ')[0]),
+                      _buildInfoRow(context, l10n.work_email, employee.workEmail),
+                      _buildInfoRow(context, l10n.work_phone, employee.workPhone),
+                      _buildInfoRow(context, l10n.employment_type, employee.empType?.name),
                     ]),
-                    _buildSectionTitle(l10n.emergency_contact),
-                    _buildInfoCard([
-                      _buildInfoRow(l10n.contact_name, employee.emergencyContact),
-                      _buildInfoRow(l10n.contact_phone, employee.emergencyPhone),
+                    _buildSectionTitle(context, l10n.emergency_contact),
+                    _buildInfoCard(context, [
+                      _buildInfoRow(context, l10n.contact_name, employee.emergencyContact),
+                      _buildInfoRow(context, l10n.contact_phone, employee.emergencyPhone),
                     ]),
-                    _buildSectionTitle(l10n.bank_details),
-                    _buildInfoCard([
-                      _buildInfoRow(l10n.bank_name, employee.bankName),
-                      _buildInfoRow(l10n.ifsc_code, employee.bankIfsc),
-                      _buildInfoRow(l10n.account_id, employee.bankAccountId),
+                    _buildSectionTitle(context, l10n.bank_details),
+                    _buildInfoCard(context, [
+                      _buildInfoRow(context, l10n.bank_name, employee.bankName),
+                      _buildInfoRow(context, l10n.ifsc_code, employee.bankIfsc),
+                      _buildInfoRow(context, l10n.account_id, employee.bankAccountId),
                     ]),
-                    _buildSectionTitle(l10n.address),
-                    _buildInfoCard([
-                      _buildInfoRow(l10n.residential_address, employee.address),
-                      _buildInfoRow(l10n.permanent_address, employee.permanentAddress),
+                    _buildSectionTitle(context, l10n.address),
+                    _buildInfoCard(context, [
+                      _buildInfoRow(context, l10n.residential_address, employee.address),
+                      _buildInfoRow(context, l10n.permanent_address, employee.permanentAddress),
                     ]),
                   ],
                 ),
@@ -101,7 +101,7 @@ class ProfileFullDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(Employee employee, AppLocalizations l10n) {
+  Widget _buildHeader(BuildContext context, Employee employee, AppLocalizations l10n) {
     Widget? avatarChild;
     final picData = employee.image1920;
 
@@ -132,9 +132,9 @@ class ProfileFullDetailsPage extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(30),
           bottomRight: Radius.circular(30),
         ),
@@ -157,7 +157,7 @@ class ProfileFullDetailsPage extends StatelessWidget {
           Text(
             employee.name ?? "N/A",
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
           ),
           const SizedBox(height: 4),
           Text(
@@ -188,7 +188,7 @@ class ProfileFullDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
       child: Align(
@@ -198,7 +198,7 @@ class ProfileFullDetailsPage extends StatelessWidget {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.bold,
-            color: Colors.grey.shade600,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
             letterSpacing: 1.2,
           ),
         ),
@@ -206,15 +206,15 @@ class ProfileFullDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard(List<Widget> children) {
+  Widget _buildInfoCard(BuildContext context, List<Widget> children) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Theme.of(context).shadowColor.withOpacity(0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -224,12 +224,12 @@ class ProfileFullDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(String title, dynamic value) {
+  Widget _buildInfoRow(BuildContext context, String title, dynamic value) {
     String displayValue = (value == null || value == false) ? "N/A" : value.toString();
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.grey.shade50)),
+        border: Border(bottom: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.05))),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -240,7 +240,7 @@ class ProfileFullDetailsPage extends StatelessWidget {
             child: Text(
               displayValue,
               textAlign: TextAlign.right,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.black87),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Theme.of(context).colorScheme.onSurface),
             ),
           ),
         ],

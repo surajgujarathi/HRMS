@@ -2,6 +2,8 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/features/notifications/cubit/notification_cubit.dart';
+import 'package:flutter_app/features/profile/cubit/profile_cubit.dart';
 import 'package:flutter_app/features/auth/login/cubit/login_cubit.dart';
 import 'package:flutter_app/routes.dart';
 import 'package:flutter_app/core/utils/shared_pref.dart';
@@ -62,7 +64,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       value: _attendanceCubit,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: AppColors.white,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           elevation: 0,
           leadingWidth: 200,
           leading: Padding(
@@ -87,10 +89,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       return Text(
                         'Hi, $name',
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black87,
+                          color: Theme.of(context).colorScheme.onSurface,
                           letterSpacing: 0.5,
                         ),
                       );
@@ -101,14 +103,49 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ),
           ),
           actions: [
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.notifications_none_outlined, color: Colors.black87),
+            BlocBuilder<NotificationCubit, NotificationState>(
+              builder: (context, state) {
+                return Stack(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, Routes.notifications);
+                      },
+                      icon: Icon(Icons.notifications_none_outlined, color: Theme.of(context).colorScheme.onSurface),
+                    ),
+                    if (state.unreadCount > 0)
+                      Positioned(
+                        right: 8,
+                        top: 8,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 16,
+                            minHeight: 16,
+                          ),
+                          child: Text(
+                            '${state.unreadCount}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
             ),
             Padding(
               padding: const EdgeInsets.only(right: 16),
               child: PopupMenuButton<String>(
-                color: AppColors.white,
+                color: Theme.of(context).colorScheme.surface,
                 offset: const Offset(0, 45),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 onSelected: (value) {
@@ -159,7 +196,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     final picData = snapshot.data;
                     if (snapshot.hasData && picData != null && picData.length > 50 && picData != 'false') {
                       try {
-                        final cleanedPicData = picData.trim().replaceAll('\n', '').replaceAll('\r', '');
+                        String cleanedPicData = picData.trim().replaceAll('\n', '').replaceAll('\r', '').replaceAll(' ', '');
+                        if (cleanedPicData.contains(',')) {
+                          cleanedPicData = cleanedPicData.split(',').last;
+                        }
                         final bytes = base64Decode(cleanedPicData);
                         return CircleAvatar(
                           radius: 18,
@@ -177,6 +217,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           ),
                         );
                       } catch (e) {
+                        debugPrint('HomePage: Error decoding profile pic: $e');
                         return const CircleAvatar(
                           radius: 18,
                           backgroundColor: AppColors.lightPurple,
@@ -196,7 +237,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ),
           ],
         ),
-        backgroundColor: AppColors.lavenderBg,
         body: SafeArea(
           child: RefreshIndicator(
             onRefresh: _handleRefresh,

@@ -26,15 +26,15 @@ class SalaryBreakdownCard extends StatelessWidget {
       // margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Salary Breakdown',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface),
           ),
           const SizedBox(height: 12),
 
@@ -89,7 +89,7 @@ class _BreakdownRow extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 12,
-              color: Colors.black54,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
               fontWeight: isBold ? FontWeight.w600 : FontWeight.w400,
             ),
           ),
@@ -98,6 +98,7 @@ class _BreakdownRow extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: isBold ? FontWeight.w600 : FontWeight.w400,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ],

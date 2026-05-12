@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/core/constants/app_colors.dart';
 
 class TaxPlannerPage extends StatefulWidget {
   const TaxPlannerPage({super.key});
@@ -66,47 +67,59 @@ class _TaxPlannerPageState extends State<TaxPlannerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Tax Planner'),
-        backgroundColor: Color.fromARGB(255, 156, 204, 223),
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             _card(
+              context: context,
               title: 'Tax Regime',
               child: DropdownButtonFormField(
                 value: regime,
+                dropdownColor: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 items: const [
                   DropdownMenuItem(value: 'Old', child: Text('Old Regime')),
                   DropdownMenuItem(value: 'New', child: Text('New Regime')),
                 ],
                 onChanged: (v) => setState(() => regime = v!),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
               ),
             ),
 
             _card(
+              context: context,
               title: 'Salary Details',
-              child: _input('Annual CTC', ctcCtrl),
+              child: _input(context, 'Annual CTC', ctcCtrl),
             ),
 
             if (regime == 'Old') ...[
               _card(
+                context: context,
                 title: 'HRA',
                 child: Column(
                   children: [
-                    _input('HRA Received', hraCtrl),
-                    _input('Rent Paid (Yearly)', rentCtrl),
+                    _input(context, 'HRA Received', hraCtrl),
+                    _input(context, 'Rent Paid (Yearly)', rentCtrl),
                   ],
                 ),
               ),
               _card(
+                context: context,
                 title: 'Deductions',
                 child: Column(
                   children: [
-                    _input('Section 80C', sec80cCtrl),
-                    _input('Section 80D', sec80dCtrl),
+                    _input(context, 'Section 80C', sec80cCtrl),
+                    _input(context, 'Section 80D', sec80dCtrl),
                   ],
                 ),
               ),
@@ -119,20 +132,21 @@ class _TaxPlannerPageState extends State<TaxPlannerPage> {
               height: 50,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromARGB(255, 156, 204, 223),
+                  backgroundColor: AppColors.primaryPurple,
+                  foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
                 onPressed: calculateTax,
-                child: const Text('Calculate Tax'),
+                child: const Text('Calculate Tax', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ),
 
             const SizedBox(height: 20),
 
-            _resultTile('Yearly Tax', '₹${yearlyTax.toStringAsFixed(0)}'),
-            _resultTile('Monthly TDS', '₹${monthlyTds.toStringAsFixed(0)}'),
+            _resultTile(context, 'Yearly Tax', '₹${yearlyTax.toStringAsFixed(0)}'),
+            _resultTile(context, 'Monthly TDS', '₹${monthlyTds.toStringAsFixed(0)}'),
           ],
         ),
       ),
@@ -140,21 +154,31 @@ class _TaxPlannerPageState extends State<TaxPlannerPage> {
   }
 
   /// ---------------- COMPONENTS ----------------
-  Widget _card({required String title, required Widget child}) {
+  Widget _card({required BuildContext context, required String title, required Widget child}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).shadowColor.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+            style: TextStyle(
+              fontWeight: FontWeight.w600, 
+              fontSize: 15,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
           const SizedBox(height: 10),
           child,
@@ -163,30 +187,50 @@ class _TaxPlannerPageState extends State<TaxPlannerPage> {
     );
   }
 
-  Widget _input(String label, TextEditingController ctrl) {
+  Widget _input(BuildContext context, String label, TextEditingController ctrl) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: TextField(
         controller: ctrl,
         keyboardType: TextInputType.number,
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
           labelText: label,
+          labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Theme.of(context).dividerTheme.color ?? Colors.grey[300]!),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: AppColors.primaryPurple, width: 2),
+          ),
         ),
       ),
     );
   }
 
-  Widget _resultTile(String label, String value) {
+  Widget _resultTile(BuildContext context, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+          Text(
+            label, 
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), 
+              fontSize: 14,
+            ),
+          ),
           Text(
             value,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+            style: TextStyle(
+              fontWeight: FontWeight.w600, 
+              fontSize: 18,
+              color: Theme.of(context).primaryColor,
+            ),
           ),
         ],
       ),

@@ -1,0 +1,285 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_app/core/constants/app_colors.dart';
+import 'package:flutter_app/features/events/cubit/event_cubit.dart';
+import 'package:flutter_app/features/events/cubit/event_state.dart';
+import 'package:flutter_app/features/events/models/event_model.dart';
+import 'package:flutter_app/routes.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+
+class EventsListPage extends StatelessWidget {
+  const EventsListPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => EventCubit()..fetchEvents(),
+      child: const _EventsListView(),
+    );
+  }
+}
+
+class _EventsListView extends StatelessWidget {
+  const _EventsListView();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: Column(
+        children: [
+          _buildHeader(context),
+          Expanded(
+            child: BlocBuilder<EventCubit, EventState>(
+              builder: (context, state) {
+                if (state.status == EventStatus.loading) {
+                  return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColor));
+                } else if (state.status == EventStatus.error) {
+                  return _buildErrorState(context, state.errorMessage ?? "An unexpected error occurred");
+                } else if (state.status == EventStatus.loaded) {
+                  if (state.events.isEmpty) {
+                    return _buildEmptyState(context);
+                  }
+                  return RefreshIndicator(
+                    onRefresh: () => context.read<EventCubit>().fetchEvents(),
+                    color: AppColors.indigo,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 100),
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: state.events.length,
+                      itemBuilder: (context, index) {
+                        return _EventCard(event: state.events[index]);
+                      },
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 60, 20, 32),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.indigo, AppColors.brightBlue],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+          ),
+          const Expanded(
+            child: Text(
+              'Company Events',
+              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(width: 48),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor.withOpacity(0.05),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.event_available_outlined, size: 80, color: Theme.of(context).primaryColor.withOpacity(0.2)),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'No Upcoming Events',
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Check back later for new company events!',
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 14),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context, String message) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: AppColors.dangerRed.withOpacity(0.05),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.error_outline_rounded, size: 80, color: AppColors.dangerRed),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Oops! Something went wrong',
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 14, height: 1.5),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EventCard extends StatelessWidget {
+  final EventModel event;
+  const _EventCard({required this.event});
+
+  @override
+  Widget build(BuildContext context) {
+    final dateStr = event.dateBegin != null 
+        ? DateFormat('EEEE, dd MMM yyyy').format(event.dateBegin!) 
+        : "N/A";
+    final timeStr = event.dateBegin != null 
+        ? DateFormat('hh:mm a').format(event.dateBegin!) 
+        : "N/A";
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).shadowColor.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: InkWell(
+          onTap: () {
+            Navigator.pushNamed(context, Routes.eventDetails, arguments: event);
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Banner Area
+              Container(
+                height: 120,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [AppColors.indigo.withOpacity(0.1), AppColors.brightBlue.withOpacity(0.1)],
+                  ),
+                ),
+                child: Center(
+                  child: Icon(Icons.celebration_rounded, size: 48, color: AppColors.indigo.withOpacity(0.3)),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      event.name,
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Theme.of(context).colorScheme.onSurface),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Icon(Icons.calendar_today_rounded, size: 14, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                        const SizedBox(width: 8),
+                        Text(dateStr, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 13)),
+                        const Spacer(),
+                        Icon(Icons.access_time_rounded, size: 14, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                        const SizedBox(width: 4),
+                        Text(timeStr, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 13)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(Icons.location_on_rounded, size: 14, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            event.addressId?.name ?? "Company Venue",
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 13),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Divider(height: 32),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        if (event.seatsLimited)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: AppColors.indigo.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              "${event.seatsMax - event.seatsTaken} Seats Left",
+                              style: const TextStyle(color: AppColors.indigo, fontSize: 11, fontWeight: FontWeight.bold),
+                            ),
+                          )
+                        else
+                          const Text(
+                            "Open Registration",
+                            style: TextStyle(color: AppColors.successGreen, fontSize: 11, fontWeight: FontWeight.bold),
+                          ),
+                        const Row(
+                          children: [
+                            Text(
+                              "View Details",
+                              style: TextStyle(color: AppColors.indigo, fontWeight: FontWeight.bold, fontSize: 13),
+                            ),
+                            SizedBox(width: 4),
+                            Icon(Icons.arrow_forward_ios, size: 12, color: AppColors.indigo),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

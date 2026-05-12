@@ -32,23 +32,24 @@ class FilterTabsPage extends StatelessWidget {
               width: 80, // reduced tab width
               margin: const EdgeInsets.only(right: 10),
               decoration: BoxDecoration(
-                color: Colors.grey.shade200, // light grey background
+                color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.shade400.withOpacity(0.4),
+                    color: Theme.of(context).shadowColor.withOpacity(0.08),
                     spreadRadius: 1,
                     blurRadius: 4,
-                    offset: const Offset(2, 2), // shadow direction
+                    offset: const Offset(2, 2),
                   ),
                 ],
               ),
               child: Center(
                 child: Text(
                   tabs[index]["title"],
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 13,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),

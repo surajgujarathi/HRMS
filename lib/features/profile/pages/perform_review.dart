@@ -45,11 +45,12 @@ class PerformanceReviewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text("Employee Performance Review"),
+        title: Text("Employee Performance Review", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
         centerTitle: true,
         elevation: 0,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -79,17 +80,18 @@ class PerformanceReviewPage extends StatelessWidget {
                           children: [
                             Text(
                               employeeName,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(role, style: const TextStyle(fontSize: 14)),
+                            Text(role, style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
                             const SizedBox(height: 2),
                             Text(
                               "Dept: $department",
-                              style: const TextStyle(fontSize: 14),
+                              style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
                             ),
                             const SizedBox(height: 2),
                             Text(
@@ -109,9 +111,9 @@ class PerformanceReviewPage extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Performance Ratings
-              const Text(
+              Text(
                 "Performance Ratings",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
               ),
               const SizedBox(height: 10),
               Column(
@@ -122,7 +124,7 @@ class PerformanceReviewPage extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(kpi['title']),
+                            Text(kpi['title'], style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                             const SizedBox(height: 4),
                             buildStarRating(kpi['rating']),
                             const SizedBox(height: 4),
@@ -141,9 +143,9 @@ class PerformanceReviewPage extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Manager Comments
-              const Text(
+              Text(
                 "Manager's Comments",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
               ),
               const SizedBox(height: 10),
               Card(
@@ -162,7 +164,7 @@ class PerformanceReviewPage extends StatelessWidget {
                               children: [
                                 const Icon(Icons.comment, size: 16),
                                 const SizedBox(width: 8),
-                                Expanded(child: Text(comment)),
+                                Expanded(child: Text(comment, style: TextStyle(color: Theme.of(context).colorScheme.onSurface))),
                               ],
                             ),
                           ),
@@ -174,9 +176,9 @@ class PerformanceReviewPage extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Review Summary
-              const Text(
+              Text(
                 "Review Summary",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
               ),
               const SizedBox(height: 10),
               Card(
@@ -192,16 +194,16 @@ class PerformanceReviewPage extends StatelessWidget {
                         children: [
                           Column(
                             children: [
-                              const Text("Overall Rating"),
+                              Text("Overall Rating", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                               const SizedBox(height: 4),
                               buildStarRating(overallRating),
                             ],
                           ),
                           Column(
                             children: [
-                              const Text("Goals Achieved"),
+                              Text("Goals Achieved", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                               const SizedBox(height: 4),
-                              Text(goalsAchieved),
+                              Text(goalsAchieved, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                             ],
                           ),
                         ],
@@ -215,7 +217,7 @@ class PerformanceReviewPage extends StatelessWidget {
                                 children: [
                                   const Icon(Icons.check, size: 16),
                                   const SizedBox(width: 4),
-                                  Text(s, style: const TextStyle(fontSize: 12)),
+                                  Text(s, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface)),
                                 ],
                               ),
                             )

@@ -37,7 +37,7 @@ class LoginScreen extends StatelessWidget {
         }
       },
       child: Scaffold(
-        backgroundColor: AppColors.loginBg,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Stack(
           children: [
             // 🎨 Top Decorative Header
@@ -47,7 +47,7 @@ class LoginScreen extends StatelessWidget {
               right: 0,
               height: MediaQuery.of(context).size.height * 0.4,
               child: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -56,7 +56,7 @@ class LoginScreen extends StatelessWidget {
                       AppColors.brightBlue,
                     ],
                   ),
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(60),
                   ),
                 ),
@@ -67,7 +67,7 @@ class LoginScreen extends StatelessWidget {
                       right: -50,
                       child: CircleAvatar(
                         radius: 100,
-                        backgroundColor: AppColors.white.withOpacity(0.05),
+                        backgroundColor: Colors.white.withOpacity(0.05),
                       ),
                     ),
                     SafeArea(
@@ -83,7 +83,7 @@ class LoginScreen extends StatelessWidget {
                                 Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                    color: AppColors.white.withValues(alpha: .2),
+                                    color: Colors.white.withOpacity(0.2),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Image.asset(AppImages.logo, width: 40, height: 40),
@@ -94,8 +94,8 @@ class LoginScreen extends StatelessWidget {
                             const SizedBox(height: 40),
                             Text(
                               l10n.welcome_title.split('\n').first,
-                              style:  TextStyle(
-                                color: AppColors.white,
+                              style: const TextStyle(
+                                color: Colors.white,
                                 fontSize: 32,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 1,
@@ -105,7 +105,7 @@ class LoginScreen extends StatelessWidget {
                             Text(
                               l10n.sign_in_continue,
                               style: TextStyle(
-                                color: AppColors.white.withOpacity(0.8),
+                                color: Colors.white.withOpacity(0.8),
                                 fontSize: 16,
                                 fontWeight: FontWeight.w400,
                               ),
@@ -124,16 +124,16 @@ class LoginScreen extends StatelessWidget {
               top: MediaQuery.of(context).size.height * 0.32,
               child: Container(
                 padding: const EdgeInsets.fromLTRB(24, 40, 24, 0),
-                decoration:  BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
+                  borderRadius: const BorderRadius.only(
                     topRight: Radius.circular(60),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.shadow,
+                      color: Theme.of(context).shadowColor.withOpacity(0.1),
                       blurRadius: 20,
-                      offset: Offset(0, -5),
+                      offset: const Offset(0, -5),
                     ),
                   ],
                 ),
@@ -144,10 +144,10 @@ class LoginScreen extends StatelessWidget {
                     children: [
                       Text(
                         l10n.login,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textDark,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 30),
@@ -179,7 +179,7 @@ class LoginScreen extends StatelessWidget {
                             onChanged: (v) => context.read<LoginCubit>().onPasswordChanged(v),
                             errorText: state.passwordError,
                             suffixIcon: IconButton(
-                              icon: Icon(state.obscurePassword ? Icons.visibility_off : Icons.visibility, color: AppColors.iconGrey),
+                              icon: Icon(state.obscurePassword ? Icons.visibility_off : Icons.visibility, color: Theme.of(context).iconTheme.color),
                               onPressed: () => context.read<LoginCubit>().togglePasswordVisibility(),
                             ),
                           );
@@ -208,7 +208,7 @@ class LoginScreen extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  Text(l10n.remember_me, style: const TextStyle(color: AppColors.grey, fontSize: 14)),
+                                  Text(l10n.remember_me, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 14)),
                                 ],
                               );
                             },
@@ -238,7 +238,7 @@ class LoginScreen extends StatelessWidget {
                               onPressed: () => _handleLogin(context),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.indigo,
-                                foregroundColor: AppColors.white,
+                                foregroundColor: Colors.white,
                                 elevation: 4,
                                 shadowColor: AppColors.indigo.withOpacity(0.5),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -261,17 +261,17 @@ class LoginScreen extends StatelessWidget {
                             Text(
                               l10n.powered_by,
                               style: TextStyle(
-                                color: AppColors.grey.withOpacity(0.6),
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 1.5,
                               ),
                             ),
                             const SizedBox(height: 4),
-                            const Text(
+                            Text(
                               "FastTrackProjects",
                               style: TextStyle(
-                                color: AppColors.textDark,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),

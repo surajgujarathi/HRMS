@@ -6,7 +6,7 @@ class NotificationsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // outer background
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, // outer background
       body: SafeArea(
         child: Center(
           child: Column(
@@ -17,7 +17,7 @@ class NotificationsPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
-                  children: const [
+                  children:  [
                     Icon(Icons.arrow_back_ios_new, size: 18),
                     SizedBox(width: 90),
                     Text(
@@ -25,6 +25,7 @@ class NotificationsPage extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ],
@@ -39,7 +40,7 @@ class NotificationsPage extends StatelessWidget {
                 child: Container(
                   height: 45,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
+                    color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: const Row(
@@ -60,9 +61,9 @@ class NotificationsPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: [
-                    _filterChip("All", "24", true),
+                    _filterChip(context, "All", "24", true),
                     const SizedBox(width: 10),
-                    _filterChip("Unread", "15", false),
+                    _filterChip(context, "Unread", "15", false),
                     const Spacer(),
                     const Text(
                       "Mark all as read",
@@ -83,16 +84,18 @@ class NotificationsPage extends StatelessWidget {
                 child: ListView(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   children: [
-                    const Text(
+                    Text(
                       "Today",
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 10),
 
                     _notificationItem(
+                      context: context,
                       icon: Icons.menu_book,
                       color: Colors.blue.shade100,
                       title: "New Course Material Available",
@@ -102,6 +105,7 @@ class NotificationsPage extends StatelessWidget {
                     ),
 
                     _notificationItem(
+                      context: context,
                       icon: Icons.assignment,
                       color: Colors.blue.shade100,
                       title: "Upcoming Assignment Deadline",
@@ -111,16 +115,18 @@ class NotificationsPage extends StatelessWidget {
                     ),
 
                     const SizedBox(height: 15),
-                    const Text(
+                    Text(
                       "Yesterday",
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 10),
 
                     _notificationItem(
+                      context: context,
                       icon: Icons.campaign,
                       color: Colors.yellow.shade100,
                       title: "Important Announcement",
@@ -130,6 +136,7 @@ class NotificationsPage extends StatelessWidget {
                     ),
 
                     _notificationItem(
+                      context: context,
                       icon: Icons.bookmark,
                       color: Colors.blue.shade50,
                       title: "Recommended Reading Material",
@@ -139,6 +146,7 @@ class NotificationsPage extends StatelessWidget {
                     ),
 
                     _notificationItem(
+                      context: context,
                       icon: Icons.emoji_events,
                       color: Colors.red.shade100,
                       title: "You've Achieved a Milestone!",
@@ -157,11 +165,11 @@ class NotificationsPage extends StatelessWidget {
   }
 
   /// Filter Chip Widget
-  static Widget _filterChip(String title, String count, bool active) {
+  Widget _filterChip(BuildContext context, String title, String count, bool active) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: active ? Colors.blue : Colors.grey.shade200,
+        color: active ? Colors.blue : (Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -169,7 +177,7 @@ class NotificationsPage extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              color: active ? Colors.white : Colors.black,
+              color: active ? Colors.white : Theme.of(context).colorScheme.onSurface,
               fontSize: 12,
             ),
           ),
@@ -194,7 +202,8 @@ class NotificationsPage extends StatelessWidget {
   }
 
   /// Notification Item Widget
-  static Widget _notificationItem({
+  Widget _notificationItem({
+    required BuildContext context,
     required IconData icon,
     required Color color,
     required String title,
@@ -222,9 +231,10 @@ class NotificationsPage extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),

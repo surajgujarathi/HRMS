@@ -31,6 +31,8 @@ class CustomTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -39,8 +41,8 @@ class CustomTextFormField extends StatelessWidget {
             padding: const EdgeInsets.only(left: 4, bottom: 8),
             child: Text(
               label!,
-              style: const TextStyle(
-                color: AppColors.textGrey,
+              style: TextStyle(
+                color: isDark ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7) : AppColors.textGrey,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -48,9 +50,11 @@ class CustomTextFormField extends StatelessWidget {
           ),
         Container(
           decoration: BoxDecoration(
-            color: fillColor ?? AppColors.inputBg,
+            color: fillColor ?? (isDark ? Colors.white.withOpacity(0.05) : AppColors.inputBg),
             borderRadius: BorderRadius.circular(16),
-            border: errorText != null ? Border.all(color: AppColors.red, width: 1) : null,
+            border: errorText != null 
+                ? Border.all(color: AppColors.red, width: 1) 
+                : (isDark ? Border.all(color: Colors.white.withOpacity(0.1), width: 1) : null),
           ),
           child: TextFormField(
             controller: controller,
@@ -58,13 +62,21 @@ class CustomTextFormField extends StatelessWidget {
             validator: validator,
             obscureText: obscureText,
             keyboardType: keyboardType,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 15,
+            ),
+            cursorColor: AppColors.primaryPurple,
             decoration: InputDecoration(
-              prefixIcon: Icon(prefixIcon, color: AppColors.iconGrey),
+              prefixIcon: Icon(prefixIcon, color: isDark ? Colors.white.withOpacity(0.5) : AppColors.iconGrey),
               suffixIcon: suffixIcon,
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               hintText: hintText,
-              hintStyle: const TextStyle(color: AppColors.iconGrey, fontSize: 14),
+              hintStyle: TextStyle(
+                color: isDark ? Colors.white.withOpacity(0.3) : AppColors.iconGrey, 
+                fontSize: 14,
+              ),
             ),
           ),
         ),

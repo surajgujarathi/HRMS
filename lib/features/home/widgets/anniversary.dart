@@ -24,10 +24,10 @@ class AnniversarySection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+        boxShadow: [
+          BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -37,9 +37,10 @@ class AnniversarySection extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               SizedBox(width: 4),
@@ -49,7 +50,7 @@ class AnniversarySection extends StatelessWidget {
               ),
               const Spacer(),
               if (trailing != null)
-                Icon(trailing, size: 18, color: Colors.grey),
+                Icon(trailing, size: 18, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
             ],
           ),
           const SizedBox(height: 12),
@@ -76,13 +77,13 @@ class AnniversarySection extends StatelessWidget {
                         children: [
                           Text(
                             cardTitle,
-                            style: const TextStyle(fontWeight: FontWeight.w600),
+                            style: TextStyle(fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             cardSubtitle,
-                            style: const TextStyle(
-                              color: Colors.grey,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                               fontSize: 12,
                             ),
                           ),

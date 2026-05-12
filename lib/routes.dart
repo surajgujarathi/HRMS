@@ -20,6 +20,12 @@ import 'package:flutter_app/features/attendance/presentation/attendance_report.d
 import 'package:flutter_app/features/screens/leave_page.dart';
 import 'package:flutter_app/features/leave/presentation/leave_list_screen.dart';
 import 'package:flutter_app/features/leave/presentation/apply_leave_screen.dart';
+import 'package:flutter_app/features/maintenance/presentation/assigned_assets_page.dart';
+import 'package:flutter_app/features/notifications/presentation/notification_page.dart';
+import 'package:flutter_app/features/maintenance/presentation/new_equipment_page.dart';
+import 'package:flutter_app/features/events/presentation/events_list_page.dart';
+import 'package:flutter_app/features/events/presentation/event_details_page.dart';
+import 'package:flutter_app/features/events/models/event_model.dart';
 
 class Routes {
   Routes._();
@@ -44,8 +50,12 @@ class Routes {
   static String reimbursements = '/reimbursements';
   static String learnTraing = '/learnTraing';
   static String changepassword = '/changepassword';
-  static String notifications = '/notifications';
   static String language = '/language';
+  static const String assignedAssets = "/assigned-assets";
+  static const String notifications = "/notifications";
+  static String newEquipment = '/new-equipment';
+  static const String events = "/events";
+  static const String eventDetails = "/event-details";
   static Map<String, WidgetBuilder> getAll() {
     return {
       onboarding: (c) => const OnboardingScreen(),
@@ -68,8 +78,12 @@ class Routes {
       reimbursements: (c) => ReimbursementPage(),
       learnTraing: (c) => TrainingLearningPage(),
       changepassword: (c) => ChangePasswordPage(),
-      notifications: (c) => NotificationsPage(),
       language: (c) => LanguagePage(),
+      Routes.assignedAssets: (context) => const AssignedAssetsPage(),
+      Routes.notifications: (context) => const NotificationPage(),
+      newEquipment: (c) => const NewEquipmentPage(),
+      events: (c) => const EventsListPage(),
+      eventDetails: (c) => EventDetailsPage(event: ModalRoute.of(c)!.settings.arguments as EventModel),
     };
   }
 }

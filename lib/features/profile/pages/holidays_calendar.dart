@@ -1,265 +1,333 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_app/core/constants/app_colors.dart';
+import 'package:flutter_app/features/profile/cubit/holiday_cubit.dart';
+import 'package:flutter_app/features/profile/cubit/holiday_state.dart';
+import 'package:flutter_app/features/profile/models/holiday_model.dart';
 
-class HolidayCalendarPage extends StatefulWidget {
+class HolidayCalendarPage extends StatelessWidget {
   const HolidayCalendarPage({super.key});
 
   @override
-  State<HolidayCalendarPage> createState() => _HolidayCalendarPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => HolidayCubit()..fetchHolidays(),
+      child: const _HolidayCalendarView(),
+    );
+  }
 }
 
-class _HolidayCalendarPageState extends State<HolidayCalendarPage> {
-  final List<Map<String, dynamic>> holidays = [
-    {
-      "title": "Good Friday",
-      "date": "April 19, 2024",
-      "color": Colors.red,
-      "tag": "Public Holiday",
-      "icon": Icons.flag,
-    },
-    {
-      "title": "Earth Day",
-      "date": "April 22, 2024",
-      "color": Colors.green,
-      "tag": "Optional Holiday",
-      "icon": Icons.check_circle,
-    },
-    {
-      "title": "Founder’s Day",
-      "date": "May 01, 2024",
-      "color": Colors.orange,
-      "tag": "Company Holiday",
-      "icon": Icons.business,
-    },
-    {
-      "title": "Labor Day",
-      "date": "May 01, 2024",
-      "color": Colors.red,
-      "tag": "Public Holiday",
-      "icon": Icons.flag,
-    },
-  ];
+class _HolidayCalendarView extends StatefulWidget {
+  const _HolidayCalendarView();
 
+  @override
+  State<_HolidayCalendarView> createState() => _HolidayCalendarViewState();
+}
+
+class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
   String searchText = "";
-  int selectedDay = 15;
+  int selectedDay = DateTime.now().day;
+  DateTime currentMonth = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> filteredHolidays = holidays
-        .where(
-          (h) => h["title"].toLowerCase().contains(searchText.toLowerCase()),
-        )
-        .toList();
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F4F8),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // _buildHeader(),
-            const SizedBox(height: 30),
-            _buildYearDropdown(),
-            const SizedBox(height: 15),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildCalendarCard(),
-                    const SizedBox(height: 20),
-                    _buildSearchBar(),
-                    const SizedBox(height: 15),
-                    const Text(
-                      "Upcoming Holidays",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    ...filteredHolidays
-                        .map(
-                          (h) => _holidayCard(
-                            icon: h["icon"],
-                            title: h["title"],
-                            date: h["date"],
-                            color: h["color"],
-                            tag: h["tag"],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: Column(
+        children: [
+          _buildHeader(context),
+          Expanded(
+            child: BlocBuilder<HolidayCubit, HolidayState>(
+              builder: (context, state) {
+                if (state is HolidayLoading || state is HolidayInitial) {
+                  return const Center(child: CircularProgressIndicator(color: AppColors.primaryPurple));
+                } else if (state is HolidayError) {
+                  return Center(child: Text("Error: ${state.message}"));
+                } else if (state is HolidayLoaded) {
+                  final holidays = state.holidays;
+
+                  // Filter for holidays in the selected year
+                  final displayHolidays = holidays.where((h) {
+                    final matchSearch = h.name.toLowerCase().contains(searchText.toLowerCase());
+                    final matchYear = h.dateFrom != null && h.dateFrom!.year == currentMonth.year;
+                    return matchSearch && matchYear;
+                  }).toList();
+
+                  // Sort by date
+                  displayHolidays.sort((a, b) => (a.dateFrom ?? DateTime(0)).compareTo(b.dateFrom ?? DateTime(0)));
+
+                  return SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildCalendarCard(holidays),
+                        const SizedBox(height: 24),
+                        _buildSearchBar(),
+                        const SizedBox(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Holidays ${currentMonth.year}",
+                              style:  TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: AppColors.indigo.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                "${displayHolidays.length} Holidays",
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.indigo,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        if (displayHolidays.isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 40),
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  Icon(Icons.event_busy_outlined, size: 48, color: AppColors.textSecondary.withOpacity(0.3)),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    "No holidays found for ${currentMonth.year}.",
+                                    style: const TextStyle(color: AppColors.textSecondary),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        )
-                        .toList(),
-                  ],
+                        ...displayHolidays.map((h) => _buildHolidayCard(h)),
+                        const SizedBox(height: 30),
+                      ],
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.indigo, AppColors.brightBlue],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+              ),
+              const Expanded(
+                child: Text(
+                  'Holidays Calendar',
+                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ================= HEADER =================
-  // Widget _buildHeader() {
-  //   return Container(
-  //     width: double.infinity,
-  //     padding: const EdgeInsets.all(20),
-  //     decoration: BoxDecoration(
-  //       gradient: LinearGradient(
-  //         colors: [Colors.blue.shade800, Colors.teal.shade400],
-  //         begin: Alignment.topLeft,
-  //         end: Alignment.bottomRight,
-  //       ),
-  //       borderRadius: const BorderRadius.only(
-  //         bottomLeft: Radius.circular(25),
-  //         bottomRight: Radius.circular(25),
-  //       ),
-  //     ),
-  //     child: const Center(
-  //       child: Text(
-  //         "Holiday Calendar",
-  //         style: TextStyle(
-  //           color: Colors.white,
-  //           fontSize: 22,
-  //           fontWeight: FontWeight.bold,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  // ================= YEAR DROPDOWN =================
-  Widget _buildYearDropdown() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
-        height: 45,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              blurRadius: 6,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "Select Year",
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-            ),
-            Icon(Icons.keyboard_arrow_down),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ================= SEARCH BAR =================
-  Widget _buildSearchBar() {
-    return TextField(
-      onChanged: (value) {
-        setState(() {
-          searchText = value;
-        });
-      },
-      decoration: InputDecoration(
-        hintText: "Search holidays",
-        prefixIcon: const Icon(Icons.search),
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(vertical: 0),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-      ),
-    );
-  }
-
-  // ================= CALENDAR =================
-  Widget _buildCalendarCard() {
-    List<String> days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+              const SizedBox(width: 48),
+            ],
           ),
+          const SizedBox(height: 20),
+          _buildYearDropdown(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildYearDropdown() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      height: 48,
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardTheme.color?.withOpacity(0.2) ?? Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.3)),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<int>(
+          value: currentMonth.year,
+          isExpanded: true,
+          dropdownColor: AppColors.indigo,
+          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+          selectedItemBuilder: (context) {
+            return List.generate(10, (index) {
+              final year = DateTime.now().year - 5 + index;
+              return Center(
+                child: Text(
+                  "Selected Year: $year",
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              );
+            });
+          },
+          items: List.generate(10, (index) {
+            final year = DateTime.now().year - 5 + index;
+            return DropdownMenuItem(
+              value: year,
+              child: Text(
+                year.toString(),
+                style: const TextStyle(fontSize: 14, color: Colors.white),
+              ),
+            );
+          }),
+          onChanged: (val) {
+            if (val != null) {
+              setState(() {
+                currentMonth = DateTime(val, currentMonth.month, currentMonth.day);
+              });
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+        ],
+      ),
+      child: TextField(
+        onChanged: (value) {
+          setState(() {
+            searchText = value;
+          });
+        },
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+        decoration: InputDecoration(
+          hintText: "Search holidays...",
+          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), fontSize: 14),
+          prefixIcon: Icon(Icons.search, color: Theme.of(context).primaryColor),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 14),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCalendarCard(List<HolidayModel> holidays) {
+    List<String> days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    final daysInMonth = DateUtils.getDaysInMonth(currentMonth.year, currentMonth.month);
+    final firstDayOfMonth = DateTime(currentMonth.year, currentMonth.month, 1).weekday % 7;
+    
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text(
-                "April 2024",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_ios, size: 14, color: AppColors.indigo),
+                onPressed: () {
+                  setState(() {
+                    currentMonth = DateTime(currentMonth.year, currentMonth.month - 1, 1);
+                  });
+                },
               ),
-              Icon(Icons.arrow_forward_ios, size: 16),
+              Text(
+                DateFormat('MMMM yyyy').format(currentMonth),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+              ),
+              IconButton(
+                icon: const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.indigo),
+                onPressed: () {
+                  setState(() {
+                    currentMonth = DateTime(currentMonth.year, currentMonth.month + 1, 1);
+                  });
+                },
+              ),
             ],
           ),
-          const SizedBox(height: 15),
-
-          // Weekdays
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: days
-                .map(
-                  (day) => Text(
-                    day,
-                    style: const TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                )
-                .toList(),
+            children: days.map((day) => Expanded(
+              child: Center(
+                child: Text(day, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.textSecondary)),
+              ),
+            )).toList(),
           ),
-          const SizedBox(height: 10),
-
-          // Dates Grid
+          const SizedBox(height: 12),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: 30,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 7,
-            ),
+            itemCount: daysInMonth + firstDayOfMonth,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7),
             itemBuilder: (context, index) {
-              int day = index + 1;
-              bool isSelected = day == selectedDay;
+              if (index < firstDayOfMonth) return const SizedBox.shrink();
+              
+              int day = index - firstDayOfMonth + 1;
+              bool isSelected = day == selectedDay && DateTime.now().month == currentMonth.month && DateTime.now().year == currentMonth.year;
+              
+              final isHoliday = holidays.any((h) => 
+                h.dateFrom != null && 
+                h.dateFrom!.year == currentMonth.year && 
+                h.dateFrom!.month == currentMonth.month && 
+                h.dateFrom!.day == day
+              );
 
               return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedDay = day;
-                  });
-                },
+                onTap: () => setState(() => selectedDay = day),
                 child: Center(
                   child: Container(
-                    width: 35,
-                    height: 35,
+                    width: 32,
+                    height: 32,
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? Colors.teal.shade400
-                          : Colors.transparent,
-                      shape: BoxShape.circle,
+                      color: isHoliday ? AppColors.red.withOpacity(0.1) : (isSelected ? AppColors.indigo.withOpacity(0.1) : Colors.transparent),
+                      borderRadius: BorderRadius.circular(10),
+                      border: isHoliday ? Border.all(color: AppColors.red.withOpacity(0.3), width: 1) : null,
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       day.toString(),
                       style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.black87,
-                        fontWeight: FontWeight.w500,
+                        color: isHoliday ? AppColors.red : (isSelected ? AppColors.indigo : Theme.of(context).colorScheme.onSurface),
+                        fontWeight: (isHoliday || isSelected) ? FontWeight.bold : FontWeight.normal,
+                        fontSize: 13,
                       ),
                     ),
                   ),
@@ -267,63 +335,25 @@ class _HolidayCalendarPageState extends State<HolidayCalendarPage> {
               );
             },
           ),
-
-          const SizedBox(height: 15),
-
-          // Holiday Legend
-          Wrap(
-            spacing: 16,
-            runSpacing: 8,
-            alignment: WrapAlignment.center,
-            children: [
-              _legendItem(Colors.red, "Public Holiday"),
-              _legendItem(Colors.green, "Optional Holiday"),
-              _legendItem(Colors.orange, "Company Holiday"),
-            ],
-          ),
+          const SizedBox(height: 20),
+          _buildSelectedHolidayInfo(holidays),
         ],
       ),
     );
   }
 
-  Widget _legendItem(Color color, String text) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 14,
-          height: 14,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ),
-        const SizedBox(width: 6),
-        Text(text, style: const TextStyle(fontSize: 12)),
-      ],
-    );
-  }
+  Widget _buildHolidayCard(HolidayModel holiday) {
+    final color = holiday.name.toLowerCase().contains('optional') ? Colors.amber : AppColors.indigo;
+    final dateStr = holiday.dateFrom != null ? DateFormat('EEEE, dd MMM').format(holiday.dateFrom!) : "N/A";
 
-  // ================= HOLIDAY CARD =================
-  Widget _holidayCard({
-    required IconData icon,
-    required String title,
-    required String date,
-    required Color color,
-    required String tag,
-  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
+        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
+          BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       child: Row(
@@ -334,38 +364,63 @@ class _HolidayCalendarPageState extends State<HolidayCalendarPage> {
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: color),
+            child: Icon(Icons.celebration_rounded, color: color, size: 22),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
+                  holiday.name,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Theme.of(context).colorScheme.onSurface),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  date,
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                Row(
+                  children: [
+                    const Icon(Icons.calendar_today_outlined, size: 12, color: AppColors.textSecondary),
+                    const SizedBox(width: 4),
+                    Text(dateStr, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                  ],
                 ),
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              tag,
-              style: const TextStyle(color: Colors.white, fontSize: 11),
-            ),
+          Icon(Icons.arrow_forward_ios, size: 12, color: AppColors.textSecondary.withOpacity(0.5)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSelectedHolidayInfo(List<HolidayModel> holidays) {
+    final selectedDateHolidays = holidays.where((h) =>
+        h.dateFrom != null &&
+        h.dateFrom!.year == currentMonth.year &&
+        h.dateFrom!.month == currentMonth.month &&
+        h.dateFrom!.day == selectedDay).toList();
+
+    if (selectedDateHolidays.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.red.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: AppColors.red.withOpacity(0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.info_outline, size: 16, color: AppColors.red),
+              const SizedBox(width: 8),
+              Text(
+                "${selectedDay} ${DateFormat('MMM').format(currentMonth)}: ${selectedDateHolidays.first.name}",
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.red),
+              ),
+            ],
           ),
         ],
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/core/constants/app_colors.dart';
 
 class TeamChatPage extends StatefulWidget {
   final String teamId;
@@ -38,20 +39,23 @@ class _TeamChatPageState extends State<TeamChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       // ---------------- APP BAR ----------------
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
-        leading: const Icon(Icons.arrow_back_ios, color: Colors.black),
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).appBarTheme.foregroundColor),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               widget.teamTitle,
-              style: const TextStyle(
-                color: Colors.black,
+              style: TextStyle(
+                color: Theme.of(context).appBarTheme.foregroundColor,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -65,14 +69,14 @@ class _TeamChatPageState extends State<TeamChatPage> {
         actions: [
           CircleAvatar(
             radius: 18,
-            backgroundColor: Colors.grey.shade200,
-            child: const Icon(Icons.videocam, size: 18, color: Colors.black),
+            backgroundColor: Theme.of(context).cardTheme.color?.withOpacity(0.5) ?? Colors.grey.shade200,
+            child: Icon(Icons.videocam, size: 18, color: Theme.of(context).colorScheme.onSurface),
           ),
           const SizedBox(width: 10),
           CircleAvatar(
             radius: 18,
-            backgroundColor: Colors.grey.shade200,
-            child: const Icon(Icons.call, size: 18, color: Colors.black),
+            backgroundColor: Theme.of(context).cardTheme.color?.withOpacity(0.5) ?? Colors.grey.shade200,
+            child: Icon(Icons.call, size: 18, color: Theme.of(context).colorScheme.onSurface),
           ),
           const SizedBox(width: 10),
         ],
@@ -100,7 +104,6 @@ class _TeamChatPageState extends State<TeamChatPage> {
           ),
 
           _chatInput(),
-          // SizedBox(height: 50),
         ],
       ),
     );
@@ -121,10 +124,29 @@ class _TeamChatPageState extends State<TeamChatPage> {
             padding: const EdgeInsets.all(12),
             constraints: const BoxConstraints(maxWidth: 280),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              color: isMe 
+                  ? AppColors.primaryPurple 
+                  : (Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface),
+              borderRadius: BorderRadius.only(
+                topLeft: const Radius.circular(16),
+                topRight: const Radius.circular(16),
+                bottomLeft: Radius.circular(isMe ? 16 : 0),
+                bottomRight: Radius.circular(isMe ? 0 : 16),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Theme.of(context).shadowColor.withOpacity(0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-            child: Text(msg['text']),
+            child: Text(
+              msg['text'],
+              style: TextStyle(
+                color: isMe ? Colors.white : Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
           ),
           if (msg['time'] != null)
             Padding(
@@ -142,27 +164,32 @@ class _TeamChatPageState extends State<TeamChatPage> {
   // ---------------- INPUT FIELD ----------------
   Widget _chatInput() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 50),
-      decoration: const BoxDecoration(
-        // color: Colors.white,
-        // border: Border(top: BorderSide(color: Colors.grey)),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 32),
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.emoji_emotions_outlined, color: Colors.grey),
+          Icon(Icons.emoji_emotions_outlined, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
           const SizedBox(width: 8),
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(25),
+                border: Border.all(color: Theme.of(context).dividerColor),
               ),
               child: TextField(
                 controller: _messageController,
-                decoration: const InputDecoration(
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                decoration: InputDecoration(
                   hintText: "Message",
+                  hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
                   border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
                 ),
               ),
             ),
@@ -170,9 +197,9 @@ class _TeamChatPageState extends State<TeamChatPage> {
           const SizedBox(width: 8),
           CircleAvatar(
             radius: 22,
-            backgroundColor: Colors.black,
+            backgroundColor: AppColors.primaryPurple,
             child: IconButton(
-              icon: const Icon(Icons.send, color: Colors.white),
+              icon: const Icon(Icons.send, color: Colors.white, size: 20),
               onPressed: () {
                 if (_messageController.text.isEmpty) return;
 

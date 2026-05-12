@@ -63,11 +63,11 @@ class CheckInOutCard extends StatelessWidget {
           return Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: AppColors.cardBg,
+              color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.shadow.withOpacity(0.04),
+                  color: Theme.of(context).shadowColor.withOpacity(0.04),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -81,10 +81,10 @@ class CheckInOutCard extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(l10n.time, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                        Text(l10n.time, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 12)),
                         const SizedBox(height: 2),
                         Text(DateFormat.jm().format(DateTime.now()),
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface)),
                       ],
                     ),
                     Column(
@@ -93,17 +93,17 @@ class CheckInOutCard extends StatelessWidget {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(l10n.date, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                            Text(l10n.date, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 12)),
                             const SizedBox(width: 8),
                             GestureDetector(
                               onTap: () => Navigator.pushNamed(context, Routes.inOutReport),
-                              child: const Icon(Icons.history_rounded, size: 18, color: AppColors.primaryPurple),
+                                child: Icon(Icons.history_rounded, size: 18, color: Theme.of(context).primaryColor),
                             ),
                           ],
                         ),
                         const SizedBox(height: 2),
                         Text(DateFormat('d MMM yyyy').format(DateTime.now()),
-                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary)),
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurface)),
                       ],
                     ),
                   ],
@@ -118,7 +118,7 @@ class CheckInOutCard extends StatelessWidget {
                       child: CircularProgressIndicator(
                         value: progress,
                         strokeWidth: strokeWidth,
-                        backgroundColor: AppColors.progressBg,
+                        backgroundColor: Theme.of(context).dividerTheme.color ?? Theme.of(context).dividerColor,
                         valueColor: AlwaysStoppedAnimation(isCheckedIn ? AppColors.orange : AppColors.successGreen),
                       ),
                     ),
@@ -130,7 +130,7 @@ class CheckInOutCard extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                                 color: isCheckedIn ? AppColors.orange : AppColors.successGreen)),
                         const SizedBox(height: 4),
-                        Text(l10n.working_hours, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                        Text(l10n.working_hours, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 12)),
                       ],
                     ),
                   ],
@@ -142,7 +142,7 @@ class CheckInOutCard extends StatelessWidget {
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isCheckedIn ? AppColors.dangerRed : AppColors.successGreen,
-                      foregroundColor: AppColors.cardBg,
+                      foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
@@ -151,7 +151,7 @@ class CheckInOutCard extends StatelessWidget {
                         ? const SizedBox(
                             width: 20,
                             height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.cardBg),
+                            child: const CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                           )
                         : Icon(isCheckedIn ? Icons.logout_rounded : Icons.login_rounded, size: 20),
                     label: Text(

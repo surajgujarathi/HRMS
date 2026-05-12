@@ -4,7 +4,7 @@ class AppColors {
   // prevents object creation
 
   // 🌈 Backgrounds
-  static Color white = Color(0xFFF4F2FB);
+  static const Color white = Color(0xFFF4F2FB);
   static const Color cardBg = Colors.white;
   static const Color searchBg = Colors.white;
 

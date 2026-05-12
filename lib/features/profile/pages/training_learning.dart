@@ -6,7 +6,7 @@ class TrainingLearningPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: SafeArea(
         child: SingleChildScrollView(
@@ -21,22 +21,24 @@ class TrainingLearningPage extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 15),
 
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(15),
 
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.4),
+                        color: Theme.of(context).shadowColor.withOpacity(0.05),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
                     ],
                   ),
 
-                  child: const TextField(
+                  child: TextField(
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     decoration: InputDecoration(
-                      icon: Icon(Icons.search),
+                      icon: Icon(Icons.search, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
                       hintText: "Search courses...",
+                      hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
                       border: InputBorder.none,
                     ),
                   ),
@@ -45,9 +47,9 @@ class TrainingLearningPage extends StatelessWidget {
                 const SizedBox(height: 25),
 
                 /// CATEGORIES
-                const Text(
+                Text(
                   "Categories",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
                 ),
 
                 const SizedBox(height: 15),
@@ -97,9 +99,9 @@ class TrainingLearningPage extends StatelessWidget {
                 const SizedBox(height: 30),
 
                 /// ONGOING TRAINING
-                const Text(
+                Text(
                   "Ongoing Training",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
                 ),
 
                 const SizedBox(height: 15),
@@ -164,7 +166,7 @@ class CategoryCard extends StatelessWidget {
       padding: const EdgeInsets.all(6),
 
       decoration: BoxDecoration(
-        color: color,
+        color: color.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.2 : 1.0),
         borderRadius: BorderRadius.circular(18),
       ),
 
@@ -180,7 +182,7 @@ class CategoryCard extends StatelessWidget {
             label,
             textAlign: TextAlign.center,
 
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Theme.of(context).colorScheme.onSurface),
           ),
         ],
       ),
@@ -228,11 +230,11 @@ class TrainingCard extends StatelessWidget {
         padding: const EdgeInsets.all(15),
 
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
 
           boxShadow: [
-            BoxShadow(color: Colors.grey.withOpacity(0.2), blurRadius: 6),
+            BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.05), blurRadius: 6),
           ],
         ),
 
@@ -262,9 +264,10 @@ class TrainingCard extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
 
@@ -343,7 +346,7 @@ class CourseDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(title: Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface))),
 
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -354,7 +357,7 @@ class CourseDetailsPage extends StatelessWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
             ),
 
             const SizedBox(height: 8),
@@ -375,19 +378,19 @@ class CourseDetailsPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
               children: [
-                statCard("Total Days", totalDays.toString()),
+                statCard(context, "Total Days", totalDays.toString()),
 
-                statCard("Completed", completedDays.toString()),
+                statCard(context, "Completed", completedDays.toString()),
 
-                statCard("Remaining", (totalDays - completedDays).toString()),
+                statCard(context, "Remaining", (totalDays - completedDays).toString()),
               ],
             ),
 
             const SizedBox(height: 30),
 
-            const Text(
+            Text(
               "Learning Timeline",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
             ),
 
             const SizedBox(height: 10),
@@ -422,13 +425,13 @@ class CourseDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget statCard(String title, String value) {
+  Widget statCard(BuildContext context, String title, String value) {
     return Container(
       width: 100,
       padding: const EdgeInsets.all(15),
 
       decoration: BoxDecoration(
-        color: Colors.grey.shade200,
+        color: Theme.of(context).colorScheme.surfaceVariant ?? Theme.of(context).dividerColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
       ),
 
@@ -436,7 +439,7 @@ class CourseDetailsPage extends StatelessWidget {
         children: [
           Text(
             value,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
           ),
 
           const SizedBox(height: 5),

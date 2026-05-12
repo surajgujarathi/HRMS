@@ -18,9 +18,9 @@ class CustomSearchBar extends StatelessWidget {
     this.onChanged,
     this.padding = const EdgeInsets.symmetric(vertical: 7),
     this.borderRadius = 20,
-    this.backgroundColor = Colors.white,
+    this.backgroundColor = Colors.transparent,
     this.prefixIcon = Icons.search,
-    this.iconColor = Colors.grey,
+    this.iconColor = Colors.transparent,
     this.autofocus = false,
   });
 
@@ -30,11 +30,11 @@ class CustomSearchBar extends StatelessWidget {
       padding: padding,
       child: Container(
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color: backgroundColor == Colors.transparent ? (Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface) : backgroundColor,
           borderRadius: BorderRadius.circular(borderRadius),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Theme.of(context).shadowColor.withOpacity(0.08),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -44,11 +44,19 @@ class CustomSearchBar extends StatelessWidget {
           controller: controller,
           autofocus: autofocus,
           onChanged: onChanged,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontSize: 15,
+          ),
           decoration: InputDecoration(
             hintText: hintText,
-            prefixIcon: Icon(prefixIcon, color: iconColor),
+            hintStyle: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+              fontSize: 15,
+            ),
+            prefixIcon: Icon(prefixIcon, color: iconColor == Colors.transparent ? Theme.of(context).colorScheme.onSurface.withOpacity(0.6) : iconColor),
             filled: true,
-            fillColor: backgroundColor,
+            fillColor: Colors.transparent, // Handled by container
             contentPadding: const EdgeInsets.symmetric(
               vertical: 0,
               horizontal: 16,

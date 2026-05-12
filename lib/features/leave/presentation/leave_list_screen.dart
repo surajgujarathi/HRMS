@@ -19,7 +19,6 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch initial data using the global Cubit
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         context.read<LeaveCubit>().fetchLeavesAndTypes();
@@ -30,101 +29,105 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F2F8),
-      body: BlocBuilder<LeaveCubit, LeaveState>(
-        builder: (context, state) {
-          return RefreshIndicator(
-            onRefresh: () => context.read<LeaveCubit>().fetchLeavesAndTypes(),
-            color: AppColors.primaryPurple,
-            child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                _buildAppBar(context),
-                if (state.status == LeaveStatus.loading && state.leaves.isEmpty)
-                  const SliverFillRemaining(
-                    child: Center(child: CircularProgressIndicator(color: AppColors.primaryPurple)),
-                  )
-                else if (state.status == LeaveStatus.failure && state.leaves.isEmpty)
-                  SliverFillRemaining(
-                    child: Center(child: Text("Error: ${state.errorMessage}", style: const TextStyle(color: Colors.red))),
-                  )
-                else ...[
-                  if (state.leaveTypes.isNotEmpty)
-                    SliverToBoxAdapter(
-                      child: _BalanceSummary(leaveTypes: state.leaveTypes),
-                    ),
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 100),
-                    sliver: Builder(
-                      builder: (context) {
-                        final activeLeaves = state.leaves.where((l) => l.state != 'cancel' && l.state != 'refuse').toList();
-                        if (activeLeaves.isEmpty) {
-                          return SliverFillRemaining(hasScrollBody: false, child: _buildEmptyState(context));
-                        }
-                        return SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) => _LeaveCard(leave: activeLeaves[index]),
-                            childCount: activeLeaves.length,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: Column(
+        children: [
+          _buildHeader(context),
+          Expanded(
+            child: BlocBuilder<LeaveCubit, LeaveState>(
+              builder: (context, state) {
+                return RefreshIndicator(
+                  onRefresh: () => context.read<LeaveCubit>().fetchLeavesAndTypes(),
+                  color: AppColors.indigo,
+                  child: CustomScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      if (state.status == LeaveStatus.loading && state.leaves.isEmpty)
+                        const SliverFillRemaining(
+                          child: Center(child: CircularProgressIndicator(color: AppColors.indigo)),
+                        )
+                      else if (state.status == LeaveStatus.failure && state.leaves.isEmpty)
+                        SliverFillRemaining(
+                          child: Center(child: Text("Error: ${state.errorMessage}", style: const TextStyle(color: Colors.red))),
+                        )
+                      else ...[
+                        if (state.leaveTypes.isNotEmpty)
+                          SliverToBoxAdapter(
+                            child: _BalanceSummary(leaveTypes: state.leaveTypes),
                           ),
-                        );
-                      },
-                    ),
+                        SliverPadding(
+                          padding: const EdgeInsets.fromLTRB(20, 24, 20, 100),
+                          sliver: Builder(
+                            builder: (context) {
+                              final activeLeaves = state.leaves.where((l) => l.state != 'cancel' && l.state != 'refuse').toList();
+                              if (activeLeaves.isEmpty) {
+                                return SliverFillRemaining(hasScrollBody: false, child: _buildEmptyState(context));
+                              }
+                              return SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                  (context, index) => _LeaveCard(leave: activeLeaves[index]),
+                                  childCount: activeLeaves.length,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                ],
-              ],
+                );
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
       floatingActionButton: _buildFAB(context),
     );
   }
 
-  Widget _buildAppBar(BuildContext context) {
-    return SliverAppBar(
-      expandedHeight: 120,
-      floating: false,
-      pinned: true,
-      elevation: 0,
-      backgroundColor: AppColors.primaryPurple,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
-        onPressed: () => Navigator.pop(context),
-      ),
-      flexibleSpace: FlexibleSpaceBar(
-        title: const Text("My Time Off", 
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.indigo, AppColors.brightBlue],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        centerTitle: true,
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.primaryPurple,
-                AppColors.primaryPurple.withOpacity(0.8),
-              ],
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+          ),
+          const Expanded(
+            child: Text(
+              'My Time Off',
+              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
             ),
           ),
-        ),
+          IconButton(
+            icon: const Icon(Icons.refresh_rounded, color: Colors.white, size: 22),
+            onPressed: () => context.read<LeaveCubit>().fetchLeavesAndTypes(),
+          ),
+        ],
       ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-          onPressed: () => context.read<LeaveCubit>().fetchLeavesAndTypes(),
-        ),
-      ],
     );
   }
 
   Widget _buildFAB(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryPurple.withOpacity(0.3),
+            color: AppColors.indigo.withOpacity(0.3),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -137,7 +140,7 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
             context.read<LeaveCubit>().fetchLeavesAndTypes();
           }
         },
-        backgroundColor: AppColors.primaryPurple,
+        backgroundColor: AppColors.indigo,
         icon: const Icon(Icons.add_rounded, color: Colors.white),
         label: const Text("Request Leave", 
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 0.5)
@@ -150,25 +153,26 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        const SizedBox(height: 60),
         Container(
           padding: const EdgeInsets.all(30),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
             shape: BoxShape.circle,
             boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20),
+              BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.05), blurRadius: 20),
             ],
           ),
-          child: Icon(Icons.event_note_rounded, size: 80, color: Colors.grey.shade300),
+          child: Icon(Icons.event_note_rounded, size: 80, color: AppColors.indigo.withOpacity(0.1)),
         ),
         const SizedBox(height: 24),
-        const Text("No Leave Records", 
-          style: TextStyle(fontSize: 20, color: Colors.black87, fontWeight: FontWeight.bold)
+        Text("No Leave Records", 
+          style: TextStyle(fontSize: 20, color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)
         ),
         const SizedBox(height: 12),
         Text("Your leave history will appear here\nonce you submit your first request.", 
           textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.grey.shade500, height: 1.5)
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), height: 1.5)
         ),
       ],
     );
@@ -184,16 +188,17 @@ class _BalanceSummary extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(24, 24, 24, 12),
+        Padding(
+          padding: EdgeInsets.fromLTRB(24, 32, 24, 16),
           child: Text("Leave Balance", 
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)
           ),
         ),
         SizedBox(
-          height: 130,
+          height: 140,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: leaveTypes.length,
             itemBuilder: (context, index) {
@@ -213,33 +218,28 @@ class _BalanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = Colors.primaries[(type.name.hashCode).abs() % Colors.primaries.length];
+    
     return Container(
       width: 160,
       margin: const EdgeInsets.only(right: 12, bottom: 8, top: 4),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Theme.of(context).shadowColor.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
-       border: Border(
-        
-          left: BorderSide(
-            color: Colors.primaries[type.hashCode % Colors.primaries.length],
-            width: 4,
-          ),
-        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(type.name, 
-            style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontWeight: FontWeight.bold),
             maxLines: 1, overflow: TextOverflow.ellipsis,
           ),
           const Spacer(),
@@ -247,18 +247,18 @@ class _BalanceCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(type.remainingLeaves.toStringAsFixed(1), 
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.primaryPurple)
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: color)
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 4, left: 4),
+                padding: const EdgeInsets.only(bottom: 6, left: 4),
                 child: Text("/ ${type.maxLeaves.toInt()}", 
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade400, fontWeight: FontWeight.w500)
+                  style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), fontWeight: FontWeight.w500)
                 ),
               ),
             ],
           ),
           const SizedBox(height: 4),
-          Text("Days Available", style: TextStyle(fontSize: 10, color: Colors.grey.shade400)),
+          Text("Days Available", style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4))),
         ],
       ),
     );
@@ -271,11 +271,11 @@ class _LeaveCard extends StatelessWidget {
 
   Color _getStatusColor() {
     switch (leave.state) {
-      case 'validate': return const Color(0xFF4CAF50);
-      case 'confirm': return const Color(0xFF2196F3);
-      case 'refuse': return const Color(0xFFF44336);
+      case 'validate': return AppColors.successGreen;
+      case 'confirm': return Colors.blue;
+      case 'refuse': return AppColors.dangerRed;
       case 'cancel': return Colors.grey;
-      default: return const Color(0xFFFF9800);
+      default: return Colors.orange;
     }
   }
 
@@ -293,81 +293,90 @@ class _LeaveCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statusColor = _getStatusColor();
+    final typeColor = Colors.primaries[(leave.holidayStatusId?.name.hashCode ?? 0).abs() % Colors.primaries.length];
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border(
-          left: BorderSide(
-            color: Colors.primaries[ leave.hashCode % Colors.primaries.length],
-            width: 4,
-          ),),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 15, offset: const Offset(0, 5)),
+          BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.04), blurRadius: 15, offset: const Offset(0, 5)),
         ],
       ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(leave.holidayStatusId?.name ?? "Leave Request", 
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17, color: Colors.black87)
-                      ),
-                    ),
-                    _StatusBadge(text: _getStatusText(), color: statusColor),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    _InfoItem(icon: Icons.calendar_today_rounded, 
-                      text: "${DateFormat('dd MMM').format(leave.requestDateFrom!)} - ${DateFormat('dd MMM yyyy').format(leave.requestDateTo!)}"
-                    ),
-                    const Spacer(),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(leave.durationDisplay ?? "", 
-                          style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryPurple, fontSize: 15)
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 4,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color: typeColor,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(leave.holidayStatusId?.name ?? "Leave Request", 
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Theme.of(context).colorScheme.onSurface)
+                              ),
+                            ),
+                          ],
                         ),
-                        if (leave.payslipState != null && leave.payslipState != "false")
-                          Text("Payslip: ${leave.payslipState}", 
-                            style: TextStyle(fontSize: 10, color: Colors.grey.shade400)
-                          ),
-                      ],
+                      ),
+                      _StatusBadge(text: _getStatusText(), color: statusColor),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Icon(Icons.calendar_today_rounded, size: 14, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+                      const SizedBox(width: 8),
+                      Text(
+                        "${DateFormat('dd MMM').format(leave.requestDateFrom!)} - ${DateFormat('dd MMM yyyy').format(leave.requestDateTo!)}",
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 13, fontWeight: FontWeight.w500),
+                      ),
+                      const Spacer(),
+                      Text(leave.durationDisplay ?? "", 
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryPurple, fontSize: 16)
+                      ),
+                    ],
+                  ),
+                  if (leave.name != null && leave.name!.isNotEmpty) ...[
+                    const Divider(height: 32),
+                    Text(leave.name!, 
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 12, height: 1.4),
+                      maxLines: 2, overflow: TextOverflow.ellipsis,
                     ),
                   ],
-                ),
-                if (leave.name != null && leave.name!.isNotEmpty) ...[
-                  const Padding(padding: EdgeInsets.symmetric(vertical: 12), child: Divider(height: 1, color: Color(0xFFF0F0F0))),
-                  Text(leave.name!, 
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 13, height: 1.4),
-                    maxLines: 2, overflow: TextOverflow.ellipsis,
-                  ),
                 ],
-              ],
+              ),
             ),
-          ),
-          if (leave.state == 'draft' || leave.state == 'confirm' || leave.state == 'validate')
-            _buildActions(context),
-        ],
+            if (leave.state == 'draft' || leave.state == 'confirm' || leave.state == 'validate')
+              _buildActions(context),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildActions(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFFFAFAFA),
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant ?? Theme.of(context).dividerColor.withOpacity(0.1),
+        border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(
@@ -377,13 +386,13 @@ class _LeaveCard extends StatelessWidget {
             TextButton.icon(
               onPressed: () => _showDeleteDialog(context),
               icon: const Icon(Icons.delete_outline_rounded, size: 18, color: Colors.redAccent),
-              label: const Text("Delete Draft", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600)),
+              label: const Text("Delete Draft", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 12)),
             )
           else
             TextButton.icon(
               onPressed: () => _showCancelDialog(context),
               icon: const Icon(Icons.cancel_outlined, size: 18, color: Colors.orangeAccent),
-              label: const Text("Cancel Leave", style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.w600)),
+              label: const Text("Cancel Leave", style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 12)),
             ),
         ],
       ),
@@ -392,13 +401,14 @@ class _LeaveCard extends StatelessWidget {
 
   void _showCancelDialog(BuildContext context) {
     showDialog(context: context, builder: (ctx) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      title: const Text("Cancel Request?"),
-      content: const Text("Are you sure you want to cancel this leave request?"),
+      backgroundColor: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      title: Text("Cancel Request?", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+      content: Text("Are you sure you want to cancel this leave request?", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
       actions: [
         TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("No")),
         TextButton(onPressed: () { Navigator.pop(ctx); context.read<LeaveCubit>().cancelLeave(leave.id); },
-          child: const Text("Yes, Cancel", style: TextStyle(color: Colors.red)),
+          child: const Text("Yes, Cancel", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
         ),
       ],
     ));
@@ -406,13 +416,14 @@ class _LeaveCard extends StatelessWidget {
 
   void _showDeleteDialog(BuildContext context) {
     showDialog(context: context, builder: (ctx) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      title: const Text("Delete Draft?"),
-      content: const Text("This draft will be permanently removed."),
+      backgroundColor: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      title: Text("Delete Draft?", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+      content: Text("This draft will be permanently removed.", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
       actions: [
         TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancel")),
         TextButton(onPressed: () { Navigator.pop(ctx); context.read<LeaveCubit>().deleteLeave(leave.id); },
-          child: const Text("Delete", style: TextStyle(color: Colors.red)),
+          child: const Text("Delete", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
         ),
       ],
     ));
@@ -429,28 +440,10 @@ class _StatusBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Text(text, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.2)),
-    );
-  }
-}
-
-class _InfoItem extends StatelessWidget {
-  final IconData icon;
-  final String text;
-  const _InfoItem({required this.icon, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 16, color: Colors.grey.shade400),
-        const SizedBox(width: 8),
-        Text(text, style: TextStyle(color: Colors.grey.shade600, fontSize: 13, fontWeight: FontWeight.w500)),
-      ],
+      child: Text(text, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold)),
     );
   }
 }

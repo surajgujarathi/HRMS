@@ -3,6 +3,7 @@ import 'package:flutter_app/core/utils/shared_pref.dart';
 import 'package:flutter_app/network/odoo_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:odoo_rpc/odoo_rpc.dart';
+import 'package:flutter_app/core/constants/api_config.dart';
 import 'login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {
@@ -57,9 +58,9 @@ class LoginCubit extends Cubit<LoginState> {
     debugPrint('Input Username: $username');
     debugPrint('Input Password: $password');
 
-    const baseUrl = 'https://test.ftprotech.in/';
+    const baseUrl = ApiConfig.baseUrl;
     debugPrint('Using Base URL: $baseUrl');
-    const db = 'pmt_test';
+    const db = ApiConfig.dbName;
     debugPrint('Using Database: $db');
     final odooService = OdooService(baseUrl);
 
@@ -92,7 +93,16 @@ class LoginCubit extends Cubit<LoginState> {
       );
 
       final empId = empResponse[0]['id']?.toString() ?? '';
-      debugPrint('Resolved Employee ID: $empId');
+      final deptData = empResponse[0]['department_id'];
+      String deptId = '';
+      if (deptData != null && deptData != false) {
+        if (deptData is List && deptData.isNotEmpty) {
+          deptId = deptData[0].toString();
+        } else {
+          deptId = deptData.toString();
+        }
+      }
+      debugPrint('Resolved Employee ID: $empId, Department ID: $deptId');
 
       // 3. Get Full Employee Details
       debugPrint(
@@ -108,6 +118,7 @@ class LoginCubit extends Cubit<LoginState> {
 
       await prefs.saveObject('employee_data', employee);
       await prefs.saveString('employee_id', employee['id']?.toString() ?? '');
+      await prefs.saveString('department_id', deptId);
       await prefs.saveString(
         'profile_pic',
         employee['profile_pic']?.toString() ?? '',
@@ -170,7 +181,7 @@ class LoginCubit extends Cubit<LoginState> {
 
     if (sessionData != null && sessionData is Map && sessionData.isNotEmpty) {
       final baseUrl =
-          await prefs.getString('baseUrl') ?? 'https://ftprotech.in/';
+          await prefs.getString('baseUrl') ?? ApiConfig.baseUrl;
 
       // Reconstruction of OdooSession
       final session = OdooSession(

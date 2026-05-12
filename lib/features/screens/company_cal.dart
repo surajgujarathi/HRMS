@@ -58,23 +58,31 @@ class _CompanyCalendarPageState extends State<CompanyCalendarPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
+                  Text(
                     "Add Event",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 18, 
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
                   const SizedBox(height: 20),
 
                   TextField(
                     controller: titleController,
-                    decoration: const InputDecoration(
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                    decoration: InputDecoration(
                       labelText: "Event Title",
-                      border: OutlineInputBorder(),
+                      labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 15),
 
                   DropdownButtonFormField<String>(
                     value: selectedType,
+                    dropdownColor: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     items: const [
                       DropdownMenuItem(value: "Event", child: Text("Event")),
                       DropdownMenuItem(
@@ -87,9 +95,10 @@ class _CompanyCalendarPageState extends State<CompanyCalendarPage> {
                         selectedType = value!;
                       });
                     },
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: "Type",
-                      border: OutlineInputBorder(),
+                      labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -151,19 +160,20 @@ class _CompanyCalendarPageState extends State<CompanyCalendarPage> {
               alignment: Alignment.centerLeft,
               child: Text(
                 "Events on ${DateFormat('dd MMM yyyy').format(selectedDate)}",
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
           ),
           Expanded(
             child: filteredEvents.isEmpty
-                ? const Center(
+                ? Center(
                     child: Text(
                       "No Events",
-                      style: TextStyle(color: Colors.grey),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
                     ),
                   )
                 : ListView.builder(

@@ -36,7 +36,7 @@ class AttendanceActions extends StatelessWidget {
         'title': 'Company Calendar',
         'icon': Icons.calendar_month,
         'color': const Color(0xFF00ACC1),
-        'routeName': Routes.companyCalendar,
+        'routeName': Routes.holidayCalendar,
       },
       {
         'title': 'Ai Chat Bot',
@@ -45,11 +45,17 @@ class AttendanceActions extends StatelessWidget {
         'routeName': Routes.aichatbot,
       },
       {
-        'title': 'Tax Planner',
-        'icon': Icons.calendar_today,
+        'title': 'Events',
+        'icon': Icons.celebration_rounded,
         'color': const Color(0xFF6C63FF),
-        'routeName': Routes.leave,
+        'routeName': Routes.events,
       },
+      // {
+      //   'title': 'Tax Planner',
+      //   'icon': Icons.calendar_today,
+      //   'color': const Color(0xFF6C63FF),
+      //   'routeName': Routes.leave,
+      // },
     ];
 
     return GridView.builder(

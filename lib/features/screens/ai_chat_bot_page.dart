@@ -72,12 +72,26 @@ class _AiChatBotPageState extends State<AiChatBotPage> {
         padding: const EdgeInsets.all(12),
         constraints: const BoxConstraints(maxWidth: 280),
         decoration: BoxDecoration(
-          color: isUser ? Colors.blue : Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(14),
+          color: isUser ? Theme.of(context).primaryColor : (Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface),
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(16),
+            topRight: const Radius.circular(16),
+            bottomLeft: Radius.circular(isUser ? 16 : 0),
+            bottomRight: Radius.circular(isUser ? 0 : 16),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).shadowColor.withOpacity(0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Text(
           message["text"],
-          style: TextStyle(color: isUser ? Colors.white : Colors.black87),
+          style: TextStyle(
+            color: isUser ? Colors.white : Theme.of(context).colorScheme.onSurface,
+          ),
         ),
       ),
     );
@@ -91,6 +105,7 @@ class _AiChatBotPageState extends State<AiChatBotPage> {
         children: [
           Expanded(
             child: ListView.builder(
+              padding: const EdgeInsets.only(top: 10, bottom: 20),
               controller: _scrollController,
               itemCount: messages.length,
               itemBuilder: (context, index) {
@@ -100,16 +115,22 @@ class _AiChatBotPageState extends State<AiChatBotPage> {
           ),
           const Divider(height: 1),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            color: Colors.white,
+            padding: EdgeInsets.fromLTRB(10, 8, 10, MediaQuery.of(context).padding.bottom + 10),
+            color: Theme.of(context).scaffoldBackgroundColor,
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    decoration: const InputDecoration(
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                    decoration: InputDecoration(
                       hintText: "Type your message...",
-                      border: OutlineInputBorder(),
+                      hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      filled: true,
+                      fillColor: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
                       isDense: true,
                     ),
                     onSubmitted: (_) => sendMessage(),
@@ -119,7 +140,7 @@ class _AiChatBotPageState extends State<AiChatBotPage> {
                 CircleAvatar(
                   backgroundColor: Theme.of(context).primaryColor,
                   child: IconButton(
-                    icon: const Icon(Icons.send, color: Colors.white),
+                    icon: const Icon(Icons.send, color: Colors.white, size: 20),
                     onPressed: sendMessage,
                   ),
                 ),

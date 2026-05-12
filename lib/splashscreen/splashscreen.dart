@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/core/constants/app_colors.dart';
 import 'package:flutter_app/core/constants/app_images.dart';
 import 'package:flutter_app/core/utils/shared_pref.dart';
 import 'package:flutter_app/features/auth/login/cubit/login_cubit.dart';
@@ -73,20 +74,27 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF1E3A8A), // Deep Navy
-              Color(0xFF1E40AF), // Darker Blue
-              Color(0xFF1D4ED8), // Royal Blue
-            ],
+            colors: isDark 
+              ? [
+                  const Color(0xFF0F172A), // Slate 900
+                  const Color(0xFF1E293B), // Slate 800
+                  const Color(0xFF0F172A), // Slate 900
+                ]
+              : [
+                  const Color(0xFF1E3A8A), // Deep Navy
+                  const Color(0xFF1E40AF), // Darker Blue
+                  const Color(0xFF1D4ED8), // Royal Blue
+                ],
           ),
         ),
         child: Stack(
@@ -100,7 +108,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 height: 300,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(0.03),
+                  color: Colors.white.withOpacity(isDark ? 0.01 : 0.03),
                 ),
               ),
             ),
@@ -112,7 +120,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(0.03),
+                  color: Colors.white.withOpacity(isDark ? 0.01 : 0.03),
                 ),
               ),
             ),
@@ -133,11 +141,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           Container(
                             padding: const EdgeInsets.all(24),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: isDark ? const Color(0xFF1E293B) : Colors.white,
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
+                                  color: Colors.black.withOpacity(0.2),
                                   blurRadius: 30,
                                   spreadRadius: 5,
                                 ),
@@ -151,10 +159,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           ),
                           const SizedBox(height: 32),
                           // App Name
-                          const Text(
+                          Text(
                             "Opzento HR",
                             style: TextStyle(
-                              color: Colors.white,
+                              color: isDark ? AppColors.primaryPurple : Colors.white,
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.5,
@@ -164,7 +172,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           Text(
                             "Human Resource Management System",
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.6),
+                              color: (isDark ? Colors.white : Colors.white).withOpacity(0.6),
                               fontSize: 14,
                               letterSpacing: 0.5,
                             ),
@@ -184,11 +192,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               right: 0,
               child: Column(
                 children: [
-                  const SizedBox(
+                  SizedBox(
                     width: 40,
                     child: LinearProgressIndicator(
-                      backgroundColor: Colors.white24,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      backgroundColor: Colors.white.withOpacity(0.1),
+                      valueColor: AlwaysStoppedAnimation<Color>(isDark ? AppColors.primaryPurple : Colors.white),
                     ),
                   ),
                   const SizedBox(height: 40),

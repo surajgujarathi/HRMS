@@ -48,6 +48,8 @@ dependencies:
   flutter_secure_storage: ^10.0.0
   odoo_rpc: ^0.7.1
   geolocator: ^13.0.2
+  file_picker: ^8.1.4
+  get_it: ^9.2.1
  
 
 dev_dependencies:

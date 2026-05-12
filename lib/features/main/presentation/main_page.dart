@@ -29,9 +29,7 @@ class MainPage extends StatelessWidget {
             ),
 
             bottomNavigationBar: NavigationBar(
-              backgroundColor: AppColors.navBg,
               selectedIndex: state.selectedIndex,
-              indicatorColor: AppColors.navIndicator,
               onDestinationSelected: (index) {
                 context.read<MainCubit>().changeTab(index);
               },
