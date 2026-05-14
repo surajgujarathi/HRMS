@@ -7,6 +7,7 @@ import 'package:flutter_app/features/notifications/cubit/notification_cubit.dart
 import 'package:flutter_app/core/theme/theme_cubit.dart';
 import 'package:flutter_app/routes.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_app/core/constants/app_colors.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -26,286 +27,400 @@ class ProfileScreen extends StatelessWidget {
             return const Center(child: Text("No employee data found"));
           }
 
-          return Column(
+          return Stack(
             children: [
-              const SizedBox(height: 50),
-              // ---------- CONTENT ----------
-              Expanded(
+              // 🎨 Gradient Header Background
+              Container(
+                height: 240,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppColors.indigo,
+                      AppColors.brightBlue,
+                    ],
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      top: -40,
+                      right: -40,
+                      child: CircleAvatar(
+                        radius: 80,
+                        backgroundColor: Colors.white.withOpacity(0.05),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 40,
+                      left: -20,
+                      child: CircleAvatar(
+                        radius: 60,
+                        backgroundColor: Colors.white.withOpacity(0.03),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // 🚀 Scrollable Content
+              SafeArea(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
+                  physics: const BouncingScrollPhysics(),
                   child: Column(
                     children: [
-                      // ---------- USER CARD ----------
-                      _WhiteCard(
-                        child: Column(
+                      const SizedBox(height: 20),
+                      // ---------- HEADER CONTENT ----------
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        child: Row(
                           children: [
-                            Row(
-                              children: [
-                                _buildAvatar(context, employee.image1920, radius: 28),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        employee.name ?? "User",
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        employee.jobTitle ?? "Employee",
-                                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                            Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white.withOpacity(0.2),
+                              ),
+                              child: _buildAvatar(context, employee.image1920, radius: 45),
                             ),
-                            const Divider(height: 24),
-                            _InfoLine(employee.employeeCode ?? "N/A"),
-                            _InfoLine(employee.departmentId?.name ?? "N/A"),
-                            _InfoLine("Joining: ${employee.doj != null ? employee.doj!.toString().split(' ')[0] : 'N/A'}"),
+                            const SizedBox(width: 20),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    employee.name ?? "User",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.15),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Text(
+                                      employee.jobTitle ?? "Employee",
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ),
 
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 30),
 
-                      // ---------- MANAGER ----------
-                      if (employee.parentId != null)
-                        _WhiteCard(
-                          title: "Reporting Manager",
-                          child: Row(
-                            children: [
-                              _buildAvatar(context, null, radius: 20),
-                              const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    employee.parentId!.name,
-                                    style: const TextStyle(fontWeight: FontWeight.w600),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    "Manager",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-
-                      if (employee.coachId != null) ...[
-                        const SizedBox(height: 12),
-                        _WhiteCard(
-                          title: "Coach",
-                          child: Row(
-                            children: [
-                              _buildAvatar(context, null, radius: 20),
-                              const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    employee.coachId!.name,
-                                    style: const TextStyle(fontWeight: FontWeight.w600),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    "Coach",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-
-                      const SizedBox(height: 12),
-
-                      // ---------- RESUME SECTION ----------
-                      if (employee.resumeLines.isNotEmpty)
-                        _WhiteCard(
-                          title: "Resume",
-                          child: Column(
-                            children: employee.resumeLines.map((line) => Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
+                      // ---------- MAIN CONTENT CARDS ----------
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                        child: Column(
+                          children: [
+                            // ---------- USER INFO CARD ----------
+                            _ProfileCard(
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(line.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                                  if (line.lineTypeId != null)
-                                    Text(line.lineTypeId!.name, style: const TextStyle(fontSize: 12, color: Colors.blue)),
-                                  Text(
-                                    "${line.dateStart?.toString().split(' ')[0] ?? ''} - ${line.dateEnd?.toString().split(' ')[0] ?? 'Present'}",
-                                    style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                                  _InfoLine(
+                                    icon: Icons.badge_outlined,
+                                    label: "Employee ID",
+                                    value: employee.employeeCode ?? "N/A",
                                   ),
-                                  if (line.description != null)
-                                    Text(line.description!, style: const TextStyle(fontSize: 12)),
-                                  const Divider(),
+                                  _InfoLine(
+                                    icon: Icons.business_outlined,
+                                    label: "Department",
+                                    value: employee.departmentId?.name ?? "N/A",
+                                  ),
+                                  _InfoLine(
+                                    icon: Icons.calendar_today_outlined,
+                                    label: "Joining Date",
+                                    value: employee.doj != null ? employee.doj!.toString().split(' ')[0] : 'N/A',
+                                  ),
                                 ],
                               ),
-                            )).toList(),
-                          ),
-                        ),
+                            ),
 
-                      const SizedBox(height: 12),
+                            const SizedBox(height: 16),
 
-                      // ---------- SKILLS SECTION ----------
-                      if (employee.skills.isNotEmpty)
-                        _WhiteCard(
-                          title: "Skills",
-                          child: Column(
-                            children: employee.skills.map((skill) => Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                            // ---------- MANAGER & COACH ----------
+                            if (employee.parentId != null || employee.coachId != null)
+                              Row(
                                 children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(skill.skillId?.name ?? "Skill", style: const TextStyle(fontWeight: FontWeight.w500)),
-                                      Text("${skill.levelProgress}%", style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  LinearProgressIndicator(
-                                    value: skill.levelProgress / 100.0,
-                                    backgroundColor: Theme.of(context).dividerColor.withOpacity(0.1),
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      skill.color != 0 ? Color(skill.color) : Colors.blue,
+                                  if (employee.parentId != null)
+                                    Expanded(
+                                      child: _ProfileCard(
+                                        title: "Manager",
+                                        child: Row(
+                                          children: [
+                                            _buildAvatar(context, null, radius: 16),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: Text(
+                                                employee.parentId!.name,
+                                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
+                                  if (employee.parentId != null && employee.coachId != null)
+                                    const SizedBox(width: 12),
+                                  if (employee.coachId != null)
+                                    Expanded(
+                                      child: _ProfileCard(
+                                        title: "Coach",
+                                        child: Row(
+                                          children: [
+                                            _buildAvatar(context, null, radius: 16),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: Text(
+                                                employee.coachId!.name,
+                                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+
+                            const SizedBox(height: 16),
+
+                            // ---------- SKILLS SECTION ----------
+                            if (employee.skills.isNotEmpty)
+                              _ProfileCard(
+                                title: "Top Skills",
+                                child: Column(
+                                  children: employee.skills.take(3).map((skill) => Padding(
+                                    padding: const EdgeInsets.only(bottom: 12.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(skill.skillId?.name ?? "Skill", style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                                            Text("${skill.levelProgress}%", style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold)),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 6),
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(4),
+                                          child: LinearProgressIndicator(
+                                            value: skill.levelProgress / 100.0,
+                                            minHeight: 6,
+                                            backgroundColor: Colors.grey.shade100,
+                                            valueColor: AlwaysStoppedAnimation<Color>(
+                                              skill.color != 0 ? Color(skill.color) : AppColors.brightBlue,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )).toList(),
+                                ),
+                              ),
+
+                            const SizedBox(height: 24),
+
+                            // ---------- SETTINGS SECTION ----------
+                            _buildSectionHeader("Quick Actions"),
+                            _ProfileCard(
+                              padding: EdgeInsets.zero,
+                              child: Column(
+                                children: [
+                                  _SettingTile(
+                                    icon: Icons.badge_outlined,
+                                    title: "Job Details",
+                                    onTap: () => Navigator.pushNamed(context, Routes.jobdetails),
+                                  ),
+                                  _buildDivider(),
+                                  _SettingTile(
+                                    icon: Icons.event_available_outlined,
+                                    title: "Leave Balance",
+                                    onTap: () => Navigator.pushNamed(context, Routes.leaveList),
+                                  ),
+                                  _buildDivider(),
+                                  _SettingTile(
+                                    icon: Icons.calendar_month_outlined,
+                                    title: "Holidays Calendar",
+                                    onTap: () => Navigator.pushNamed(context, Routes.holidayCalendar),
+                                  ),
+                                  _buildDivider(),
+                                  _SettingTile(
+                                    icon: Icons.receipt_long_outlined,
+                                    title: "Reimbursements",
+                                    onTap: () => Navigator.pushNamed(context, Routes.reimbursements),
+                                  ),
+                                  _buildDivider(),
+                                  _SettingTile(
+                                    icon: Icons.school_outlined,
+                                    title: "Training & Learning",
+                                    onTap: () => Navigator.pushNamed(context, Routes.learnTraing),
+                                  ),
+                                  _buildDivider(),
+                                  _SettingTile(
+                                    icon: Icons.assignment_turned_in_outlined,
+                                    title: "Assets Assigned",
+                                    onTap: () => Navigator.pushNamed(context, Routes.assignedAssets),
                                   ),
                                 ],
                               ),
-                            )).toList(),
-                          ),
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            // ---------- RESUME SECTION ----------
+                            if (employee.resumeLines.isNotEmpty) ...[
+                              _buildSectionHeader("Resume & Experience"),
+                              _ProfileCard(
+                                child: Column(
+                                  children: employee.resumeLines.map((line) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 16.0),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.brightBlue.withOpacity(0.05),
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: Icon(
+                                              line.lineTypeId?.name.toLowerCase().contains('education') ?? false 
+                                                ? Icons.school_outlined 
+                                                : Icons.work_outline,
+                                              size: 16,
+                                              color: AppColors.brightBlue,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  line.name,
+                                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                                ),
+                                                if (line.lineTypeId != null)
+                                                  Text(
+                                                    line.lineTypeId!.name,
+                                                    style: const TextStyle(fontSize: 11, color: AppColors.brightBlue, fontWeight: FontWeight.w500),
+                                                  ),
+                                                Text(
+                                                  "${line.dateStart?.toString().split(' ')[0] ?? ''} - ${line.dateEnd?.toString().split(' ')[0] ?? 'Present'}",
+                                                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                                                ),
+                                                if (line.description != null && line.description!.isNotEmpty)
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(top: 4),
+                                                    child: Text(
+                                                      line.description!,
+                                                      style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                            ],
+
+                            _buildSectionHeader("Preferences"),
+                            _ProfileCard(
+                              padding: EdgeInsets.zero,
+                              child: Column(
+                                children: [
+                                  BlocBuilder<NotificationCubit, NotificationState>(
+                                    builder: (context, state) {
+                                      return _SettingTile(
+                                        icon: Icons.notifications_none_outlined,
+                                        title: "Notifications",
+                                        trailing: state.unreadCount > 0 
+                                          ? _Badge(count: state.unreadCount) 
+                                          : const Icon(Icons.chevron_right, size: 16),
+                                        onTap: () => Navigator.pushNamed(context, Routes.notifications),
+                                      );
+                                    },
+                                  ),
+                                  _buildDivider(),
+                                  _SettingTile(
+                                    icon: Icons.language_outlined,
+                                    title: "Language",
+                                    onTap: () => Navigator.pushNamed(context, Routes.language),
+                                  ),
+                                  _buildDivider(),
+                                  BlocBuilder<ThemeCubit, ThemeMode>(
+                                    builder: (context, themeMode) {
+                                      final isDark = themeMode == ThemeMode.dark;
+                                      return SwitchListTile(
+                                        dense: true,
+                                        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                                        title: const Text("Dark Mode", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13)),
+                                        secondary: Icon(isDark ? Icons.dark_mode_outlined : Icons.light_mode_outlined, color: AppColors.brightBlue, size: 20),
+                                        value: isDark,
+                                        onChanged: (value) => context.read<ThemeCubit>().toggleTheme(value),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            _buildSectionHeader("Security"),
+                            _ProfileCard(
+                              padding: EdgeInsets.zero,
+                              child: Column(
+                                children: [
+                                  _SettingTile(
+                                    icon: Icons.lock_outline,
+                                    title: "Change Password",
+                                    onTap: () => Navigator.pushNamed(context, Routes.changepassword),
+                                  ),
+                                  _buildDivider(),
+                                  _SettingTile(
+                                    icon: Icons.logout,
+                                    title: "Logout",
+                                    titleColor: Colors.redAccent,
+                                    iconColor: Colors.redAccent,
+                                    onTap: () async {
+                                      await context.read<LoginCubit>().logout();
+                                      if (context.mounted) {
+                                        Navigator.of(context).pushNamedAndRemoveUntil(Routes.login, (route) => false);
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 40),
+                          ],
                         ),
-
-                      const SizedBox(height: 12),
-
-                      // ---------- SETTINGS ----------
-                      _SettingTile(
-                        icon: Icons.badge_outlined,
-                        title: "Job Details",
-                        onTap: () {
-                          Navigator.pushNamed(context, Routes.jobdetails);
-                        },
-                      ),
-                      const Divider(),
-                      _SettingTile(
-                        icon: Icons.event_available_outlined,
-                        title: "Leave Balance",
-                        onTap: () {
-                          Navigator.pushNamed(context, Routes.leaveList);
-                        },
-                      ),
-                      const Divider(),
-                      _SettingTile(
-                        icon: Icons.calendar_month_outlined,
-                        title: "Holidays Calendar",
-                        onTap: () {
-                          Navigator.pushNamed(context, Routes.holidayCalendar);
-                        },
-                      ),
-                      const Divider(),
-                      _SettingTile(
-                        icon: Icons.receipt_long_outlined,
-                        title: "Reimbursements",
-                        onTap: () {
-                          Navigator.pushNamed(context, Routes.reimbursements);
-                        },
-                      ),
-                      const Divider(),
-                      _SettingTile(
-                        icon: Icons.school_outlined,
-                        title: "Training & Learning",
-                        onTap: () {
-                          Navigator.pushNamed(context, Routes.learnTraing);
-                        },
-                      ),
-                      const Divider(),
-                      _SettingTile(
-                        icon: Icons.assignment_turned_in_outlined,
-                        title: "Assets Assigned",
-                        onTap: () {
-                          Navigator.pushNamed(context, Routes.assignedAssets);
-                        },
-                      ),
-                      const Divider(),
-                      _SettingTile(
-                        icon: Icons.lock_outline,
-                        title: "Change Password",
-                        onTap: () {
-                          Navigator.pushNamed(context, Routes.changepassword);
-                        },
-                      ),
-                      const Divider(),
-                      BlocBuilder<NotificationCubit, NotificationState>(
-                        builder: (context, state) {
-                          return _SettingTile(
-                            icon: Icons.notifications_none_outlined,
-                            title: "Notifications",
-                            trailing: state.unreadCount > 0 
-                              ? _Badge(count: state.unreadCount) 
-                              : const Icon(Icons.chevron_right),
-                            onTap: () {
-                              Navigator.pushNamed(context, Routes.notifications);
-                            },
-                          );
-                        },
-                      ),
-                      const Divider(),
-                      _SettingTile(
-                        icon: Icons.language_outlined,
-                        title: "Language",
-                        onTap: () {
-                          Navigator.pushNamed(context, Routes.language);
-                        },
-                      ),
-                      const Divider(),
-                      BlocBuilder<ThemeCubit, ThemeMode>(
-                        builder: (context, themeMode) {
-                          final isDark = themeMode == ThemeMode.dark;
-                          return SwitchListTile(
-                            dense: true,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                            title: const Text("Dark Mode", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13)),
-                            secondary: Icon(isDark ? Icons.dark_mode : Icons.light_mode, color: Colors.blue),
-                            value: isDark,
-                            onChanged: (value) {
-                              context.read<ThemeCubit>().toggleTheme(value);
-                            },
-                          );
-                        },
-                      ),
-                      const Divider(),
-                      _SettingTile(
-                        icon: Icons.logout,
-                        title: "Logout",
-                        titleColor: Colors.red,
-                        iconColor: Colors.red,
-                        onTap: () async {
-                          await context.read<LoginCubit>().logout();
-                          if (context.mounted) {
-                            Navigator.of(context).pushNamedAndRemoveUntil(
-                              Routes.login,
-                              (route) => false,
-                            );
-                          }
-                        },
                       ),
                     ],
                   ),
@@ -316,6 +431,28 @@ class ProfileScreen extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          title.toUpperCase(),
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey.shade500,
+            letterSpacing: 1.2,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Divider(height: 1, indent: 50, color: Colors.grey.withOpacity(0.1));
   }
 
   Widget _buildAvatar(BuildContext context, dynamic picData, {double radius = 28}) {
@@ -350,48 +487,39 @@ class ProfileScreen extends StatelessWidget {
 
     return CircleAvatar(
       radius: radius,
-      backgroundColor: Theme.of(context).dividerColor.withOpacity(0.05),
+      backgroundColor: Colors.white.withOpacity(0.1),
       child: avatarImage ??
           Icon(
             Icons.person,
             size: radius * 1.2,
-            color: Colors.blue.shade300,
+            color: Colors.white.withOpacity(0.8),
           ),
     );
   }
 }
 
-class _InfoLine extends StatelessWidget {
-  final String text;
-  const _InfoLine(this.text);
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          text,
-          style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
-        ),
-      ),
-    );
-  }
-}
-
-class _WhiteCard extends StatelessWidget {
+class _ProfileCard extends StatelessWidget {
   final String? title;
   final Widget child;
-  const _WhiteCard({this.title, required this.child});
+  final EdgeInsetsGeometry? padding;
+
+  const _ProfileCard({this.title, required this.child, this.padding});
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: padding ?? const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.05), blurRadius: 6)],
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -399,11 +527,67 @@ class _WhiteCard extends StatelessWidget {
           if (title != null) ...[
             Text(
               title!,
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey.shade400,
+              ),
             ),
-            const Divider(),
+            const SizedBox(height: 12),
           ],
           child,
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoLine extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _InfoLine({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.brightBlue.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, size: 18, color: AppColors.brightBlue),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -432,13 +616,17 @@ class _SettingTile extends StatelessWidget {
     return ListTile(
       dense: true,
       onTap: onTap,
-      leading: Icon(icon, color: iconColor ?? Colors.blue),
+      leading: Icon(icon, color: iconColor ?? AppColors.brightBlue, size: 20),
       title: Text(
         title,
-        style: TextStyle(color: titleColor ?? Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w500, fontSize: 13),
+        style: TextStyle(
+          color: titleColor ?? Theme.of(context).colorScheme.onSurface,
+          fontWeight: FontWeight.w500,
+          fontSize: 13,
+        ),
       ),
-      trailing: trailing ?? const Icon(Icons.chevron_right, size: 16),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+      trailing: trailing ?? Icon(Icons.chevron_right, size: 16, color: Colors.grey.shade400),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
     );
   }
 }
@@ -446,14 +634,18 @@ class _SettingTile extends StatelessWidget {
 class _Badge extends StatelessWidget {
   final int count;
   const _Badge({required this.count});
+
   @override
   Widget build(BuildContext context) {
-    return CircleAvatar(
-      radius: 10,
-      backgroundColor: Colors.red,
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: const BoxDecoration(
+        color: Colors.redAccent,
+        shape: BoxShape.circle,
+      ),
       child: Text(
         count.toString(),
-        style: const TextStyle(color: Colors.white, fontSize: 10),
+        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
       ),
     );
   }

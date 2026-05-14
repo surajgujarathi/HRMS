@@ -10,11 +10,21 @@ class LoginCubit extends Cubit<LoginState> {
   LoginCubit() : super(const LoginState());
 
   void onUsernameChanged(String value) {
-    emit(state.copyWith(username: value, usernameError: null));
+    emit(state.copyWith(
+      username: value,
+      usernameError: null,
+      status: LoginStatus.initial,
+      errorMessage: null,
+    ));
   }
 
   void onPasswordChanged(String value) {
-    emit(state.copyWith(password: value, passwordError: null));
+    emit(state.copyWith(
+      password: value,
+      passwordError: null,
+      status: LoginStatus.initial,
+      errorMessage: null,
+    ));
   }
 
   void togglePasswordVisibility() {

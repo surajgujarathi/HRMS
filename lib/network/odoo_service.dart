@@ -813,4 +813,54 @@ class OdooService {
     return response is List ? response : [];
   }
 
+  /// Registers a user for an event.
+  Future<int> eventRegister({
+    required int eventId,
+    required String name,
+    required String email,
+    int? partnerId,
+    int? ticketId,
+  }) async {
+    final data = {
+      'event_id': eventId,
+      'name': name,
+      'email': email,
+    };
+    if (partnerId != null) {
+      data['partner_id'] = partnerId;
+    }
+    if (ticketId != null) {
+      data['event_ticket_id'] = ticketId;
+    }
+
+    final response = await executeModelMethod(
+      'event.registration',
+      'create',
+      [data],
+    );
+    return response is int ? response : 0;
+  }
+  /// Fetches registrations for the current user across all events or a specific event.
+  Future<List<dynamic>> fetchUserRegistrations({int? partnerId, int? eventId}) async {
+    final List<dynamic> domain = [];
+    if (partnerId != null) {
+      domain.add(['partner_id', '=', partnerId]);
+    }
+    if (eventId != null) {
+      domain.add(['event_id', '=', eventId]);
+    }
+    // Exclude cancelled registrations
+    domain.add(['state', '!=', 'cancel']);
+
+    final response = await executeModelMethod(
+      'event.registration',
+      'search_read',
+      [],
+      kwargs: {
+        'domain': domain,
+        'fields': ['id', 'event_id', 'state', 'name', 'email', 'event_ticket_id'],
+      },
+    );
+    return response is List ? response : [];
+  }
 }

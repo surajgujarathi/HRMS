@@ -27,6 +27,9 @@ import 'package:flutter_app/features/events/presentation/events_list_page.dart';
 import 'package:flutter_app/features/events/presentation/event_details_page.dart';
 import 'package:flutter_app/features/events/models/event_model.dart';
 
+import 'package:flutter_app/features/events/cubit/event_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 class Routes {
   Routes._();
   static String onboarding = '/onboarding';

@@ -10,6 +10,9 @@ import 'package:flutter_app/features/notifications/cubit/notification_cubit.dart
 import 'package:flutter_app/features/profile/cubit/profile_cubit.dart';
 import 'package:flutter_app/core/theme/theme_cubit.dart';
 import 'package:flutter_app/core/theme/app_theme.dart';
+import 'package:flutter_app/features/events/cubit/event_cubit.dart';
+import 'package:flutter_app/features/profile/cubit/holiday_cubit.dart';
+import 'package:flutter_app/features/chat/cubit/chat_cubit.dart';
 import 'package:flutter_app/routes.dart';
 
 void main() {
@@ -29,6 +32,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => NotificationCubit()..fetchNotifications()),
         BlocProvider(create: (context) => ProfileCubit()..fetchProfile()),
         BlocProvider(create: (context) => ThemeCubit()..loadTheme()),
+        BlocProvider(create: (context) => EventCubit()..fetchEvents()),
+        BlocProvider(create: (context) => HolidayCubit()..fetchHolidays()),
+        BlocProvider(create: (context) => ChatCubit()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {

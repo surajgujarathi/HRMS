@@ -12,6 +12,8 @@ import 'package:flutter_app/core/widget/custome_search_bar.dart';
 import 'package:flutter_app/features/home/widgets/action_card.dart';
 import 'package:flutter_app/features/home/widgets/anniversary.dart';
 import 'package:flutter_app/features/home/widgets/birth_days.dart';
+import 'package:flutter_app/features/home/widgets/upcoming_events.dart';
+import 'package:flutter_app/features/home/widgets/upcoming_holidays.dart';
 
 import 'package:flutter_app/features/attendance/presentation/check_in_out.dart';
 import 'package:flutter_app/features/home/widgets/circular.dart';
@@ -253,11 +255,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   const SizedBox(height: 16),
                   const AttendanceActions(),
                   const SizedBox(height: 16),
-                  const CircularCardSection(),
+                  const UpcomingHolidaysSection(),
                   const SizedBox(height: 16),
-                  const BirthdaySection(),
+                  const UpcomingEventsSection(),
                   const SizedBox(height: 16),
-                  const AnniversarySection(),
+                  // const BirthdaySection(),
+                  // const SizedBox(height: 32),
                 ],
               ),
             ),

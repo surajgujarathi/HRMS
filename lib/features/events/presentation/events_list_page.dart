@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/core/constants/app_colors.dart';
 import 'package:flutter_app/features/events/cubit/event_cubit.dart';
@@ -12,15 +13,28 @@ class EventsListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => EventCubit()..fetchEvents(),
-      child: const _EventsListView(),
-    );
+    return const _EventsListView();
   }
 }
 
-class _EventsListView extends StatelessWidget {
+class _EventsListView extends StatefulWidget {
   const _EventsListView();
+
+  @override
+  State<_EventsListView> createState() => _EventsListViewState();
+}
+
+class _EventsListViewState extends State<_EventsListView> {
+  @override
+  void initState() {
+    super.initState();
+    // Refresh events whenever the list is opened
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<EventCubit>().fetchEvents();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -193,16 +207,17 @@ class _EventCard extends StatelessWidget {
             children: [
               // Banner Area
               Container(
-                height: 120,
+                height: 140,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [AppColors.indigo.withOpacity(0.1), AppColors.brightBlue.withOpacity(0.1)],
+                    colors: [
+                      AppColors.indigo.withOpacity(0.1),
+                      AppColors.brightBlue.withOpacity(0.1)
+                    ],
                   ),
                 ),
-                child: Center(
-                  child: Icon(Icons.celebration_rounded, size: 48, color: AppColors.indigo.withOpacity(0.3)),
-                ),
+                child: _buildBannerImage(event.badgeImage),
               ),
               Padding(
                 padding: const EdgeInsets.all(20),
@@ -261,6 +276,30 @@ class _EventCard extends StatelessWidget {
                             "Open Registration",
                             style: TextStyle(color: AppColors.successGreen, fontSize: 11, fontWeight: FontWeight.bold),
                           ),
+                        BlocBuilder<EventCubit, EventState>(
+                          builder: (context, state) {
+                            if (state.registeredEventIds.contains(event.id)) {
+                              return Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: AppColors.successGreen.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Row(
+                                  children: [
+                                    Icon(Icons.check_circle, color: AppColors.successGreen, size: 12),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      "Registered",
+                                      style: TextStyle(color: AppColors.successGreen, fontSize: 11, fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
                         const Row(
                           children: [
                             Text(
@@ -281,5 +320,38 @@ class _EventCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildBannerImage(String? base64String) {
+    if (base64String == null ||
+        base64String == "false" ||
+        base64String.isEmpty) {
+      return Center(
+        child: Icon(Icons.celebration_rounded,
+            size: 48, color: AppColors.indigo.withOpacity(0.3)),
+      );
+    }
+
+    try {
+      String cleanedData = base64String.trim();
+      if (cleanedData.contains(',')) {
+        cleanedData = cleanedData.split(',').last;
+      }
+      final bytes = base64Decode(cleanedData);
+      return Image.memory(
+        bytes,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        errorBuilder: (context, error, stackTrace) => Center(
+          child: Icon(Icons.broken_image_outlined,
+              size: 48, color: AppColors.indigo.withOpacity(0.3)),
+        ),
+      );
+    } catch (e) {
+      return Center(
+        child: Icon(Icons.celebration_rounded,
+            size: 48, color: AppColors.indigo.withOpacity(0.3)),
+      );
+    }
   }
 }

@@ -19,6 +19,9 @@ class LoginScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return BlocListener<LoginCubit, LoginState>(
+      listenWhen: (previous, current) =>
+          previous.status != current.status ||
+          previous.errorMessage != current.errorMessage,
       listener: (context, state) {
         if (state.status == LoginStatus.success) {
           Navigator.pushReplacement(
@@ -26,12 +29,14 @@ class LoginScreen extends StatelessWidget {
             MaterialPageRoute(builder: (_) => const MainPage()),
           );
         } else if (state.status == LoginStatus.failure) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage ?? 'Login failed'),
               backgroundColor: AppColors.red,
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
           );
         }

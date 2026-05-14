@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/core/constants/app_colors.dart';
-import 'package:flutter_app/features/chat/chat_screen.dart';
+import 'package:flutter_app/features/chat/presentation/chat_list_page.dart';
 import 'package:flutter_app/features/home/presentation/home_page.dart';
 import 'package:flutter_app/features/main/cubit/main_cubit.dart';
 import 'package:flutter_app/features/main/state/main_state.dart';
@@ -23,7 +23,7 @@ class MainPage extends StatelessWidget {
               children: [
                 HomePage(),
                 PayrollScreen(), // My Pay
-                chatPage(),
+                ChatListPage(),
                 ProfileScreen(), // Profile
               ],
             ),
