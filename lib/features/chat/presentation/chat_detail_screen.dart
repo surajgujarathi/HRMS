@@ -26,15 +26,20 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final List<ChatAttachment> _pendingAttachments = [];
+  int _lastMessageCount = 0;
+  late ChatCubit _chatCubit;
 
   @override
   void initState() {
     super.initState();
-    context.read<ChatCubit>().fetchMessages(widget.channel.id);
+    _chatCubit = context.read<ChatCubit>();
+    _chatCubit.fetchMessages(widget.channel.id);
   }
 
   @override
   void dispose() {
+    // Safely clear the active chat using the stored cubit reference
+    _chatCubit.clearActiveChat();
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -90,7 +95,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       _pendingAttachments.clear();
     });
 
-    final success = await context.read<ChatCubit>().sendMessage(
+    final success = await _chatCubit.sendMessage(
       widget.channel.id, 
       text,
       attachments: attachmentsCopy.isNotEmpty ? attachmentsCopy : null,
@@ -112,7 +117,9 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           Expanded(
             child: BlocConsumer<ChatCubit, ChatState>(
               listener: (context, state) {
-                if (state.status == ChatStatus.loaded) {
+                // Only scroll if we actually received new messages
+                if (state.status == ChatStatus.loaded && state.activeMessages.length != _lastMessageCount) {
+                  _lastMessageCount = state.activeMessages.length;
                   _scrollToBottom();
                 }
               },
@@ -121,9 +128,9 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   return const Center(child: CircularProgressIndicator(color: AppColors.indigo));
                 }
 
-                if (state.activeMessages.isEmpty) {
+                if (state.activeMessages.isEmpty && state.status == ChatStatus.loaded) {
                   return _buildEmptyChat(context);
-                }
+                } 
 
                 return ListView.builder(
                   controller: _scrollController,
@@ -395,12 +402,33 @@ class _MessageBubble extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  message.formattedDate,
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: message.isMe ? Colors.white.withOpacity(0.7) : Colors.grey,
-                  ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      message.formattedDate,
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: message.isMe ? Colors.white.withOpacity(0.7) : Colors.grey,
+                      ),
+                    ),
+                    if (message.isMe) ...[
+                      const SizedBox(width: 4),
+                      BlocBuilder<ChatCubit, ChatState>(
+                        buildWhen: (previous, current) => 
+                            previous.partnerLastSeenMessageId != current.partnerLastSeenMessageId,
+                        builder: (context, state) {
+                          final isRead = state.partnerLastSeenMessageId != null && 
+                                        state.partnerLastSeenMessageId! >= message.id;
+                          return Icon(
+                            isRead ? Icons.done_all_rounded : Icons.done_rounded,
+                            size: 14,
+                            color: isRead ? Colors.cyanAccent : Colors.white.withOpacity(0.7),
+                          );
+                        },
+                      ),
+                    ],
+                  ],
                 ),
               ],
             ),

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/core/constants/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart';  
 import '../../../core/theme/app_theme.dart';
 import '../cubit/chat_cubit.dart';
 import '../cubit/chat_state.dart';
@@ -154,7 +154,11 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
                                         MaterialPageRoute(
                                           builder: (context) => ChatDetailScreen(channel: channel),
                                         ),
-                                      );
+                                      ).then((_) {
+                                        if (mounted) {
+                                          context.read<ChatCubit>().fetchChannels();
+                                        }
+                                      });
                                     }
                                   }
                                 },
@@ -240,8 +244,19 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
 
   Widget _buildChannelList(ChannelType type) {
     return BlocBuilder<ChatCubit, ChatState>(
+      // FIX: Only rebuild when the actual list data changes, NOT on every loading state.
+      // This prevents the full-screen spinner from appearing during background polls.
+      buildWhen: (previous, current) {
+        final prevItems = type == ChannelType.channel ? previous.channels : previous.directMessages;
+        final currItems = type == ChannelType.channel ? current.channels : current.directMessages;
+        // Rebuild only if: initial load is done, or the list itself changes
+        return (previous.status == ChatStatus.loading && current.status == ChatStatus.loaded) ||
+               prevItems.length != currItems.length ||
+               prevItems != currItems;
+      },
       builder: (context, state) {
-        if (state.status == ChatStatus.loading) {
+        // Only show full spinner on very first load (no data yet)
+        if (state.status == ChatStatus.loading && state.channels.isEmpty && state.directMessages.isEmpty) {
           return const Center(child: CircularProgressIndicator(color: AppColors.indigo));
         }
 
@@ -256,8 +271,14 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(vertical: 12),
             itemCount: items.length,
+            // FIX: Use ValueKey with channel ID so Flutter ALWAYS maps
+            // the correct widget to the correct channel — prevents wrong chat opening.
             itemBuilder: (context, index) {
-              return _ChannelTile(channel: items[index]);
+              final channel = items[index];
+              return _ChannelTile(
+                key: ValueKey(channel.id),
+                channel: channel,
+              );
             },
           ),
         );
@@ -288,7 +309,7 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
 
 class _ChannelTile extends StatelessWidget {
   final ChatChannel channel;
-  const _ChannelTile({required this.channel});
+  const _ChannelTile({super.key, required this.channel});
 
   @override
   Widget build(BuildContext context) {
@@ -300,12 +321,18 @@ class _ChannelTile extends StatelessWidget {
         child: InkWell(
           onTap: () {
             debugPrint('ChatListPage: Tapped on channel ${channel.displayName} (ID: ${channel.id})');
+            // Capture channel reference before navigation to prevent stale closure
+            final selectedChannel = channel;
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ChatDetailScreen(channel: channel),
+                builder: (context) => ChatDetailScreen(channel: selectedChannel),
               ),
-            );
+            ).then((_) {
+              if (context.mounted) {
+                context.read<ChatCubit>().fetchChannels();
+              }
+            });
           },
           borderRadius: BorderRadius.circular(16),
         child: Container(
