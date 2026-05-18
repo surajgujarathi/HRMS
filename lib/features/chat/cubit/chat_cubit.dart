@@ -25,6 +25,7 @@ class ChatCubit extends Cubit<ChatState> {
   Future<void> initChat() async {
     emit(state.copyWith(status: ChatStatus.loading));
     await fetchChannels();
+    _startPolling(); // Always start reliable background polling
     _initWebSockets();
   }
 
@@ -34,42 +35,67 @@ class ChatCubit extends Cubit<ChatState> {
       final baseUrl = await prefs.getString('baseUrl');
       final sessionJson = await prefs.getObject('session');
 
-      if (baseUrl == null || sessionJson == null) return;
+      if (baseUrl == null || sessionJson == null) {
+        debugPrint('ChatCubit: Missing baseUrl or session data. Cannot init WebSockets.');
+        return;
+      }
 
       final uri = Uri.parse(baseUrl.trim());
       final wsScheme = uri.scheme == 'https' ? 'wss' : 'ws';
       final host = uri.host;
-      final wsUrl = '$wsScheme://$host/longpolling';
+      final wsUrl = '$wsScheme://$host/websocket';
       final sessionId = sessionJson['session_id'];
+
+      debugPrint('ChatCubit: ==========================================');
+      debugPrint('ChatCubit: Initializing Odoo 18 WebSocket Connection');
+      debugPrint('ChatCubit: Base URL: $baseUrl');
+      debugPrint('ChatCubit: Host: $host');
+      debugPrint('ChatCubit: Target WS URL: $wsUrl');
+      debugPrint('ChatCubit: Session ID (Cookie): ${sessionId != null ? "PRESENT (${sessionId.toString().substring(0, 6)}...)" : "MISSING"}');
+      debugPrint('ChatCubit: ==========================================');
 
       _channelSocket = IOWebSocketChannel.connect(
         Uri.parse(wsUrl),
         headers: {'Cookie': 'session_id=$sessionId'},
       );
 
+      _channelSocket!.ready.catchError((e) {
+        debugPrint('ChatCubit: [WebSocket Ready Error Handled] --> $e');
+      });
+
       _channelSubscription = _channelSocket!.stream.listen(
-        (message) {
-          json.decode(message);
-          fetchChannels();
+        (message) async {
+          debugPrint('ChatCubit: [WebSocket Event Received] --> $message');
+          try {
+            json.decode(message);
+          } catch (_) {}
           if (state.currentChatId != null) {
-            fetchMessages(int.parse(state.currentChatId!), quiet: true);
+            await fetchMessages(int.parse(state.currentChatId!), quiet: true);
           }
+          await fetchChannels();
         },
-        onError: (error) => _startPolling(),
-        onDone: () => _startPolling(),
+        onError: (error) {
+          debugPrint('ChatCubit: [WebSocket Error Handled] --> $error');
+        },
+        onDone: () {
+          debugPrint('ChatCubit: [WebSocket Closed / Disconnected]');
+        },
+        cancelOnError: true,
       );
     } catch (e) {
-      _startPolling();
+      debugPrint('ChatCubit: [WebSocket Connection Exception Handled] --> $e');
     }
   }
 
   void _startPolling() {
     _pollingTimer?.cancel();
-    _pollingTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
-      fetchChannels();
+    debugPrint('ChatCubit: [Polling Activated] --> Polling every 5 seconds.');
+    _pollingTimer = Timer.periodic(const Duration(seconds: 5), (_) async {
+      debugPrint('ChatCubit: [Polling Execution] --> Fetching active chat messages & latest channels.');
       if (state.currentChatId != null) {
-        fetchMessages(int.parse(state.currentChatId!), quiet: true);
+        await fetchMessages(int.parse(state.currentChatId!), quiet: true);
       }
+      await fetchChannels();
     });
   }
 
@@ -157,24 +183,31 @@ class ChatCubit extends Cubit<ChatState> {
       }
 
       Map<int, Map<String, dynamic>> lastMessages = {};
+      Map<int, List<int>> channelMessageIds = {};
+
       if (channelIds.isNotEmpty) {
         final messages = await client.callKw({
           'model': 'mail.message',
           'method': 'search_read',
           'args': [[['res_id', 'in', channelIds], ['model', '=', 'discuss.channel']]],
           'kwargs': {
-            'fields': ['res_id', 'body', 'date'],
+            'fields': ['id', 'res_id', 'body', 'date'],
             'order': 'date desc',
-            'limit': 500,
+            'limit': 1000,
           },
         });
         for (var m in (messages as List)) {
           final resId = m['res_id'] is List ? m['res_id'][0] : m['res_id'];
-          if (resId != null && !lastMessages.containsKey(resId)) {
-            lastMessages[resId] = {
-              'body': _stripHtml(m['body'] is String ? m['body'] : ''),
-              'date': m['date']
-            };
+          final msgId = m['id'] as int? ?? 0;
+          if (resId != null && msgId > 0) {
+            if (!lastMessages.containsKey(resId)) {
+              lastMessages[resId] = {
+                'id': msgId,
+                'body': _stripHtml(m['body'] is String ? m['body'] : ''),
+                'date': m['date']
+              };
+            }
+            channelMessageIds.putIfAbsent(resId, () => []).add(msgId);
           }
         }
       }
@@ -217,19 +250,32 @@ class ChatCubit extends Cubit<ChatState> {
         final isCurrentChat = state.currentChatId == channel.id.toString();
         int unreadCount = memberInfo['message_unread_counter'] ?? 0;
 
+        final seenIdRaw = memberInfo['seen_message_id'];
+        int seenId = 0;
+        if (seenIdRaw is int) seenId = seenIdRaw;
+        else if (seenIdRaw is List && seenIdRaw.isNotEmpty) seenId = seenIdRaw[0];
+
+        final lastMsgId = lastMsgInfo?['id'] as int? ?? 0;
+        final msgIds = channelMessageIds[channel.id] ?? [];
+
         // WHATSAPP-LIKE SYNC:
-        // If user is currently in this chat OR read it within the last 8 seconds,
-        // force unread to 0 regardless of what the (still syncing) server says.
+        // Calculate unread count with mathematical precision by checking local message IDs strictly greater than seenId.
         if (isCurrentChat) {
           unreadCount = 0;
+        } else if (seenId > 0 && lastMsgId > 0 && seenId >= lastMsgId) {
+          unreadCount = 0; // Verified: user has already seen the newest message in this channel
         } else if (_channelReadTimestamps.containsKey(channel.id)) {
           final sinceRead = now.difference(_channelReadTimestamps[channel.id]!).inSeconds;
           if (sinceRead < 8) {
             unreadCount = 0; // Server still syncing, keep badge clear
           } else {
-            // Server has had 8+ seconds to sync. Trust its value now.
             _channelReadTimestamps.remove(channel.id);
+            if (seenId > 0 && msgIds.isNotEmpty) {
+              unreadCount = msgIds.where((id) => id > seenId).length;
+            }
           }
+        } else if (seenId > 0 && msgIds.isNotEmpty) {
+          unreadCount = msgIds.where((id) => id > seenId).length;
         }
 
         final updatedChannel = ChatChannel(
@@ -408,6 +454,7 @@ class ChatCubit extends Cubit<ChatState> {
 
         if (members != null && (members as List).isNotEmpty) {
           int? myMemberId;
+          int mySeenMessageId = 0;
           for (var m in members) {
             final pid = m['partner_id'] is List ? m['partner_id'][0] : m['partner_id'];
             final seenIdRaw = m['seen_message_id'];
@@ -417,6 +464,7 @@ class ChatCubit extends Cubit<ChatState> {
 
             if (pid == session.partnerId) {
               myMemberId = m['id'];
+              mySeenMessageId = seenId;
             } else {
               if (partnerLastSeenId == null || seenId > partnerLastSeenId!) {
                 partnerLastSeenId = seenId;
@@ -430,13 +478,27 @@ class ChatCubit extends Cubit<ChatState> {
             // CRITICAL CHECK: Only mark as seen if user is STILL in this chat
             if (state.currentChatId != channelId.toString()) {
               debugPrint('ChatCubit: Skip mark-as-seen — user already left chat $channelId');
+            } else if (mySeenMessageId >= newestId) {
+              // We already marked this message as seen. Keep local timestamp refreshed but skip server write.
+              _channelReadTimestamps[channelId] = DateTime.now();
             } else {
               await client.callKw({
                 'model': 'discuss.channel.member',
                 'method': 'write',
-                'args': [[myMemberId], {'seen_message_id': newestId}],
+                'args': [[myMemberId], {
+                  'seen_message_id': newestId,
+                  'fetched_message_id': newestId,
+                }],
                 'kwargs': {},
               });
+              try {
+                await client.callKw({
+                  'model': 'discuss.channel',
+                  'method': 'channel_seen',
+                  'args': [[channelId]],
+                  'kwargs': {'last_message_id': newestId},
+                });
+              } catch (_) {}
               // Refresh timestamp after successful server write
               _channelReadTimestamps[channelId] = DateTime.now();
               debugPrint('ChatCubit: Marked channel $channelId as seen up to message $newestId');
@@ -461,9 +523,8 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-  void clearActiveChat() {
-    // Use clearCurrentChat() which properly nullifies currentChatId.
-    // copyWith(currentChatId: null) was silently ignored due to null-coalescing.
+  void clearActiveChat(int channelId) {
+    _channelReadTimestamps[channelId] = DateTime.now();
     emit(state.clearCurrentChat());
   }
 
@@ -598,7 +659,9 @@ class ChatCubit extends Cubit<ChatState> {
   @override
   Future<void> close() {
     _channelSubscription?.cancel();
-    _channelSocket?.sink.close();
+    try {
+      _channelSocket?.sink.close();
+    } catch (_) {}
     _pollingTimer?.cancel();
     return super.close();
   }

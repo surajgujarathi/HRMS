@@ -274,7 +274,7 @@ class LoginScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              "FastTrackProjects",
+                              "Srivyn",
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 14,

@@ -39,7 +39,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   @override
   void dispose() {
     // Safely clear the active chat using the stored cubit reference
-    _chatCubit.clearActiveChat();
+    _chatCubit.clearActiveChat(widget.channel.id);
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -138,7 +138,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   itemCount: state.activeMessages.length,
                   itemBuilder: (context, index) {
                     final message = state.activeMessages[index];
-                    return _MessageBubble(message: message);
+                    return _MessageBubble(key: ValueKey(message.id), message: message);
                   },
                 );
               },
@@ -359,7 +359,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
 class _MessageBubble extends StatelessWidget {
   final ChatMessage message;
-  const _MessageBubble({required this.message});
+  const _MessageBubble({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {

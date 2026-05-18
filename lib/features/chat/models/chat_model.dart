@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:equatable/equatable.dart';
 
 enum MessageType { text, image, video, document, audio, notification }
 
@@ -6,7 +7,7 @@ enum MessageStatus { sending, sent, failed }
 
 enum ChannelType { channel, chat, group }
 
-class ChatChannel {
+class ChatChannel extends Equatable {
   final int id;
   final String name;
   final String displayName;
@@ -29,7 +30,7 @@ class ChatChannel {
   final String? sfuServerUrl;
   final bool active;
 
-  ChatChannel({
+  const ChatChannel({
     required this.id,
     required this.name,
     required this.displayName,
@@ -110,9 +111,16 @@ class ChatChannel {
       active: active,
     );
   }
+
+  @override
+  List<Object?> get props => [
+    id, name, displayName, lastMessage, lastMessageTime,
+    unreadCount, isPinned, memberCount, image, type,
+    imStatus, active
+  ];
 }
 
-class ChatMessage {
+class ChatMessage extends Equatable {
   final int id;
   final String sender;
   final int senderId;
@@ -136,7 +144,7 @@ class ChatMessage {
   final int? parentId;
   final List<int>? reactionIds;
 
-  ChatMessage({
+  const ChatMessage({
     required this.id,
     required this.sender,
     required this.senderId,
@@ -186,9 +194,15 @@ class ChatMessage {
       reactionIds: reactionIds,
     );
   }
+
+  @override
+  List<Object?> get props => [
+    id, senderId, message, date, formattedDate,
+    isMe, type, status, attachments
+  ];
 }
 
-class ChatAttachment {
+class ChatAttachment extends Equatable {
   final int id;
   final String name;
   final Uint8List? bytes;
@@ -196,7 +210,7 @@ class ChatAttachment {
   final int? fileSize;
   final int? createUid;
 
-  ChatAttachment({
+  const ChatAttachment({
     required this.id,
     required this.name,
     this.bytes,
@@ -214,4 +228,7 @@ class ChatAttachment {
       createUid: json['create_uid'] is List ? json['create_uid'][0] : json['create_uid'],
     );
   }
+
+  @override
+  List<Object?> get props => [id, name, mimeType, fileSize];
 }
