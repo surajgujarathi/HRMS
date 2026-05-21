@@ -28,36 +28,73 @@ class MainPage extends StatelessWidget {
               ],
             ),
 
-            bottomNavigationBar: NavigationBar(
-              selectedIndex: state.selectedIndex,
-              onDestinationSelected: (index) {
-                context.read<MainCubit>().changeTab(index);
-              },
-              destinations: const [
-                NavigationDestination(
-                  icon: Icon(Icons.home_outlined),
-                  selectedIcon: Icon(Icons.home),
-                  label: 'Home',
+            extendBody: true,
+            bottomNavigationBar: SafeArea(
+              child: Container(
+                margin: const EdgeInsets.only(left: 20, right: 20, bottom: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(32),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.brightBlue.withOpacity(0.15),
+                      blurRadius: 24,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
                 ),
-                NavigationDestination(
-                  icon: Icon(Icons.payment_outlined),
-                  selectedIcon: Icon(Icons.payment),
-                  label: 'My Pay',
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildNavItem(context, state, 0, Icons.home_outlined, Icons.home, 'Home'),
+                    _buildNavItem(context, state, 1, Icons.payment_outlined, Icons.payment, 'My Pay'),
+                    _buildNavItem(context, state, 2, Icons.chat_bubble_outline, Icons.chat_bubble, 'Chat'),
+                    _buildNavItem(context, state, 3, Icons.person_outline, Icons.person, 'Profile'),
+                  ],
                 ),
-                NavigationDestination(
-                  icon: Icon(Icons.chat_bubble_outline),
-                  selectedIcon: Icon(Icons.chat_bubble),
-                  label: 'Chat',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.person_outline),
-                  selectedIcon: Icon(Icons.person),
-                  label: 'Profile',
-                ),
-              ],
+              ),
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildNavItem(BuildContext context, MainState state, int index, IconData icon, IconData activeIcon, String label) {
+    final isSelected = state.selectedIndex == index;
+    return GestureDetector(
+      onTap: () => context.read<MainCubit>().changeTab(index),
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutQuint,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.brightBlue.withOpacity(0.12) : Colors.transparent,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isSelected ? activeIcon : icon,
+              color: isSelected ? AppColors.brightBlue : AppColors.textGrey,
+              size: 24,
+            ),
+            if (isSelected) ...[
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: AppColors.brightBlue,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+            ]
+          ],
+        ),
       ),
     );
   }

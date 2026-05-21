@@ -5,23 +5,17 @@ class CustomSearchBar extends StatelessWidget {
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
   final EdgeInsetsGeometry padding;
-  final double borderRadius;
-  final Color backgroundColor;
-  final IconData prefixIcon;
-  final Color iconColor;
-  final bool autofocus;
+  final bool readOnly;
+  final VoidCallback? onTap;
 
   const CustomSearchBar({
     super.key,
     this.hintText = 'Search...',
     this.controller,
     this.onChanged,
-    this.padding = const EdgeInsets.symmetric(vertical: 7),
-    this.borderRadius = 20,
-    this.backgroundColor = Colors.transparent,
-    this.prefixIcon = Icons.search,
-    this.iconColor = Colors.transparent,
-    this.autofocus = false,
+    this.padding = const EdgeInsets.symmetric(vertical: 0),
+    this.readOnly = false,
+    this.onTap,
   });
 
   @override
@@ -29,40 +23,36 @@ class CustomSearchBar extends StatelessWidget {
     return Padding(
       padding: padding,
       child: Container(
+        height: 50,
         decoration: BoxDecoration(
-          color: backgroundColor == Colors.transparent ? (Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface) : backgroundColor,
-          borderRadius: BorderRadius.circular(borderRadius),
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).shadowColor.withOpacity(0.08),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          color: Colors.white.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
         ),
         child: TextField(
           controller: controller,
-          autofocus: autofocus,
           onChanged: onChanged,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface,
+          readOnly: readOnly,
+          onTap: onTap,
+          style: const TextStyle(
+            color: Colors.white,
             fontSize: 15,
           ),
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+              color: Colors.white.withOpacity(0.6),
               fontSize: 15,
             ),
-            prefixIcon: Icon(prefixIcon, color: iconColor == Colors.transparent ? Theme.of(context).colorScheme.onSurface.withOpacity(0.6) : iconColor),
+            prefixIcon: Icon(Icons.search_rounded, color: Colors.white.withOpacity(0.8)),
             filled: true,
-            fillColor: Colors.transparent, // Handled by container
+            fillColor: Colors.transparent,
             contentPadding: const EdgeInsets.symmetric(
               vertical: 0,
-              horizontal: 16,
+              horizontal: 20,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(borderRadius),
+              borderRadius: BorderRadius.circular(30),
               borderSide: BorderSide.none,
             ),
           ),

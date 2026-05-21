@@ -61,15 +61,15 @@ class CheckInOutCard extends StatelessWidget {
           if (progress > 1.0) progress = 1.0;
 
           return Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(32),
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).shadowColor.withOpacity(0.04),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
+                  color: AppColors.primaryPurple.withOpacity(0.08),
+                  blurRadius: 24,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
@@ -81,10 +81,10 @@ class CheckInOutCard extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(l10n.time, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 12)),
-                        const SizedBox(height: 2),
+                        Text(l10n.time.toUpperCase(), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+                        const SizedBox(height: 4),
                         Text(DateFormat.jm().format(DateTime.now()),
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface)),
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Theme.of(context).colorScheme.onSurface)),
                       ],
                     ),
                     Column(
@@ -93,22 +93,29 @@ class CheckInOutCard extends StatelessWidget {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(l10n.date, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 12)),
+                            Text(l10n.date.toUpperCase(), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
                             const SizedBox(width: 8),
-                            GestureDetector(
-                              onTap: () => Navigator.pushNamed(context, Routes.inOutReport),
-                                child: Icon(Icons.history_rounded, size: 18, color: Theme.of(context).primaryColor),
-                            ),
+                            // GestureDetector(
+                            //   onTap: () => Navigator.pushNamed(context, Routes.inOutReport),
+                            //   child: Container(
+                            //     padding: const EdgeInsets.all(4),
+                            //     decoration: BoxDecoration(
+                            //       color: AppColors.lightPurple.withOpacity(0.3),
+                            //       borderRadius: BorderRadius.circular(8),
+                            //     ),
+                            //     child: const Icon(Icons.history_rounded, size: 16, color: AppColors.primaryPurple),
+                            //   ),
+                            // ),
                           ],
                         ),
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 4),
                         Text(DateFormat('d MMM yyyy').format(DateTime.now()),
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurface)),
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface)),
                       ],
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
                 Stack(
                   alignment: Alignment.center,
                   children: [
@@ -118,7 +125,8 @@ class CheckInOutCard extends StatelessWidget {
                       child: CircularProgressIndicator(
                         value: progress,
                         strokeWidth: strokeWidth,
-                        backgroundColor: Theme.of(context).dividerTheme.color ?? Theme.of(context).dividerColor,
+                        strokeCap: StrokeCap.round,
+                        backgroundColor: AppColors.progressBg.withOpacity(0.5),
                         valueColor: AlwaysStoppedAnimation(isCheckedIn ? AppColors.orange : AppColors.successGreen),
                       ),
                     ),
@@ -126,40 +134,54 @@ class CheckInOutCard extends StatelessWidget {
                       children: [
                         Text(todayHoursStr,
                             style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 28,
+                                fontWeight: FontWeight.w900,
                                 color: isCheckedIn ? AppColors.orange : AppColors.successGreen)),
                         const SizedBox(height: 4),
-                        Text(l10n.working_hours, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 12)),
+                        Text(l10n.working_hours, style: const TextStyle(color: AppColors.textGrey, fontSize: 13, fontWeight: FontWeight.w500)),
                       ],
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
-                SizedBox(
+                const SizedBox(height: 32),
+                Container(
                   width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton.icon(
+                  height: 56,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: (isCheckedIn ? AppColors.dangerRed : AppColors.successGreen).withOpacity(0.3),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isCheckedIn ? AppColors.dangerRed : AppColors.successGreen,
                       foregroundColor: Colors.white,
                       elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                     ),
                     onPressed: isLoading ? null : () => context.read<AttendanceCubit>().toggleAttendance(),
-                    icon: isLoading
+                    child: isLoading
                         ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: const CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
                           )
-                        : Icon(isCheckedIn ? Icons.logout_rounded : Icons.login_rounded, size: 20),
-                    label: Text(
-                      isLoading
-                          ? (isCheckedIn ? l10n.checking_out : l10n.checking_in)
-                          : (isCheckedIn ? l10n.check_out : l10n.check_in),
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(isCheckedIn ? Icons.logout_rounded : Icons.login_rounded, size: 22),
+                              const SizedBox(width: 12),
+                              Text(
+                                isCheckedIn ? l10n.check_out : l10n.check_in,
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                              ),
+                            ],
+                          ),
                   ),
                 ),
               ],

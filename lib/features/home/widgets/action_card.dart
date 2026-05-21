@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/core/widget/custome_card.dart';
 import 'package:flutter_app/routes.dart';
-
 class AttendanceActions extends StatelessWidget {
   const AttendanceActions({super.key});
 
@@ -10,37 +9,37 @@ class AttendanceActions extends StatelessWidget {
     final actions = [
       {
         'title': 'Leaves',
-        'icon': Icons.edit_calendar,
+        'icon': Icons.event_note_rounded,
         'color': const Color(0xFF8E7CF0),
         'routeName': Routes.leaveList,
       },
       {
         'title': 'MyPay',
-        'icon': Icons.list_alt,
+        'icon': Icons.account_balance_wallet_rounded,
         'color': const Color(0xFF00C853),
         'routeName': Routes.myPay,
       },
       {
         'title': 'In/Out Report',
-        'icon': Icons.report,
+        'icon': Icons.analytics_rounded,
         'color': const Color(0xFFFF6D00),
         'routeName': Routes.inOutReport,
       },
       {
         'title': 'Doc Box',
-        'icon': Icons.swap_horiz,
+        'icon': Icons.folder_copy_rounded,
         'color': const Color(0xFFFF4081),
         'routeName': Routes.docbox,
       },
       {
         'title': 'Company Calendar',
-        'icon': Icons.calendar_month,
+        'icon': Icons.calendar_today_rounded,
         'color': const Color(0xFF00ACC1),
         'routeName': Routes.holidayCalendar,
       },
       {
         'title': 'Ai Chat Bot',
-        'icon': Icons.report,
+        'icon': Icons.smart_toy_rounded,
         'color': const Color(0xFFFF6D00),
         'routeName': Routes.aichatbot,
       },
@@ -50,12 +49,6 @@ class AttendanceActions extends StatelessWidget {
         'color': const Color(0xFF6C63FF),
         'routeName': Routes.events,
       },
-      // {
-      //   'title': 'Tax Planner',
-      //   'icon': Icons.calendar_today,
-      //   'color': const Color(0xFF6C63FF),
-      //   'routeName': Routes.leave,
-      // },
     ];
 
     return GridView.builder(

@@ -8,7 +8,7 @@
         brightness: Brightness.light,
         primaryColor: AppColors.primaryPurple,
         dividerColor: Colors.grey.withOpacity(0.2),
-        scaffoldBackgroundColor: AppColors.lavenderBg,
+        scaffoldBackgroundColor: AppColors.white,
         colorScheme: const ColorScheme.light(
           primary: AppColors.primaryPurple,
           secondary: AppColors.brightBlue,
@@ -59,7 +59,7 @@
         ),
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
           backgroundColor: Colors.white,
-          selectedItemColor: AppColors.primaryPurple,
+          selectedItemColor: AppColors.indigo,
           unselectedItemColor: AppColors.textGrey,
           type: BottomNavigationBarType.fixed,
           elevation: 8,
@@ -151,7 +151,7 @@
         ),
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
           backgroundColor: darkSurface,
-          selectedItemColor: AppColors.primaryPurple,
+          selectedItemColor: AppColors.indigo,
           unselectedItemColor: darkTextSecondary,
           type: BottomNavigationBarType.fixed,
           elevation: 8,

@@ -205,20 +205,52 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
       backgroundColor: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.white,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: isDark ? Theme.of(context).appBarTheme.backgroundColor : Colors.white,
-        title: Text(
+        backgroundColor: Colors.transparent,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.indigo,
+                AppColors.brightBlue,
+              ],
+            ),
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                top: -40,
+                right: -40,
+                child: CircleAvatar(
+                  radius: 80,
+                  backgroundColor: Colors.white.withOpacity(0.05),
+                ),
+              ),
+              Positioned(
+                bottom: -20,
+                left: -20,
+                child: CircleAvatar(
+                  radius: 60,
+                  backgroundColor: Colors.white.withOpacity(0.03),
+                ),
+              ),
+            ],
+          ),
+        ),
+        title: const Text(
           'Messages',
           style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface,
+            color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 24,
           ),
         ),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: AppColors.indigo,
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: AppColors.indigo,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          indicatorColor: Colors.white,
           indicatorWeight: 3,
           indicatorSize: TabBarIndicatorSize.label,
           tabs: const [
@@ -234,10 +266,13 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
           _buildChannelList(ChannelType.chat),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showContactPicker,
-        backgroundColor: AppColors.indigo,
-        child: const Icon(Icons.add_comment_rounded, color: Colors.white),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 100.0), // Added padding to prevent overlap with bottom navigation bar
+        child: FloatingActionButton(
+          onPressed: _showContactPicker,
+          backgroundColor: AppColors.indigo,
+          child: const Icon(Icons.add_comment_rounded, color: Colors.white),
+        ),  
       ),
     );
   }

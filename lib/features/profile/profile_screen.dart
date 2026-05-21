@@ -375,7 +375,7 @@ class ProfileScreen extends StatelessWidget {
                                   _buildDivider(),
                                   BlocBuilder<ThemeCubit, ThemeMode>(
                                     builder: (context, themeMode) {
-                                      final isDark = themeMode == ThemeMode.dark;
+                                      final isDark = Theme.of(context).brightness == Brightness.dark;
                                       return SwitchListTile(
                                         dense: true,
                                         contentPadding: const EdgeInsets.symmetric(horizontal: 16),

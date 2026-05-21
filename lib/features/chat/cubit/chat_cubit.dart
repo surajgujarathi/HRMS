@@ -34,17 +34,19 @@ class ChatCubit extends Cubit<ChatState> {
       final prefs = SharedPref();
       final baseUrl = await prefs.getString('baseUrl');
       final sessionJson = await prefs.getObject('session');
+        final port=await prefs.getObject('port');
 
       if (baseUrl == null || sessionJson == null) {
         debugPrint('ChatCubit: Missing baseUrl or session data. Cannot init WebSockets.');
         return;
       }
 
+      final session = OdooSession.fromJson(sessionJson);
       final uri = Uri.parse(baseUrl.trim());
       final wsScheme = uri.scheme == 'https' ? 'wss' : 'ws';
       final host = uri.host;
-      final wsUrl = '$wsScheme://$host/websocket';
-      final sessionId = sessionJson['session_id'];
+      final wsUrl = '$wsScheme://$host:${port ?? 7075}/websocket';
+      final sessionId = session.id;
 
       debugPrint('ChatCubit: ==========================================');
       debugPrint('ChatCubit: Initializing Odoo 18 WebSocket Connection');
@@ -341,15 +343,77 @@ class ChatCubit extends Cubit<ChatState> {
       if (baseUrl == null || sobj == null) return null;
       final session = OdooSession.fromJson(sobj);
       final client = OdooClient(baseUrl, sessionId: session);
+      debugPrint('ChatCubit: Calling channel_get for partnerId $partnerId');
       final result = await client.callKw({
         'model': 'discuss.channel',
         'method': 'channel_get',
         'args': [],
         'kwargs': {'partners_to': [partnerId]},
       });
-      if (result != null && result is Map && result['id'] != null) {
-        fetchChannels();
-        return null;
+
+      debugPrint('ChatCubit: channel_get Result Type: ${result.runtimeType}');
+      debugPrint('ChatCubit: channel_get Result Payload: $result');
+
+      if (result != null) {
+        // Case 1: Result is a direct Map
+        if (result is Map && result['id'] != null) {
+          final channelMap = Map<String, dynamic>.from(result);
+          final channel = ChatChannel.fromJson(channelMap, session.userName, session.partnerId);
+          final formattedChannel = channel.copyWith(
+            displayName: _formatDisplayName(channel.displayName, session.userName, channel.type)
+          );
+          fetchChannels();
+          return formattedChannel;
+        }
+
+        // Case 2: Result is a List of maps
+        if (result is List && result.isNotEmpty && result[0] is Map && result[0]['id'] != null) {
+          final channelMap = Map<String, dynamic>.from(result[0]);
+          final channel = ChatChannel.fromJson(channelMap, session.userName, session.partnerId);
+          final formattedChannel = channel.copyWith(
+            displayName: _formatDisplayName(channel.displayName, session.userName, channel.type)
+          );
+          fetchChannels();
+          return formattedChannel;
+        }
+
+        // Case 3: Result is a Map containing Odoo 18 discuss.channel metadata
+        if (result is Map && result.containsKey('discuss.channel')) {
+          final channelList = result['discuss.channel'];
+          if (channelList is List && channelList.isNotEmpty) {
+            final channelMap = Map<String, dynamic>.from(channelList[0]);
+            final channel = ChatChannel.fromJson(channelMap, session.userName, session.partnerId);
+            final formattedChannel = channel.copyWith(
+              displayName: _formatDisplayName(channel.displayName, session.userName, channel.type)
+            );
+            fetchChannels();
+            return formattedChannel;
+          }
+        }
+
+        // Case 4: Result is an integer ID (Common in Odoo 17/18)
+        if (result is int) {
+          debugPrint('ChatCubit: channel_get returned integer ID ($result). Fetching channel details...');
+          final channelRecords = await client.callKw({
+            'model': 'discuss.channel',
+            'method': 'search_read',
+            'args': [],
+            'kwargs': {
+              'domain': [['id', '=', result]],
+              'fields': ['id', 'name', 'channel_type', 'display_name', 'image_128', 'channel_member_ids', 'description', 'active'],
+            },
+          });
+
+          if (channelRecords != null && channelRecords is List && channelRecords.isNotEmpty) {
+            final channelMap = Map<String, dynamic>.from(channelRecords[0]);
+            final channel = ChatChannel.fromJson(channelMap, session.userName, session.partnerId);
+            final formattedChannel = channel.copyWith(
+              displayName: _formatDisplayName(channel.displayName, session.userName, channel.type)
+            );
+            fetchChannels();
+            return formattedChannel;
+          }
+        }
       }
       return null;
     } catch (e) {
@@ -452,9 +516,12 @@ class ChatCubit extends Cubit<ChatState> {
           },
         });
 
+        debugPrint('ChatCubit: fetchMessages members fetched: ${(members as List).length}');
+
+        int? myMemberId;
+        int mySeenMessageId = 0;
+
         if (members != null && (members as List).isNotEmpty) {
-          int? myMemberId;
-          int mySeenMessageId = 0;
           for (var m in members) {
             final pid = m['partner_id'] is List ? m['partner_id'][0] : m['partner_id'];
             final seenIdRaw = m['seen_message_id'];
@@ -471,38 +538,66 @@ class ChatCubit extends Cubit<ChatState> {
               }
             }
           }
+        }
 
-          if (myMemberId != null && response.isNotEmpty) {
-            final newestId = response[0]['id'];
+        debugPrint('ChatCubit: fetchMessages myMemberId=$myMemberId, mySeenMessageId=$mySeenMessageId, responseNotEmpty=${response.isNotEmpty}');
 
-            // CRITICAL CHECK: Only mark as seen if user is STILL in this chat
-            if (state.currentChatId != channelId.toString()) {
-              debugPrint('ChatCubit: Skip mark-as-seen — user already left chat $channelId');
-            } else if (mySeenMessageId >= newestId) {
-              // We already marked this message as seen. Keep local timestamp refreshed but skip server write.
-              _channelReadTimestamps[channelId] = DateTime.now();
-            } else {
-              await client.callKw({
+        if (myMemberId == null && response.isNotEmpty) {
+          debugPrint('ChatCubit: myMemberId not found in initial search. Executing targeted query...');
+          try {
+            final mySelf = await client.callKw({
+              'model': 'discuss.channel.member',
+              'method': 'search_read',
+              'args': [],
+              'kwargs': {
+                'domain': [['channel_id', '=', channelId], ['partner_id', '=', session.partnerId]],
+                'fields': ['seen_message_id'],
+              },
+            });
+            if (mySelf != null && (mySelf as List).isNotEmpty) {
+              myMemberId = mySelf[0]['id'];
+              final seenIdRaw = mySelf[0]['seen_message_id'];
+              int seenId = 0;
+              if (seenIdRaw is int) seenId = seenIdRaw;
+              else if (seenIdRaw is List && seenIdRaw.isNotEmpty) seenId = seenIdRaw[0];
+              mySeenMessageId = seenId;
+            }
+          } catch (e) {
+            debugPrint('ChatCubit: Targeted member query error: $e');
+          }
+        }
+
+        if (myMemberId != null && response.isNotEmpty) {
+          int newestId = response[0]['id'];
+          for (var msg in response) {
+            if (msg['id'] is int && msg['id'] > newestId) {
+              newestId = msg['id'];
+            }
+          }
+
+          // CRITICAL CHECK: Only mark as seen if user is STILL in this chat
+          if (state.currentChatId != channelId.toString()) {
+            debugPrint('ChatCubit: Skip mark-as-seen — user already left chat $channelId');
+          } else {
+            try {
+              final writeRes = await client.callKw({
                 'model': 'discuss.channel.member',
                 'method': 'write',
                 'args': [[myMemberId], {
                   'seen_message_id': newestId,
                   'fetched_message_id': newestId,
+                  'message_unread_counter': 0,
                 }],
                 'kwargs': {},
               });
-              try {
-                await client.callKw({
-                  'model': 'discuss.channel',
-                  'method': 'channel_seen',
-                  'args': [[channelId]],
-                  'kwargs': {'last_message_id': newestId},
-                });
-              } catch (_) {}
-              // Refresh timestamp after successful server write
-              _channelReadTimestamps[channelId] = DateTime.now();
-              debugPrint('ChatCubit: Marked channel $channelId as seen up to message $newestId');
+              debugPrint('ChatCubit: [Odoo Write Success] discuss.channel.member write response: $writeRes');
+            } catch (err) {
+              debugPrint('ChatCubit: [Odoo Write Error] discuss.channel.member write failed: $err');
             }
+
+            // Refresh timestamp after successful server write
+            _channelReadTimestamps[channelId] = DateTime.now();
+            debugPrint('ChatCubit: Finished marking channel $channelId as seen up to message $newestId');
           }
         }
       } catch (e) {

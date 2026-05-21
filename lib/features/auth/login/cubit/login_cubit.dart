@@ -88,6 +88,7 @@ class LoginCubit extends Cubit<LoginState> {
       await prefs.saveObject('session', session);
       await prefs.saveString('baseUrl', baseUrl);
       await prefs.saveString('db', db);
+       await prefs.saveObject('port', 7075); // Example port value
       await prefs.saveBool('isLoggedIn', true);
       await prefs.saveBool('rememberMe', state.rememberMe);
 

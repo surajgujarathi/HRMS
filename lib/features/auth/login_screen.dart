@@ -98,7 +98,7 @@ class LoginScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 40),
                             Text(
-                              l10n.welcome_title.split('\n').first,
+                              l10n.welcome_title,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 32,

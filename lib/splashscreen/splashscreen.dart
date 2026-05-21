@@ -211,7 +211,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   ),
                   const SizedBox(height: 4),
                   const Text(
-                    "FastTrackProjects",
+                    "Srivyn",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 14,
