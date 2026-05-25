@@ -31,7 +31,7 @@ class LanguagePage extends StatelessWidget {
                 children: [
                   const SizedBox(height: 24),
                     Text(
-                      "Select Your Language",
+                      l10n.select_your_language,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -39,9 +39,9 @@ class LanguagePage extends StatelessWidget {
                       ),
                     ),
                   const SizedBox(height: 8),
-                  const Text(
-                    "Choose the language you prefer for the app interface.",
-                    style: TextStyle(
+                  Text(
+                    l10n.choose_language_info,
+                    style: const TextStyle(
                       fontSize: 13,
                       color: AppColors.textSecondary,
                     ),

@@ -4,25 +4,27 @@ import 'package:flutter_app/features/notifications/cubit/notification_cubit.dart
 import 'package:flutter_app/features/notifications/models/notification_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class NotificationPage extends StatelessWidget {
   const NotificationPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: BlocBuilder<NotificationCubit, NotificationState>(
           builder: (context, state) {
             return Column(
               children: [
-                _buildHeader(context, state),
-                _buildFilterChips(context, state),
+                _buildHeader(context, state, l10n),
+                _buildFilterChips(context, state, l10n),
                 Expanded(
                   child: state.status == NotificationStatus.loading
                       ? Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColor))
                       : state.filteredNotifications.isEmpty
-                          ? _buildEmptyState(context)
+                          ? _buildEmptyState(context, l10n)
                           : ListView.builder(
                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                               itemCount: state.filteredNotifications.length,
@@ -39,14 +41,14 @@ class NotificationPage extends StatelessWidget {
       );
   }
 
-  Widget _buildFilterChips(BuildContext context, NotificationState state) {
+  Widget _buildFilterChips(BuildContext context, NotificationState state, AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
       child: Row(
         children: [
           _buildChip(
             context,
-            'All',
+            l10n.all,
             state.notifications.length,
             state.filter == NotificationFilter.all,
             () => context.read<NotificationCubit>().setFilter(NotificationFilter.all),
@@ -54,7 +56,7 @@ class NotificationPage extends StatelessWidget {
           const SizedBox(width: 12),
           _buildChip(
             context,
-            'Unread',
+            l10n.unread,
             state.notifications.where((n) => !n.isRead).length,
             state.filter == NotificationFilter.unread,
             () => context.read<NotificationCubit>().setFilter(NotificationFilter.unread),
@@ -63,7 +65,7 @@ class NotificationPage extends StatelessWidget {
           const SizedBox(width: 12),
           _buildChip(
             context,
-            'Read',
+            l10n.read,
             state.notifications.where((n) => n.isRead).length,
             state.filter == NotificationFilter.read,
             () => context.read<NotificationCubit>().setFilter(NotificationFilter.read),
@@ -128,7 +130,7 @@ class NotificationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, NotificationState state) {
+  Widget _buildHeader(BuildContext context, NotificationState state, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 60, 20, 32),
       decoration: const BoxDecoration(
@@ -150,10 +152,10 @@ class NotificationPage extends StatelessWidget {
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
               ),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Notifications',
-                  style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                  l10n.notifications,
+                  style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -169,7 +171,7 @@ class NotificationPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                '${state.unreadCount} New Notifications',
+                l10n.new_notifications_count(state.unreadCount.toString()),
                 style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
               ),
             ),
@@ -179,7 +181,7 @@ class NotificationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
+  Widget _buildEmptyState(BuildContext context, AppLocalizations l10n) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -187,12 +189,12 @@ class NotificationPage extends StatelessWidget {
           Icon(Icons.notifications_none_rounded, size: 80, color: Theme.of(context).primaryColor.withOpacity(0.2)),
           const SizedBox(height: 16),
           Text(
-            'All caught up!',
+            l10n.all_caught_up,
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
-            'You have no new notifications.',
+            l10n.no_notifications,
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 14),
           ),
         ],
@@ -207,6 +209,7 @@ class _NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final bool isFailed = notification.status == 'exception' || notification.failureType != null;
     final cardColor = Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface;
     
@@ -232,7 +235,7 @@ class _NotificationCard extends StatelessWidget {
             if (!notification.isRead) {
               context.read<NotificationCubit>().markAsRead(notification.id);
             }
-            _showNotificationDetails(context, notification);
+            _showNotificationDetails(context, notification, l10n);
           },
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -285,7 +288,7 @@ class _NotificationCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            'Delivery Failed: ${notification.failureType ?? 'Unknown'}',
+                            l10n.delivery_failed(notification.failureType ?? 'Unknown'),
                             style: const TextStyle(color: AppColors.red, fontSize: 10, fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -334,7 +337,7 @@ class _NotificationCard extends StatelessWidget {
     return htmlText.replaceAll(exp, '').trim();
   }
 
-  void _showNotificationDetails(BuildContext context, OdooNotification notification) {
+  void _showNotificationDetails(BuildContext context, OdooNotification notification, AppLocalizations l10n) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -372,7 +375,7 @@ class _NotificationCard extends StatelessWidget {
                     ),
                     if (notification.failureReason != null && notification.failureReason!.isNotEmpty) ...[
                       const SizedBox(height: 24),
-                      const Text('Failure Details', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.red)),
+                      Text(l10n.failure_details, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.red)),
                       const SizedBox(height: 8),
                       Container(
                         padding: const EdgeInsets.all(12),

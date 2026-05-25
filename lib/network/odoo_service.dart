@@ -327,10 +327,16 @@ class OdooService {
 
   /// Creates a new expense.
   Future<int> createExpense(Map<String, dynamic> data) async {
+    final sanitizedData = Map<String, dynamic>.from(data);
+    sanitizedData.forEach((key, value) {
+      if (value == null) {
+        sanitizedData[key] = false;
+      }
+    });
     final response = await executeModelMethod(
       'hr.expense',
       'create',
-      [data],
+      [sanitizedData],
     );
     return response is int ? response : 0;
   }
@@ -444,10 +450,16 @@ class OdooService {
 
   /// Creates a new leave request.
   Future<int> createLeaveRequest(Map<String, dynamic> data) async {
+    final sanitizedData = Map<String, dynamic>.from(data);
+    sanitizedData.forEach((key, value) {
+      if (value == null) {
+        sanitizedData[key] = false;
+      }
+    });
     final response = await executeModelMethod(
       'hr.leave',
       'create',
-      [data],
+      [sanitizedData],
     );
     return response is int ? response : 0;
   }
@@ -692,10 +704,16 @@ class OdooService {
 
   /// Creates a new maintenance equipment.
   Future<int> createEquipment(Map<String, dynamic> data) async {
+    final sanitizedData = Map<String, dynamic>.from(data);
+    sanitizedData.forEach((key, value) {
+      if (value == null) {
+        sanitizedData[key] = false;
+      }
+    });
     final response = await executeModelMethod(
       'maintenance.equipment',
       'create',
-      [data],
+      [sanitizedData],
     );
     return response is int ? response : 0;
   }

@@ -9,40 +9,52 @@ import 'package:flutter_app/features/profile/models/employee_model.dart';
 class ProfileCubit extends Cubit<ProfileState> {
   ProfileCubit() : super(const ProfileState());
 
+  /// Clears all in-memory profile data back to initial.
+  /// Call this on logout so stale data never leaks into a new session.
+  void resetProfile() {
+    debugPrint('ProfileCubit: resetting state to initial');
+    emit(const ProfileState());
+  }
+
   Future<void> fetchProfile() async {
     emit(state.copyWith(status: ProfileStatus.loading));
 
     try {
       final prefs = SharedPref();
 
-      // 1. Try to get cached data first to save a network call
+      // 1. Get the current session's employee_id first
+      final currentEmployeeId = await prefs.getString('employee_id');
+      if (currentEmployeeId == null) {
+        throw Exception("Missing session data. Please log in again.");
+      }
+
+      // 2. Try cached data ONLY if it belongs to the current logged-in user
       final cachedData = await prefs.getObject('employee_data');
       if (cachedData != null && cachedData is Map && cachedData.isNotEmpty) {
-        debugPrint('Using cached profile data');
-        try {
-          final employee = Employee.fromJson(cachedData as Map<String, dynamic>);
-          emit(
-            state.copyWith(
-              status: ProfileStatus.success,
-              employee: employee,
-            ),
+        final cachedId = cachedData['id']?.toString();
+        if (cachedId == currentEmployeeId) {
+          debugPrint('Using cached profile data for employee: $currentEmployeeId');
+          try {
+            final employee = Employee.fromJson(cachedData as Map<String, dynamic>);
+            emit(state.copyWith(status: ProfileStatus.success, employee: employee));
+          } catch (e) {
+            debugPrint('Error parsing cached employee data: $e');
+          }
+        } else {
+          // Cached data belongs to a different user — discard it
+          debugPrint(
+            'Cached data belongs to different user ($cachedId vs $currentEmployeeId) — clearing cache',
           );
-          // Optional: still fetch from server to refresh
-        } catch (e) {
-          debugPrint('Error parsing cached employee data: $e');
+          await prefs.remove('employee_data');
         }
       }
 
-      // 2. Fetch from server
+      // 3. Always fetch fresh data from server
       final baseUrl = await prefs.getString('baseUrl');
       final db = await prefs.getString('db');
-      final employeeId = await prefs.getString('employee_id');
       final sessionData = await prefs.getObject('session');
 
-      if (baseUrl == null ||
-          db == null ||
-          employeeId == null ||
-          sessionData == null) {
+      if (baseUrl == null || db == null || sessionData == null) {
         throw Exception("Missing session data. Please log in again.");
       }
 
@@ -62,9 +74,7 @@ class ProfileCubit extends Cubit<ProfileState> {
         userName: sessionData['userName']?.toString() ?? '',
         userLang: sessionData['userLang']?.toString() ?? "en_US",
         userTz: sessionData['userTz']?.toString() ?? "UTC",
-        isSystem: sessionData['isSystem'] is bool
-            ? sessionData['isSystem']
-            : false,
+        isSystem: sessionData['isSystem'] is bool ? sessionData['isSystem'] : false,
         dbName: sessionData['dbName']?.toString() ?? db,
         serverVersion: sessionData['serverVersion']?.toString() ?? "",
       );
@@ -72,69 +82,41 @@ class ProfileCubit extends Cubit<ProfileState> {
       final odooService = OdooService(baseUrl, session: session);
 
       try {
-        debugPrint('Fetching profile from server for employeeId: $employeeId');
+        debugPrint('Fetching profile from server for employeeId: $currentEmployeeId');
 
         final employeeResponse = await odooService.fetchEmployeeDetails(
-          int.parse(employeeId),
+          int.parse(currentEmployeeId),
           session.userId,
         );
 
-        debugPrint('Profile Data Received (Main): $employeeResponse');
-
         // Fetch Resume and Skills in parallel
         final results = await Future.wait([
-          odooService.getResumeLines(int.parse(employeeId)),
-          odooService.getEmployeeSkills(int.parse(employeeId)),
+          odooService.getResumeLines(int.parse(currentEmployeeId)),
+          odooService.getEmployeeSkills(int.parse(currentEmployeeId)),
         ]);
 
-        final resumeData = results[0];
-        final skillsData = results[1];
-
-        debugPrint('Resume Data Received: $resumeData');
-        debugPrint('Skills Data Received: $skillsData');
-
-        // Merge data into the response map
         final fullData = Map<String, dynamic>.from(employeeResponse);
-        fullData['resume_line_ids'] = resumeData;
-        fullData['employee_skill_ids'] = skillsData;
+        fullData['resume_line_ids'] = results[0];
+        fullData['employee_skill_ids'] = results[1];
 
         final employee = Employee.fromJson(fullData);
-        
-        // Detailed debug print for the user
+
         debugPrint('--- EMPLOYEE DATA DEBUG ---');
         debugPrint('ID: ${employee.id}');
         debugPrint('Name: ${employee.name}');
         debugPrint('Code: ${employee.employeeCode}');
-        debugPrint('Manager: ${employee.parentId?.name}');
-        debugPrint('Coach: ${employee.coachId?.name}');
-        debugPrint('Department: ${employee.departmentId?.name}');
-        debugPrint('Company: ${employee.companyId?.name}');
-        debugPrint('Location: ${employee.workLocationId?.name}');
-        debugPrint('Resume Lines Count: ${employee.resumeLines.length}');
-        debugPrint('Skills Count: ${employee.skills.length}');
-        debugPrint('Gender: ${employee.gender}');
-        debugPrint('DOJ: ${employee.doj}');
         debugPrint('---------------------------');
 
+        // Save fresh data keyed to the current user
         await prefs.saveObject('employee_data', fullData);
 
-        emit(
-          state.copyWith(
-            status: ProfileStatus.success,
-            employee: employee,
-          ),
-        );
+        emit(state.copyWith(status: ProfileStatus.success, employee: employee));
       } finally {
         odooService.close();
       }
     } catch (e) {
       debugPrint('Profile Fetch Error: $e');
-      emit(
-        state.copyWith(
-          status: ProfileStatus.failure,
-          errorMessage: e.toString(),
-        ),
-      );
+      emit(state.copyWith(status: ProfileStatus.failure, errorMessage: e.toString()));
     }
   }
 }

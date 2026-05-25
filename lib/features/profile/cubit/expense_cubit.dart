@@ -121,8 +121,9 @@ class ExpenseCubit extends Cubit<ExpenseState> {
     }
   }
 
-  Future<void> addExpense(Map<String, dynamic> data, {File? file}) async {
+  Future<bool> addExpense(Map<String, dynamic> data, {File? file}) async {
     try {
+      emit(ExpenseLoading());
       debugPrint('Adding Expense with Payload: $data');
       final prefs = SharedPref();
       final baseUrl = await prefs.getString('baseUrl');
@@ -168,13 +169,15 @@ class ExpenseCubit extends Cubit<ExpenseState> {
           await uploadReceipt(expenseId, file);
         }
 
-        fetchExpenses(); // Refresh list
+        await fetchExpenses(); // Refresh list
+        return true;
       } finally {
         odooService.close();
       }
     } catch (e) {
       debugPrint('Expense Create Error: $e');
       emit(ExpenseError(e.toString()));
+      return false;
     }
   }
 

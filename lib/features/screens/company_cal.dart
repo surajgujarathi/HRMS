@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class CompanyCalendarPage extends StatefulWidget {
   const CompanyCalendarPage({super.key});
@@ -35,7 +36,7 @@ class _CompanyCalendarPageState extends State<CompanyCalendarPage> {
     }
   }
 
-  void _openAddEventSheet() {
+  void _openAddEventSheet(AppLocalizations l10n) {
     final titleController = TextEditingController();
     String selectedType = "Event";
 
@@ -59,7 +60,7 @@ class _CompanyCalendarPageState extends State<CompanyCalendarPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "Add Event",
+                    l10n.add_event,
                     style: TextStyle(
                       fontSize: 18, 
                       fontWeight: FontWeight.bold,
@@ -72,7 +73,7 @@ class _CompanyCalendarPageState extends State<CompanyCalendarPage> {
                     controller: titleController,
                     style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     decoration: InputDecoration(
-                      labelText: "Event Title",
+                      labelText: l10n.event_title,
                       labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                       border: const OutlineInputBorder(),
                     ),
@@ -83,11 +84,11 @@ class _CompanyCalendarPageState extends State<CompanyCalendarPage> {
                     value: selectedType,
                     dropdownColor: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
                     style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-                    items: const [
-                      DropdownMenuItem(value: "Event", child: Text("Event")),
+                    items: [
+                      DropdownMenuItem(value: "Event", child: Text(l10n.event)),
                       DropdownMenuItem(
                         value: "Holiday",
-                        child: Text("Holiday"),
+                        child: Text(l10n.holiday),
                       ),
                     ],
                     onChanged: (value) {
@@ -96,7 +97,7 @@ class _CompanyCalendarPageState extends State<CompanyCalendarPage> {
                       });
                     },
                     decoration: InputDecoration(
-                      labelText: "Type",
+                      labelText: l10n.type,
                       labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                       border: const OutlineInputBorder(),
                     ),
@@ -118,7 +119,7 @@ class _CompanyCalendarPageState extends State<CompanyCalendarPage> {
                           Navigator.pop(context);
                         }
                       },
-                      child: const Text("Save"),
+                      child: Text(l10n.save),
                     ),
                   ),
                   const SizedBox(height: 15),
@@ -133,12 +134,13 @@ class _CompanyCalendarPageState extends State<CompanyCalendarPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final filteredEvents = getEventsForSelectedDate();
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Company Calendar"), centerTitle: true),
+      appBar: AppBar(title: Text(l10n.company_calendar), centerTitle: true),
       floatingActionButton: FloatingActionButton(
-        onPressed: _openAddEventSheet,
+        onPressed: () => _openAddEventSheet(l10n),
         child: const Icon(Icons.add),
       ),
       body: Column(
@@ -159,7 +161,7 @@ class _CompanyCalendarPageState extends State<CompanyCalendarPage> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                "Events on ${DateFormat('dd MMM yyyy').format(selectedDate)}",
+                l10n.events_on(DateFormat('dd MMM yyyy').format(selectedDate)),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -172,7 +174,7 @@ class _CompanyCalendarPageState extends State<CompanyCalendarPage> {
             child: filteredEvents.isEmpty
                 ? Center(
                     child: Text(
-                      "No Events",
+                      l10n.no_events,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
                     ),
                   )
@@ -199,7 +201,7 @@ class _CompanyCalendarPageState extends State<CompanyCalendarPage> {
                             ),
                           ),
                           title: Text(event["title"]),
-                          subtitle: Text(event["type"]),
+                          subtitle: Text(event["type"] == "Holiday" ? l10n.holiday : l10n.event),
                         ),
                       );
                     },

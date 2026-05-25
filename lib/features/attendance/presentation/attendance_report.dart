@@ -111,12 +111,12 @@ class _ReportHeader extends StatelessWidget {
       builder: (context, state) {
         return Container(
           padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [AppColors.primaryPurple, AppColors.violet],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+         decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.indigo, AppColors.brightBlue],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(32),
               bottomRight: Radius.circular(32),

@@ -3,6 +3,7 @@ import 'package:flutter_app/core/constants/app_colors.dart';
 import 'package:flutter_app/features/maintenance/cubit/maintenance_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class NewEquipmentPage extends StatefulWidget {
   const NewEquipmentPage({super.key});
@@ -89,6 +90,7 @@ class _NewEquipmentPageState extends State<NewEquipmentPage> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocProvider(
       create: (context) => MaintenanceCubit()..fetchMasterData(),
       child: Scaffold(
@@ -108,18 +110,18 @@ class _NewEquipmentPageState extends State<NewEquipmentPage> with SingleTickerPr
             icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text('New Equipment', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          title: Text(l10n.new_equipment, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           bottom: TabBar(
             controller: _tabController,
             isScrollable: true,
             indicatorColor: Colors.white,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white70,
-            tabs: const [
-              Tab(text: 'General'),
-              Tab(text: 'Description'),
-              Tab(text: 'Product Info'),
-              Tab(text: 'Maintenance'),
+            tabs: [
+              Tab(text: l10n.general),
+              Tab(text: l10n.description),
+              Tab(text: l10n.product_info),
+              Tab(text: l10n.maintenance),
             ],
           ),
         ),
@@ -127,12 +129,12 @@ class _NewEquipmentPageState extends State<NewEquipmentPage> with SingleTickerPr
           listener: (context, state) {
             if (state.status == MaintenanceStatus.submitted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Equipment created successfully'), backgroundColor: AppColors.successGreen),
+                SnackBar(content: Text(l10n.equipment_created_success), backgroundColor: AppColors.successGreen),
               );
               Navigator.pop(context);
             } else if (state.status == MaintenanceStatus.failure) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Error: ${state.errorMessage}'), backgroundColor: AppColors.dangerRed),
+                SnackBar(content: Text(l10n.error_message(state.errorMessage ?? '')), backgroundColor: AppColors.dangerRed),
               );
             }
           },
@@ -155,23 +157,24 @@ class _NewEquipmentPageState extends State<NewEquipmentPage> with SingleTickerPr
   }
 
   Widget _buildGeneralTab() {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<MaintenanceCubit, MaintenanceState>(
       builder: (context, state) {
         return SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              _buildTextField('Equipment Name', _nameController, Icons.label_important_outline, required: true),
-              _buildDropdownField('Category', state.categories, _selectedCategoryId, (val) => setState(() => _selectedCategoryId = val)),
-              _buildDropdownField('Company', state.companies, _selectedCompanyId, (val) => setState(() => _selectedCompanyId = val)),
+              _buildTextField(l10n.equipment_name, _nameController, Icons.label_important_outline, required: true),
+              _buildDropdownField(l10n.category, state.categories, _selectedCategoryId, (val) => setState(() => _selectedCategoryId = val)),
+              _buildDropdownField(l10n.company, state.companies, _selectedCompanyId, (val) => setState(() => _selectedCompanyId = val)),
               _buildUsedBySelection(),
               if (_usedBy == 'department' || _usedBy == 'other')
-                _buildDropdownField('Assigned Department', state.departments, _selectedDepartmentId, (val) => setState(() => _selectedDepartmentId = val)),
+                _buildDropdownField(l10n.assigned_department, state.departments, _selectedDepartmentId, (val) => setState(() => _selectedDepartmentId = val)),
               if (_usedBy == 'employee' || _usedBy == 'other')
-                _buildDropdownField('Assigned Employee', state.employees, _selectedEmployeeId, (val) => setState(() => _selectedEmployeeId = val)),
-              _buildDropdownField('Team', state.teams, _selectedTeamId, (val) => setState(() => _selectedTeamId = val)),
-              _buildDropdownField('Technician', state.employees, _selectedTechnicianId, (val) => setState(() => _selectedTechnicianId = val)),
-              _buildDateField('Scrap Date', _scrapDate, () => _selectDate(context, 'scrap')),
+                _buildDropdownField(l10n.assigned_employee, state.employees, _selectedEmployeeId, (val) => setState(() => _selectedEmployeeId = val)),
+              _buildDropdownField(l10n.team, state.teams, _selectedTeamId, (val) => setState(() => _selectedTeamId = val)),
+              _buildDropdownField(l10n.technician, state.employees, _selectedTechnicianId, (val) => setState(() => _selectedTechnicianId = val)),
+              _buildDateField(l10n.scrap_date, _scrapDate, () => _selectDate(context, 'scrap')),
             ],
           ),
         );
@@ -180,33 +183,35 @@ class _NewEquipmentPageState extends State<NewEquipmentPage> with SingleTickerPr
   }
 
   Widget _buildDescriptionTab() {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
-      child: _buildTextField('Note', _noteController, Icons.note_alt_outlined, maxLines: 10),
+      child: _buildTextField(l10n.note, _noteController, Icons.note_alt_outlined, maxLines: 10),
     );
   }
 
   Widget _buildProductInfoTab() {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<MaintenanceCubit, MaintenanceState>(
       builder: (context, state) {
         return SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              _buildDropdownField('Vendor', state.vendors, _selectedPartnerId, (val) => setState(() => _selectedPartnerId = val)),
-              _buildTextField('Vendor Reference', _partnerRefController, Icons.tag),
-              _buildTextField('Model', _modelController, Icons.settings_input_component),
-              _buildTextField('Mfg. Serial Number', _serialNoController, Icons.confirmation_number_outlined),
-              _buildTextField('Inventory Serial Number', _compSerialNoController, Icons.inventory_outlined, suffix: IconButton(
+              _buildDropdownField(l10n.vendor, state.vendors, _selectedPartnerId, (val) => setState(() => _selectedPartnerId = val)),
+              _buildTextField(l10n.vendor_reference, _partnerRefController, Icons.tag),
+              _buildTextField(l10n.model, _modelController, Icons.settings_input_component),
+              _buildTextField(l10n.mfg_serial_number, _serialNoController, Icons.confirmation_number_outlined),
+              _buildTextField(l10n.inventory_serial_number, _compSerialNoController, Icons.inventory_outlined, suffix: IconButton(
                 icon: const Icon(Icons.refresh, color: AppColors.primaryPurple),
                 onPressed: () {
                   // Simulate generating sequence
                   _compSerialNoController.text = 'INV-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
                 },
               )),
-              _buildDateField('Effective Date', _effectiveDate, () => _selectDate(context, 'effective')),
-              _buildTextField('Cost', _costController, Icons.attach_money, keyboardType: TextInputType.number),
-              _buildDateField('Warranty Expiration Date', _warrantyDate, () => _selectDate(context, 'warranty')),
+              _buildDateField(l10n.effective_date, _effectiveDate, () => _selectDate(context, 'effective')),
+              _buildTextField(l10n.cost, _costController, Icons.attach_money, keyboardType: TextInputType.number),
+              _buildDateField(l10n.warranty_expiration_date, _warrantyDate, () => _selectDate(context, 'warranty')),
             ],
           ),
         );
@@ -215,21 +220,23 @@ class _NewEquipmentPageState extends State<NewEquipmentPage> with SingleTickerPr
   }
 
   Widget _buildMaintenanceTab() {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          _buildTextField('Expected MTBF', _expectedMtbfController, Icons.timer_outlined, keyboardType: TextInputType.number),
-          _buildTextField('Mean Time Between Failure', _mtbfController, Icons.av_timer, keyboardType: TextInputType.number),
-          _buildDateField('Estimated Next Failure', _estimatedNextFailure, () => _selectDate(context, 'est_failure')),
-          _buildDateField('Latest Failure', _latestFailureDate, () => _selectDate(context, 'latest_failure')),
-          _buildTextField('Mean Time To Repair', _mttrController, Icons.build_outlined, keyboardType: TextInputType.number),
+          _buildTextField(l10n.expected_mtbf, _expectedMtbfController, Icons.timer_outlined, keyboardType: TextInputType.number),
+          _buildTextField(l10n.mean_time_between_failure, _mtbfController, Icons.av_timer, keyboardType: TextInputType.number),
+          _buildDateField(l10n.estimated_next_failure, _estimatedNextFailure, () => _selectDate(context, 'est_failure')),
+          _buildDateField(l10n.latest_failure, _latestFailureDate, () => _selectDate(context, 'latest_failure')),
+          _buildTextField(l10n.mean_time_to_repair, _mttrController, Icons.build_outlined, keyboardType: TextInputType.number),
         ],
       ),
     );
   }
 
   Widget _buildTextField(String label, TextEditingController controller, IconData icon, {bool required = false, int maxLines = 1, TextInputType? keyboardType, Widget? suffix}) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: TextFormField(
@@ -258,7 +265,7 @@ class _NewEquipmentPageState extends State<NewEquipmentPage> with SingleTickerPr
           ),
         ),
         validator: (value) {
-          if (required && (value == null || value.isEmpty)) return 'Please enter $label';
+          if (required && (value == null || value.isEmpty)) return l10n.please_enter(label);
           return null;
         },
       ),
@@ -289,6 +296,7 @@ class _NewEquipmentPageState extends State<NewEquipmentPage> with SingleTickerPr
   }
 
   Widget _buildDateField(String label, DateTime? date, VoidCallback onTap) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: InkWell(
@@ -301,26 +309,27 @@ class _NewEquipmentPageState extends State<NewEquipmentPage> with SingleTickerPr
             fillColor: Colors.white,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
           ),
-          child: Text(date != null ? DateFormat('dd MMM yyyy').format(date) : 'Select Date'),
+          child: Text(date != null ? DateFormat('dd MMM yyyy').format(date) : l10n.select_date),
         ),
       ),
     );
   }
 
   Widget _buildUsedBySelection() {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Used By', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textGrey)),
+          Text(l10n.used_by, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textGrey)),
           Row(
             children: [
-              _buildChoiceChip('Employee', 'employee'),
+              _buildChoiceChip(l10n.employee, 'employee'),
               const SizedBox(width: 8),
-              _buildChoiceChip('Department', 'department'),
+              _buildChoiceChip(l10n.department, 'department'),
               const SizedBox(width: 8),
-              _buildChoiceChip('Other', 'other'),
+              _buildChoiceChip(l10n.other, 'other'),
             ],
           ),
         ],
@@ -342,6 +351,7 @@ class _NewEquipmentPageState extends State<NewEquipmentPage> with SingleTickerPr
   }
 
   Widget _buildBottomAction(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(
@@ -357,7 +367,7 @@ class _NewEquipmentPageState extends State<NewEquipmentPage> with SingleTickerPr
           elevation: 0,
         ),
         onPressed: () => _submitForm(context),
-        child: const Text('Save Equipment', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+        child: Text(l10n.save_equipment, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
       ),
     );
   }

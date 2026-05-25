@@ -7,6 +7,7 @@ import 'package:flutter_app/features/main/state/main_state.dart';
 import 'package:flutter_app/features/payroll/payroll_screen.dart';
 import 'package:flutter_app/features/profile/profile_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key});
@@ -15,49 +16,50 @@ class MainPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => MainCubit(),
-      child: BlocBuilder<MainCubit, MainState>(
-        builder: (context, state) {
-          return Scaffold(
-            body: IndexedStack(
-              index: state.selectedIndex,
-              children: [
-                HomePage(),
-                PayrollScreen(), // My Pay
-                ChatListPage(),
-                ProfileScreen(), // Profile
-              ],
-            ),
-
-            extendBody: true,
-            bottomNavigationBar: SafeArea(
-              child: Container(
-                margin: const EdgeInsets.only(left: 20, right: 20, bottom: 16),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(32),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.brightBlue.withOpacity(0.15),
-                      blurRadius: 24,
-                      offset: const Offset(0, 8),
+              child: BlocBuilder<MainCubit, MainState>(
+                builder: (context, state) {
+                  final l10n = AppLocalizations.of(context)!;
+                  return Scaffold(
+                    body: IndexedStack(
+                      index: state.selectedIndex,
+                      children: [
+                        HomePage(),
+                        PayrollScreen(), // My Pay
+                        ChatListPage(),
+                        ProfileScreen(), // Profile
+                      ],
                     ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildNavItem(context, state, 0, Icons.home_outlined, Icons.home, 'Home'),
-                    _buildNavItem(context, state, 1, Icons.payment_outlined, Icons.payment, 'My Pay'),
-                    _buildNavItem(context, state, 2, Icons.chat_bubble_outline, Icons.chat_bubble, 'Chat'),
-                    _buildNavItem(context, state, 3, Icons.person_outline, Icons.person, 'Profile'),
-                  ],
-                ),
+
+                    extendBody: true,
+                    bottomNavigationBar: SafeArea(
+                      child: Container(
+                        margin: const EdgeInsets.only(left: 20, right: 20, bottom: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: BorderRadius.circular(32),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.brightBlue.withOpacity(0.15),
+                              blurRadius: 24,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _buildNavItem(context, state, 0, Icons.home_outlined, Icons.home, l10n.home),
+                            _buildNavItem(context, state, 1, Icons.payment_outlined, Icons.payment, l10n.my_pay),
+                            _buildNavItem(context, state, 2, Icons.chat_bubble_outline, Icons.chat_bubble, l10n.chat),
+                            _buildNavItem(context, state, 3, Icons.person_outline, Icons.person, l10n.profile),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
-            ),
-          );
-        },
-      ),
     );
   }
 

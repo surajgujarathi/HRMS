@@ -13,6 +13,7 @@ class CustomTextFormField extends StatelessWidget {
   final TextInputType keyboardType;
   final Color? fillColor;
   final String? errorText;
+  final String? initialValue;
 
   const CustomTextFormField({
     super.key,
@@ -27,6 +28,7 @@ class CustomTextFormField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.fillColor,
     this.errorText,
+    this.initialValue,
   });
 
   @override
@@ -57,6 +59,7 @@ class CustomTextFormField extends StatelessWidget {
                 : (isDark ? Border.all(color: Colors.white.withOpacity(0.1), width: 1) : null),
           ),
           child: TextFormField(
+            initialValue: initialValue,
             controller: controller,
             onChanged: onChanged,
             validator: validator,

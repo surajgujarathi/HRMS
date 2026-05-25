@@ -20,7 +20,7 @@ class AssignedAssetsPage extends StatelessWidget {
           builder: (context, state) {
             return Column(
               children: [
-                _buildHeader(context, state),
+                _buildHeader(context, l10n, state),
                 Expanded(
                   child: state.status == MaintenanceStatus.loading
                       ? const Center(child: CircularProgressIndicator(color: AppColors.primaryPurple))
@@ -44,7 +44,7 @@ class AssignedAssetsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, MaintenanceState state) {
+  Widget _buildHeader(BuildContext context, AppLocalizations l10n, MaintenanceState state) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 60, 20, 32),
       decoration: const BoxDecoration(
@@ -67,10 +67,10 @@ class AssignedAssetsPage extends StatelessWidget {
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
               ),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'My Assets',
-                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                  l10n.my_assets,
+                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -84,7 +84,7 @@ class AssignedAssetsPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Hello, ${state.employeeName ?? 'Employee'}',
+                  l10n.hello(state.employeeName ?? l10n.employee),
                   style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 6),
@@ -95,7 +95,7 @@ class AssignedAssetsPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    '${state.equipments.length} Active Assets Assigned',
+                    l10n.active_assets_assigned(state.equipments.length.toString()),
                     style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
                   ),
                 ),
@@ -122,14 +122,14 @@ class AssignedAssetsPage extends StatelessWidget {
           ),
           const SizedBox(height: 24),
            Text(
-            'No Assets Found',
+            l10n.no_assets_found,
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Assets assigned to you will appear here.',
+          Text(
+            l10n.assets_assigned_desc,
             textAlign: TextAlign.center,
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+            style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
           ),
         ],
       ),
@@ -144,6 +144,7 @@ class _AssetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isScrapped = equipment.scrapDate != null;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -191,13 +192,13 @@ class _AssetCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            equipment.categoryId?.name ?? 'General Asset',
+                            equipment.categoryId?.name ?? l10n.general_asset,
                             style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
                           ),
                         ],
                       ),
                     ),
-                    _buildStatusBadge(isScrapped),
+                    _buildStatusBadge(l10n, isScrapped),
                   ],
                 ),
               ),
@@ -210,9 +211,9 @@ class _AssetCard extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildInfoItem(context, 'Model', equipment.model ?? '---'),
-                    _buildInfoItem(context, 'Serial No', equipment.serialNo ?? '---'),
-                    _buildInfoItem(context, 'Cost', equipment.cost != null && equipment.cost! > 0 ? '\$${equipment.cost!.toStringAsFixed(0)}' : '---'),
+                    _buildInfoItem(context, l10n.model, equipment.model ?? '---'),
+                    _buildInfoItem(context, l10n.serial_number, equipment.serialNo ?? '---'),
+                    _buildInfoItem(context, l10n.cost, equipment.cost != null && equipment.cost! > 0 ? '\$${equipment.cost!.toStringAsFixed(0)}' : '---'),
                   ],
                 ),
               ),
@@ -223,7 +224,7 @@ class _AssetCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusBadge(bool isScrapped) {
+  Widget _buildStatusBadge(AppLocalizations l10n, bool isScrapped) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
@@ -231,7 +232,7 @@ class _AssetCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
-        isScrapped ? 'Scrapped' : 'In Use',
+        isScrapped ? l10n.scrapped : l10n.in_use,
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.bold,
@@ -279,6 +280,7 @@ class _AssetDetailSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
       decoration: BoxDecoration(
@@ -317,24 +319,24 @@ class _AssetDetailSheet extends StatelessWidget {
                   ),
                   Center(
                     child: Text(
-                      asset.categoryId?.name ?? 'General Asset',
+                      asset.categoryId?.name ?? l10n.general_asset,
                       style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
                     ),
                   ),
                   const SizedBox(height: 32),
-                  _buildDetailSection(context, 'Asset Specifications', [
-                    _buildDetailRow(context, 'Model', asset.model),
-                    _buildDetailRow(context, 'Serial Number', asset.serialNo),
-                    _buildDetailRow(context, 'Company', asset.companyId?.name),
-                    _buildDetailRow(context, 'Vendor', asset.partnerId?.name),
+                  _buildDetailSection(context, l10n.asset_specifications, [
+                    _buildDetailRow(context, l10n.model, asset.model),
+                    _buildDetailRow(context, l10n.serial_number, asset.serialNo),
+                    _buildDetailRow(context, l10n.company, asset.companyId?.name),
+                    _buildDetailRow(context, l10n.vendor, asset.partnerId?.name),
                   ]),
-                  _buildDetailSection(context, 'Maintenance History', [
-                    _buildDetailRow(context, 'Effective Date', asset.effectiveDate != null ? DateFormat('dd MMM yyyy').format(asset.effectiveDate!) : null),
-                    _buildDetailRow(context, 'Warranty Exp.', asset.warrantyDate != null ? DateFormat('dd MMM yyyy').format(asset.warrantyDate!) : null),
-                    _buildDetailRow(context, 'Est. Next Failure', asset.estimatedNextFailure != null ? DateFormat('dd MMM yyyy').format(asset.estimatedNextFailure!) : null),
+                  _buildDetailSection(context, l10n.maintenance_history, [
+                    _buildDetailRow(context, l10n.effective_date, asset.effectiveDate != null ? DateFormat('dd MMM yyyy').format(asset.effectiveDate!) : null),
+                    _buildDetailRow(context, l10n.warranty_expiration_date, asset.warrantyDate != null ? DateFormat('dd MMM yyyy').format(asset.warrantyDate!) : null),
+                    _buildDetailRow(context, l10n.estimated_next_failure, asset.estimatedNextFailure != null ? DateFormat('dd MMM yyyy').format(asset.estimatedNextFailure!) : null),
                   ]),
                   if (asset.note != null && asset.note!.isNotEmpty) ...[
-                    const Text('Additional Notes', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.indigo)),
+                    Text(l10n.additional_notes, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.indigo)),
                     const SizedBox(height: 12),
                     Container(
                       padding: const EdgeInsets.all(16),

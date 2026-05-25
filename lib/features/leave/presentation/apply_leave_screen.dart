@@ -6,6 +6,7 @@ import 'package:flutter_app/features/leave/cubit/leave_cubit.dart';
 import 'package:flutter_app/features/leave/cubit/leave_state.dart';
 import 'package:flutter_app/features/leave/models/leave_type_model.dart';
 import 'package:flutter_app/core/constants/app_colors.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class ApplyLeaveScreen extends StatefulWidget {
   const ApplyLeaveScreen({super.key});
@@ -30,7 +31,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
     super.dispose();
   }
 
-  void _submit(BuildContext context) async {
+  void _submit(BuildContext context, AppLocalizations l10n) async {
     if (_formKey.currentState!.validate() && _selectedType != null) {
       // 1. Calculate requested duration
       double requestedDays = 0;
@@ -39,7 +40,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
       } else {
         if (_endDate.isBefore(_startDate)) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("End date cannot be before start date"), backgroundColor: Colors.red),
+            SnackBar(content: Text(l10n.end_date_error), backgroundColor: Colors.red),
           );
           return;
         }
@@ -51,7 +52,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
       if (requestedDays > _selectedType!.remainingLeaves) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Insufficient balance. You requested $requestedDays days but only have ${_selectedType!.remainingLeaves} days available."),
+            content: Text(l10n.insufficient_balance(requestedDays.toString(), _selectedType!.remainingLeaves.toString())),
             backgroundColor: Colors.orange.shade800,
           ),
         );
@@ -77,13 +78,14 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
       }
     } else if (_selectedType == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select a leave type")),
+        SnackBar(content: Text(l10n.please_select_leave_type)),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocListener<LeaveCubit, LeaveState>(
       listener: (context, state) {
         if (state.status == LeaveStatus.submitted) {
@@ -106,7 +108,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
             icon: Icon(Icons.close_rounded, color: Theme.of(context).colorScheme.onSurface),
             onPressed: () => Navigator.pop(context),
           ),
-          title: Text("Request Time Off", 
+          title: Text(l10n.request_time_off, 
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)
           ),
           centerTitle: true,
@@ -120,25 +122,25 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildSectionHeader("Leave Type", Icons.category_outlined),
+                    _buildSectionHeader(l10n.leave_type, Icons.category_outlined),
                     const SizedBox(height: 12),
-                    _buildLeaveTypeSelector(state),
+                    _buildLeaveTypeSelector(state, l10n),
                     
                     const SizedBox(height: 32),
-                    _buildSectionHeader("Date & Duration", Icons.calendar_month_outlined),
+                    _buildSectionHeader(l10n.date_duration, Icons.calendar_month_outlined),
                     const SizedBox(height: 12),
-                    _buildDatePickerSection(),
+                    _buildDatePickerSection(l10n),
                     
                     const SizedBox(height: 24),
-                    _buildHalfDayToggle(),
+                    _buildHalfDayToggle(l10n),
                     
                     const SizedBox(height: 32),
-                    _buildSectionHeader("Additional Details", Icons.description_outlined),
+                    _buildSectionHeader(l10n.additional_details, Icons.description_outlined),
                     const SizedBox(height: 12),
-                    _buildDescriptionField(),
+                    _buildDescriptionField(l10n),
                     
                     const SizedBox(height: 48),
-                    _buildSubmitButton(context, state),
+                    _buildSubmitButton(context, state, l10n),
                   ],
                 ),
               ),
@@ -159,7 +161,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
     );
   }
 
-  Widget _buildLeaveTypeSelector(LeaveState state) {
+  Widget _buildLeaveTypeSelector(LeaveState state, AppLocalizations l10n) {
     if (state.status == LeaveStatus.loading) {
       return const Center(child: Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator(strokeWidth: 2)));
     }
@@ -176,7 +178,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-          hintText: "Select leave type",
+          hintText: l10n.select_leave_type,
           hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
         ),
         items: state.leaveTypes
@@ -189,12 +191,12 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
     );
   }
 
-  Widget _buildDatePickerSection() {
+  Widget _buildDatePickerSection(AppLocalizations l10n) {
     return Row(
       children: [
-        Expanded(child: _buildDateTile("Start Date", _startDate, (date) => setState(() => _startDate = date))),
+        Expanded(child: _buildDateTile(l10n.start_date, _startDate, (date) => setState(() => _startDate = date))),
         const SizedBox(width: 16),
-        Expanded(child: _buildDateTile("End Date", _endDate, (date) => setState(() => _endDate = date))),
+        Expanded(child: _buildDateTile(l10n.end_date, _endDate, (date) => setState(() => _endDate = date))),
       ],
     );
   }
@@ -237,7 +239,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
     );
   }
 
-  Widget _buildHalfDayToggle() {
+  Widget _buildHalfDayToggle(AppLocalizations l10n) {
     return Column(
       children: [
         Container(
@@ -248,7 +250,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
             boxShadow: [BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.02), blurRadius: 10)],
           ),
           child: SwitchListTile(
-            title: Text("Half Day", style: TextStyle(fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface)),
+            title: Text(l10n.half_day, style: TextStyle(fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface)),
             value: _isHalfDay,
             activeColor: AppColors.primaryPurple,
             onChanged: (val) => setState(() {
@@ -261,9 +263,9 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
           const SizedBox(height: 16),
           Row(
             children: [
-              _buildChoiceChip("Morning (AM)", _halfDayPeriod == 'am', () => setState(() => _halfDayPeriod = 'am')),
+              _buildChoiceChip(l10n.morning_am, _halfDayPeriod == 'am', () => setState(() => _halfDayPeriod = 'am')),
               const SizedBox(width: 12),
-              _buildChoiceChip("Afternoon (PM)", _halfDayPeriod == 'pm', () => setState(() => _halfDayPeriod = 'pm')),
+              _buildChoiceChip(l10n.afternoon_pm, _halfDayPeriod == 'pm', () => setState(() => _halfDayPeriod = 'pm')),
             ],
           ),
         ],
@@ -291,7 +293,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
     );
   }
 
-  Widget _buildDescriptionField() {
+  Widget _buildDescriptionField(AppLocalizations l10n) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
@@ -303,23 +305,23 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
         maxLines: 4,
         style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
-          hintText: "Reason for time off...",
+          hintText: l10n.reason_time_off_hint,
           hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), fontSize: 14),
           contentPadding: const EdgeInsets.all(16),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
         ),
-        validator: (val) => val == null || val.isEmpty ? "Required" : null,
+        validator: (val) => val == null || val.isEmpty ? l10n.required_field : null,
       ),
     );
   }
 
-  Widget _buildSubmitButton(BuildContext context, LeaveState state) {
+  Widget _buildSubmitButton(BuildContext context, LeaveState state, AppLocalizations l10n) {
     final isLoading = state.status == LeaveStatus.submitting;
     return SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
-        onPressed: isLoading ? null : () => _submit(context),
+        onPressed: isLoading ? null : () => _submit(context, l10n),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryPurple,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -327,7 +329,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
         ),
         child: isLoading
             ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-            : const Text("Submit Request", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+            : Text(l10n.submit_request, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
       ),
     );
   }

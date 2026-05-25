@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class AiChatBotPage extends StatefulWidget {
   const AiChatBotPage({super.key});
@@ -11,12 +12,19 @@ class _AiChatBotPageState extends State<AiChatBotPage> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  final List<Map<String, dynamic>> messages = [
-    {
-      "text": "Hello 👋 I'm your HR Assistant. How can I help you today?",
-      "isUser": false,
-    },
-  ];
+  final List<Map<String, dynamic>> messages = [];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (messages.isEmpty) {
+      final l10n = AppLocalizations.of(context)!;
+      messages.add({
+        "text": l10n.bot_welcome,
+        "isUser": false,
+      });
+    }
+  }
 
   void sendMessage() {
     final text = _controller.text.trim();
@@ -99,8 +107,9 @@ class _AiChatBotPageState extends State<AiChatBotPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text("AI HR Assistant"), centerTitle: true),
+      appBar: AppBar(title: Text(l10n.ai_hr_assistant), centerTitle: true),
       body: Column(
         children: [
           Expanded(
@@ -124,7 +133,7 @@ class _AiChatBotPageState extends State<AiChatBotPage> {
                     controller: _controller,
                     style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     decoration: InputDecoration(
-                      hintText: "Type your message...",
+                      hintText: l10n.type_message,
                       hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),

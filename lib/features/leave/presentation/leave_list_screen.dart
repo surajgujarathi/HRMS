@@ -7,6 +7,7 @@ import 'package:flutter_app/features/leave/models/leave_type_model.dart';
 import 'package:flutter_app/core/constants/app_colors.dart';
 import 'package:flutter_app/routes.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class LeaveListScreen extends StatefulWidget {
   const LeaveListScreen({super.key});
@@ -28,11 +29,12 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
-          _buildHeader(context),
+          _buildHeader(context, l10n),
           Expanded(
             child: BlocBuilder<LeaveCubit, LeaveState>(
               builder: (context, state) {
@@ -53,7 +55,7 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
                       else ...[
                         if (state.leaveTypes.isNotEmpty)
                           SliverToBoxAdapter(
-                            child: _BalanceSummary(leaveTypes: state.leaveTypes),
+                            child: _BalanceSummary(leaveTypes: state.leaveTypes, l10n: l10n),
                           ),
                         SliverPadding(
                           padding: const EdgeInsets.fromLTRB(20, 24, 20, 100),
@@ -61,7 +63,7 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
                             builder: (context) {
                               final activeLeaves = state.leaves.where((l) => l.state != 'cancel' && l.state != 'refuse').toList();
                               if (activeLeaves.isEmpty) {
-                                return SliverFillRemaining(hasScrollBody: false, child: _buildEmptyState(context));
+                                return SliverFillRemaining(hasScrollBody: false, child: _buildEmptyState(context, l10n));
                               }
                               return SliverList(
                                 delegate: SliverChildBuilderDelegate(
@@ -81,11 +83,11 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
           ),
         ],
       ),
-      floatingActionButton: _buildFAB(context),
+      floatingActionButton: _buildFAB(context, l10n),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
       decoration: const BoxDecoration(
@@ -105,10 +107,10 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
           ),
-          const Expanded(
+          Expanded(
             child: Text(
-              'My Time Off',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              l10n.my_time_off,
+              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
           ),
@@ -121,7 +123,7 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
     );
   }
 
-  Widget _buildFAB(BuildContext context) {
+  Widget _buildFAB(BuildContext context, AppLocalizations l10n) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
@@ -142,14 +144,14 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
         },
         backgroundColor: AppColors.indigo,
         icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: const Text("Request Leave", 
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 0.5)
+        label: Text(l10n.request_leave, 
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 0.5)
         ),
       ),
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
+  Widget _buildEmptyState(BuildContext context, AppLocalizations l10n) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -166,11 +168,11 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
           child: Icon(Icons.event_note_rounded, size: 80, color: AppColors.indigo.withOpacity(0.1)),
         ),
         const SizedBox(height: 24),
-        Text("No Leave Records", 
+        Text(l10n.no_leave_records, 
           style: TextStyle(fontSize: 20, color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)
         ),
         const SizedBox(height: 12),
-        Text("Your leave history will appear here\nonce you submit your first request.", 
+        Text(l10n.leave_history_info, 
           textAlign: TextAlign.center,
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), height: 1.5)
         ),
@@ -181,7 +183,8 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
 
 class _BalanceSummary extends StatelessWidget {
   final List<LeaveType> leaveTypes;
-  const _BalanceSummary({required this.leaveTypes});
+  final AppLocalizations l10n;
+  const _BalanceSummary({required this.leaveTypes, required this.l10n});
 
   @override
   Widget build(BuildContext context) {
@@ -189,8 +192,8 @@ class _BalanceSummary extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.fromLTRB(24, 32, 24, 16),
-          child: Text("Leave Balance", 
+          padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
+          child: Text(l10n.leave_balance, 
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)
           ),
         ),
@@ -203,7 +206,7 @@ class _BalanceSummary extends StatelessWidget {
             itemCount: leaveTypes.length,
             itemBuilder: (context, index) {
               final type = leaveTypes[index];
-              return _BalanceCard(type: type);
+              return _BalanceCard(type: type, l10n: l10n);
             },
           ),
         ),
@@ -214,7 +217,8 @@ class _BalanceSummary extends StatelessWidget {
 
 class _BalanceCard extends StatelessWidget {
   final LeaveType type;
-  const _BalanceCard({required this.type});
+  final AppLocalizations l10n;
+  const _BalanceCard({required this.type, required this.l10n});
 
   @override
   Widget build(BuildContext context) {
@@ -258,7 +262,7 @@ class _BalanceCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 4),
-          Text("Days Available", style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4))),
+          Text(l10n.days_available, style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4))),
         ],
       ),
     );
@@ -279,19 +283,20 @@ class _LeaveCard extends StatelessWidget {
     }
   }
 
-  String _getStatusText() {
+  String _getStatusText(AppLocalizations l10n) {
     switch (leave.state) {
-      case 'validate': return "Approved";
-      case 'confirm': return "Pending";
-      case 'refuse': return "Refused";
-      case 'cancel': return "Cancelled";
-      case 'draft': return "Draft";
+      case 'validate': return l10n.approved;
+      case 'confirm': return l10n.pending;
+      case 'refuse': return l10n.refused;
+      case 'cancel': return l10n.cancelled;
+      case 'draft': return l10n.draft;
       default: return leave.state;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final statusColor = _getStatusColor();
     final typeColor = Colors.primaries[(leave.holidayStatusId?.name.hashCode ?? 0).abs() % Colors.primaries.length];
 
@@ -336,7 +341,7 @@ class _LeaveCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                      _StatusBadge(text: _getStatusText(), color: statusColor),
+                      _StatusBadge(text: _getStatusText(l10n), color: statusColor),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -365,14 +370,14 @@ class _LeaveCard extends StatelessWidget {
               ),
             ),
             if (leave.state == 'draft' || leave.state == 'confirm' || leave.state == 'validate')
-              _buildActions(context),
+              _buildActions(context, l10n),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildActions(BuildContext context) {
+  Widget _buildActions(BuildContext context, AppLocalizations l10n) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceVariant ?? Theme.of(context).dividerColor.withOpacity(0.1),
@@ -384,46 +389,46 @@ class _LeaveCard extends StatelessWidget {
         children: [
           if (leave.state == 'draft')
             TextButton.icon(
-              onPressed: () => _showDeleteDialog(context),
+              onPressed: () => _showDeleteDialog(context, l10n),
               icon: const Icon(Icons.delete_outline_rounded, size: 18, color: Colors.redAccent),
-              label: const Text("Delete Draft", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 12)),
+              label: Text(l10n.delete_draft, style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 12)),
             )
           else
             TextButton.icon(
-              onPressed: () => _showCancelDialog(context),
+              onPressed: () => _showCancelDialog(context, l10n),
               icon: const Icon(Icons.cancel_outlined, size: 18, color: Colors.orangeAccent),
-              label: const Text("Cancel Leave", style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 12)),
+              label: Text(l10n.cancel_leave, style: const TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 12)),
             ),
         ],
       ),
     );
   }
 
-  void _showCancelDialog(BuildContext context) {
+  void _showCancelDialog(BuildContext context, AppLocalizations l10n) {
     showDialog(context: context, builder: (ctx) => AlertDialog(
       backgroundColor: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      title: Text("Cancel Request?", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-      content: Text("Are you sure you want to cancel this leave request?", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+      title: Text(l10n.cancel_request_q, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+      content: Text(l10n.cancel_request_confirm, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("No")),
+        TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.no)),
         TextButton(onPressed: () { Navigator.pop(ctx); context.read<LeaveCubit>().cancelLeave(leave.id); },
-          child: const Text("Yes, Cancel", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+          child: Text(l10n.yes_cancel, style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
         ),
       ],
     ));
   }
 
-  void _showDeleteDialog(BuildContext context) {
+  void _showDeleteDialog(BuildContext context, AppLocalizations l10n) {
     showDialog(context: context, builder: (ctx) => AlertDialog(
       backgroundColor: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      title: Text("Delete Draft?", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-      content: Text("This draft will be permanently removed.", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+      title: Text(l10n.delete_draft_q, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+      content: Text(l10n.delete_draft_confirm, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancel")),
+        TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
         TextButton(onPressed: () { Navigator.pop(ctx); context.read<LeaveCubit>().deleteLeave(leave.id); },
-          child: const Text("Delete", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+          child: Text(l10n.delete, style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
         ),
       ],
     ));

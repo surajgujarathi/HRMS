@@ -8,6 +8,7 @@ import 'package:flutter_app/core/theme/theme_cubit.dart';
 import 'package:flutter_app/routes.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_app/core/constants/app_colors.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -18,13 +19,14 @@ class ProfileScreen extends StatelessWidget {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: BlocBuilder<ProfileCubit, ProfileState>(
         builder: (context, state) {
+          final l10n = AppLocalizations.of(context)!;
           if (state.status == ProfileStatus.loading) {
             return const Center(child: CircularProgressIndicator());
           }
 
           final employee = state.employee;
           if (employee == null) {
-            return const Center(child: Text("No employee data found"));
+            return Center(child: Text(l10n.no_employee_data_found));
           }
 
           return Stack(
@@ -134,17 +136,17 @@ class ProfileScreen extends StatelessWidget {
                                 children: [
                                   _InfoLine(
                                     icon: Icons.badge_outlined,
-                                    label: "Employee ID",
+                                    label: l10n.employee_id,
                                     value: employee.employeeCode ?? "N/A",
                                   ),
                                   _InfoLine(
                                     icon: Icons.business_outlined,
-                                    label: "Department",
+                                    label: l10n.department,
                                     value: employee.departmentId?.name ?? "N/A",
                                   ),
                                   _InfoLine(
                                     icon: Icons.calendar_today_outlined,
-                                    label: "Joining Date",
+                                    label: l10n.date_of_joining,
                                     value: employee.doj != null ? employee.doj!.toString().split(' ')[0] : 'N/A',
                                   ),
                                 ],
@@ -160,7 +162,7 @@ class ProfileScreen extends StatelessWidget {
                                   if (employee.parentId != null)
                                     Expanded(
                                       child: _ProfileCard(
-                                        title: "Manager",
+                                        title: l10n.manager,
                                         child: Row(
                                           children: [
                                             _buildAvatar(context, null, radius: 16),
@@ -181,7 +183,7 @@ class ProfileScreen extends StatelessWidget {
                                   if (employee.coachId != null)
                                     Expanded(
                                       child: _ProfileCard(
-                                        title: "Coach",
+                                        title: l10n.coach,
                                         child: Row(
                                           children: [
                                             _buildAvatar(context, null, radius: 16),
@@ -205,7 +207,7 @@ class ProfileScreen extends StatelessWidget {
                             // ---------- SKILLS SECTION ----------
                             if (employee.skills.isNotEmpty)
                               _ProfileCard(
-                                title: "Top Skills",
+                                title: l10n.top_skills,
                                 child: Column(
                                   children: employee.skills.take(3).map((skill) => Padding(
                                     padding: const EdgeInsets.only(bottom: 12.0),
@@ -240,44 +242,44 @@ class ProfileScreen extends StatelessWidget {
                             const SizedBox(height: 24),
 
                             // ---------- SETTINGS SECTION ----------
-                            _buildSectionHeader("Quick Actions"),
+                            _buildSectionHeader(l10n.quick_actions),
                             _ProfileCard(
                               padding: EdgeInsets.zero,
                               child: Column(
                                 children: [
                                   _SettingTile(
                                     icon: Icons.badge_outlined,
-                                    title: "Job Details",
+                                    title: l10n.job_details,
                                     onTap: () => Navigator.pushNamed(context, Routes.jobdetails),
                                   ),
                                   _buildDivider(),
                                   _SettingTile(
                                     icon: Icons.event_available_outlined,
-                                    title: "Leave Balance",
+                                    title: l10n.leave_balance,
                                     onTap: () => Navigator.pushNamed(context, Routes.leaveList),
                                   ),
                                   _buildDivider(),
                                   _SettingTile(
                                     icon: Icons.calendar_month_outlined,
-                                    title: "Holidays Calendar",
+                                    title: l10n.holidays_calendar,
                                     onTap: () => Navigator.pushNamed(context, Routes.holidayCalendar),
                                   ),
                                   _buildDivider(),
                                   _SettingTile(
                                     icon: Icons.receipt_long_outlined,
-                                    title: "Reimbursements",
+                                    title: l10n.reimbursements,
                                     onTap: () => Navigator.pushNamed(context, Routes.reimbursements),
                                   ),
                                   _buildDivider(),
                                   _SettingTile(
                                     icon: Icons.school_outlined,
-                                    title: "Training & Learning",
+                                    title: l10n.training_learning,
                                     onTap: () => Navigator.pushNamed(context, Routes.learnTraing),
                                   ),
                                   _buildDivider(),
                                   _SettingTile(
                                     icon: Icons.assignment_turned_in_outlined,
-                                    title: "Assets Assigned",
+                                    title: l10n.assets_assigned,
                                     onTap: () => Navigator.pushNamed(context, Routes.assignedAssets),
                                   ),
                                 ],
@@ -288,7 +290,7 @@ class ProfileScreen extends StatelessWidget {
 
                             // ---------- RESUME SECTION ----------
                             if (employee.resumeLines.isNotEmpty) ...[
-                              _buildSectionHeader("Resume & Experience"),
+                              _buildSectionHeader(l10n.resume_experience),
                               _ProfileCard(
                                 child: Column(
                                   children: employee.resumeLines.map((line) {
@@ -349,7 +351,7 @@ class ProfileScreen extends StatelessWidget {
                               const SizedBox(height: 20),
                             ],
 
-                            _buildSectionHeader("Preferences"),
+                            _buildSectionHeader(l10n.preferences),
                             _ProfileCard(
                               padding: EdgeInsets.zero,
                               child: Column(
@@ -358,7 +360,7 @@ class ProfileScreen extends StatelessWidget {
                                     builder: (context, state) {
                                       return _SettingTile(
                                         icon: Icons.notifications_none_outlined,
-                                        title: "Notifications",
+                                        title: l10n.notifications,
                                         trailing: state.unreadCount > 0 
                                           ? _Badge(count: state.unreadCount) 
                                           : const Icon(Icons.chevron_right, size: 16),
@@ -369,7 +371,7 @@ class ProfileScreen extends StatelessWidget {
                                   _buildDivider(),
                                   _SettingTile(
                                     icon: Icons.language_outlined,
-                                    title: "Language",
+                                    title: l10n.language,
                                     onTap: () => Navigator.pushNamed(context, Routes.language),
                                   ),
                                   _buildDivider(),
@@ -379,7 +381,7 @@ class ProfileScreen extends StatelessWidget {
                                       return SwitchListTile(
                                         dense: true,
                                         contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                                        title: const Text("Dark Mode", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13)),
+                                        title: Text(l10n.dark_mode, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13)),
                                         secondary: Icon(isDark ? Icons.dark_mode_outlined : Icons.light_mode_outlined, color: AppColors.brightBlue, size: 20),
                                         value: isDark,
                                         onChanged: (value) => context.read<ThemeCubit>().toggleTheme(value),
@@ -392,23 +394,24 @@ class ProfileScreen extends StatelessWidget {
 
                             const SizedBox(height: 20),
 
-                            _buildSectionHeader("Security"),
+                            _buildSectionHeader(l10n.security),
                             _ProfileCard(
                               padding: EdgeInsets.zero,
                               child: Column(
                                 children: [
                                   _SettingTile(
                                     icon: Icons.lock_outline,
-                                    title: "Change Password",
+                                    title: l10n.change_password,
                                     onTap: () => Navigator.pushNamed(context, Routes.changepassword),
                                   ),
                                   _buildDivider(),
                                   _SettingTile(
                                     icon: Icons.logout,
-                                    title: "Logout",
+                                    title: l10n.logout,
                                     titleColor: Colors.redAccent,
                                     iconColor: Colors.redAccent,
                                     onTap: () async {
+                                      context.read<ProfileCubit>().resetProfile();
                                       await context.read<LoginCubit>().logout();
                                       if (context.mounted) {
                                         Navigator.of(context).pushNamedAndRemoveUntil(Routes.login, (route) => false);

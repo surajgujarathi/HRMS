@@ -5,6 +5,7 @@ import 'package:flutter_app/core/constants/app_colors.dart';
 import 'package:flutter_app/features/profile/cubit/holiday_cubit.dart';
 import 'package:flutter_app/features/profile/cubit/holiday_state.dart';
 import 'package:flutter_app/features/profile/models/holiday_model.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class HolidayCalendarPage extends StatelessWidget {
   const HolidayCalendarPage({super.key});
@@ -32,11 +33,12 @@ class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
-          _buildHeader(context),
+          _buildHeader(context, l10n),
           Expanded(
             child: BlocBuilder<HolidayCubit, HolidayState>(
               builder: (context, state) {
@@ -65,13 +67,13 @@ class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
                       children: [
                         _buildCalendarCard(holidays),
                         const SizedBox(height: 24),
-                        _buildSearchBar(),
+                        _buildSearchBar(l10n),
                         const SizedBox(height: 24),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Holidays ${currentMonth.year}",
+                              "${l10n.holidays_calendar} ${currentMonth.year}",
                               style:  TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -85,7 +87,7 @@ class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
-                                "${displayHolidays.length} Holidays",
+                                "${displayHolidays.length} ${l10n.holidays_calendar}",
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: AppColors.indigo,
@@ -105,7 +107,7 @@ class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
                                   Icon(Icons.event_busy_outlined, size: 48, color: AppColors.textSecondary.withOpacity(0.3)),
                                   const SizedBox(height: 12),
                                   Text(
-                                    "No holidays found for ${currentMonth.year}.",
+                                    l10n.no_holidays_found(currentMonth.year.toString()),
                                     style: const TextStyle(color: AppColors.textSecondary),
                                   ),
                                 ],
@@ -127,7 +129,7 @@ class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
       decoration: const BoxDecoration(
@@ -149,10 +151,10 @@ class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
               ),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Holidays Calendar',
-                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                  l10n.holidays_calendar,
+                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -160,13 +162,13 @@ class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
             ],
           ),
           const SizedBox(height: 20),
-          _buildYearDropdown(),
+          _buildYearDropdown(l10n),
         ],
       ),
     );
   }
 
-  Widget _buildYearDropdown() {
+  Widget _buildYearDropdown(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       height: 48,
@@ -186,7 +188,7 @@ class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
               final year = DateTime.now().year - 5 + index;
               return Center(
                 child: Text(
-                  "Selected Year: $year",
+                  l10n.selected_year(year.toString()),
                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               );
@@ -214,7 +216,7 @@ class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(AppLocalizations l10n) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
@@ -231,7 +233,7 @@ class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
         },
         style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
-          hintText: "Search holidays...",
+          hintText: l10n.search_holidays,
           hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), fontSize: 14),
           prefixIcon: Icon(Icons.search, color: Theme.of(context).primaryColor),
           border: InputBorder.none,

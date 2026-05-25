@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_app/features/events/cubit/event_cubit.dart';
 import 'package:flutter_app/features/events/cubit/event_state.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final EventModel event;
@@ -32,6 +33,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
@@ -49,7 +51,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   _buildVenueCard(context),
                   if (widget.event.note != null && widget.event.note != "false" && widget.event.note!.isNotEmpty) ...[
                     const SizedBox(height: 24),
-                    Text("About Event", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+                    Text(l10n.about_event, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
                     const SizedBox(height: 12),
                     Text(
                       _stripHtml(widget.event.note!),
@@ -60,13 +62,13 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   _buildOrganizerCard(context),
                   if (widget.event.ticketInstructions != null && widget.event.ticketInstructions!.isNotEmpty) ...[
                     const SizedBox(height: 24),
-                    Text("Important Instructions", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+                    Text(l10n.important_instructions, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
                     const SizedBox(height: 12),
                     _buildInstructionsCard(context),
                   ],
                   if (widget.event.tickets.isNotEmpty) ...[
                     const SizedBox(height: 24),
-                    Text("Select Ticket", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+                    Text(l10n.select_ticket, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
                     const SizedBox(height: 16),
                     ...widget.event.tickets.map((t) => _buildTicketCard(context, t)),
                   ],
@@ -203,7 +205,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
   Widget _buildVenueCard(BuildContext context) {
-    final addressName = widget.event.addressId?.name ?? "Venue Information";
+    final l10n = AppLocalizations.of(context)!;
+    final addressName = widget.event.addressId?.name ?? l10n.company_venue;
     return InkWell(
       onTap: () => _openMap(addressName),
       borderRadius: BorderRadius.circular(24),
@@ -222,7 +225,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 children: [
                   Text(addressName, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Theme.of(context).colorScheme.onSurface)),
                   const SizedBox(height: 4),
-                  const Text("Tap to view on map", style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                  Text(l10n.tap_view_map, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
                 ],
               ),
             ),
@@ -234,6 +237,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
   Widget _buildOrganizerCard(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return _WhiteCard(
       child: Row(
         children: [
@@ -247,9 +251,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(widget.event.organizerId?.name ?? "Organizer", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Theme.of(context).colorScheme.onSurface)),
+                Text(widget.event.organizerId?.name ?? l10n.employee, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Theme.of(context).colorScheme.onSurface)),
                 const SizedBox(height: 4),
-                const Text("Host / Contact Person", style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                Text(l10n.host_contact_person, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
               ],
             ),
           ),
@@ -275,6 +279,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
   Widget _buildTicketCard(BuildContext context, EventTicket ticket) {
     final isSelected = _selectedTicketId == ticket.id;
+    final l10n = AppLocalizations.of(context)!;
 
     return BlocBuilder<EventCubit, EventState>(
       builder: (context, state) {
@@ -330,7 +335,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text("${ticket.seatsMax - ticket.seatsReserved}", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Theme.of(context).colorScheme.onSurface)),
-                      const Text("Left", style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
+                      Text(l10n.left, style: const TextStyle(fontSize: 10, color: AppColors.textSecondary)),
                     ],
                   ),
               ],
@@ -339,12 +344,11 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         );
       }
     );
-  }
-
-  Widget _buildBottomAction(BuildContext context) {
+  }  Widget _buildBottomAction(BuildContext context) {
     return BlocBuilder<EventCubit, EventState>(
       builder: (context, state) {
         final isRegistered = state.registeredEventIds.contains(widget.event.id);
+        final l10n = AppLocalizations.of(context)!;
         
         return Container(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
@@ -363,24 +367,24 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     if (isRegistered) {
                       // Cancellation logic
                       scaffoldMessenger.showSnackBar(
-                        const SnackBar(content: Text("Cancelling registration...")),
+                        SnackBar(content: Text(l10n.cancelling_registration)),
                       );
                       final success = await context.read<EventCubit>().cancelRegistration(widget.event.id);
                       scaffoldMessenger.hideCurrentSnackBar();
                       if (success) {
                         scaffoldMessenger.showSnackBar(
-                          const SnackBar(content: Text("Registration cancelled successfully."), backgroundColor: AppColors.successGreen),
+                          SnackBar(content: Text(l10n.registration_cancelled_success), backgroundColor: AppColors.successGreen),
                         );
                       } else {
                         scaffoldMessenger.showSnackBar(
-                          const SnackBar(content: Text("Failed to cancel registration."), backgroundColor: Colors.redAccent),
+                          SnackBar(content: Text(l10n.failed_cancel_registration), backgroundColor: Colors.redAccent),
                         );
                       }
                     } else {
                       // Registration logic
                       if (widget.event.tickets.isNotEmpty && _selectedTicketId == null) {
                         scaffoldMessenger.showSnackBar(
-                          const SnackBar(content: Text("Please select a ticket first."), backgroundColor: Colors.orange),
+                          SnackBar(content: Text(l10n.please_select_ticket_first), backgroundColor: Colors.orange),
                         );
                         return;
                       }
@@ -391,7 +395,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       }
 
                       scaffoldMessenger.showSnackBar(
-                        const SnackBar(content: Text("Registering for event...")),
+                        SnackBar(content: Text(l10n.registering_event)),
                       );
                       final success = await context.read<EventCubit>().registerForEvent(
                         widget.event.id,
@@ -400,11 +404,11 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       scaffoldMessenger.hideCurrentSnackBar();
                       if (success) {
                         scaffoldMessenger.showSnackBar(
-                          const SnackBar(content: Text("Successfully registered!"), backgroundColor: AppColors.successGreen),
+                          SnackBar(content: Text(l10n.successfully_registered), backgroundColor: AppColors.successGreen),
                         );
                       } else {
                         scaffoldMessenger.showSnackBar(
-                          const SnackBar(content: Text("Registration failed."), backgroundColor: Colors.redAccent),
+                          SnackBar(content: Text(l10n.registration_failed), backgroundColor: Colors.redAccent),
                         );
                       }
                     }
@@ -418,7 +422,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     side: isRegistered ? const BorderSide(color: Colors.redAccent, width: 1.5) : null,
                   ),
                   child: Text(
-                    isRegistered ? "Cancel Registration" : "Register Now", 
+                    isRegistered ? l10n.cancel_registration : l10n.register_now, 
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)
                   ),
                 ),

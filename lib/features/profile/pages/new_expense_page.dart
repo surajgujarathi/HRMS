@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/features/profile/cubit/expense_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_app/features/profile/cubit/expense_cubit.dart';
@@ -393,7 +394,12 @@ class _NewExpensePageState extends State<NewExpensePage> {
     if (_formKey.currentState!.validate()) {
       if (_selectedProductId == null) {
         debugPrint('Validation Failed: Category not selected');
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select a category")));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select a category"), backgroundColor: Colors.orange));
+        return;
+      }
+      if (_selectedCurrencyId == null) {
+        debugPrint('Validation Failed: Currency not selected');
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select a currency"), backgroundColor: Colors.orange));
         return;
       }
 
@@ -413,10 +419,28 @@ class _NewExpensePageState extends State<NewExpensePage> {
       debugPrint('Form Data Validated: $data');
 
       final expenseCubit = context.read<ExpenseCubit>();
-      expenseCubit.addExpense(data, file: _selectedFile).then((_) {
-        debugPrint('Expense added successfully.');
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Expense created successfully")));
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Creating expense..."), duration: Duration(seconds: 1)),
+      );
+
+      expenseCubit.addExpense(data, file: _selectedFile).then((success) {
+        if (success) {
+          debugPrint('Expense added successfully.');
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Expense created successfully"), backgroundColor: Colors.green),
+          );
+        } else {
+          final errorState = expenseCubit.state;
+          String errorMsg = "Failed to create expense";
+          if (errorState is ExpenseError) {
+            errorMsg = errorState.message;
+          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errorMsg), backgroundColor: Colors.redAccent),
+          );
+        }
       });
     } else {
       debugPrint('Form Validation Failed');

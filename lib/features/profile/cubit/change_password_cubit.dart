@@ -39,12 +39,12 @@ class ChangePasswordCubit extends Cubit<ChangePasswordState> {
   }) async {
     debugPrint('ChangePasswordCubit: Starting password change process...');
     emit(state.copyWith(status: ChangePasswordStatus.loading));
-    
+
     final odooService = OdooService(ApiConfig.baseUrl);
     try {
       final prefs = SharedPref();
       final sessionData = await prefs.getObject('session');
-      
+
       if (sessionData == null) {
         throw Exception('User session not found. Please login again.');
       }
@@ -52,11 +52,11 @@ class ChangePasswordCubit extends Cubit<ChangePasswordState> {
       final session = OdooSession.fromJson(sessionData);
       odooService.setSession(session);
 
-      final userId = sessionData['userId'] is int 
-          ? sessionData['userId'] 
+      final userId = sessionData['userId'] is int
+          ? sessionData['userId']
           : int.parse(sessionData['userId']?.toString() ?? '0');
       final userLogin = sessionData['userLogin']?.toString() ?? '';
-      
+
       debugPrint('ChangePasswordCubit: userId=$userId, userLogin=$userLogin');
 
       await odooService.changePassword(
@@ -71,10 +71,55 @@ class ChangePasswordCubit extends Cubit<ChangePasswordState> {
       debugPrint('ChangePasswordCubit: Password change ERROR: $e');
       emit(state.copyWith(
         status: ChangePasswordStatus.failure,
-        errorMessage: e.toString(),
+        errorMessage: _getFriendlyErrorMessage(e.toString()),
       ));
     } finally {
       odooService.close();
     }
+  }
+
+  /// Converts raw Odoo/server error messages into clear, user-friendly text.
+  String _getFriendlyErrorMessage(String rawError) {
+    final lower = rawError.toLowerCase();
+
+    // Access rights / permission denied
+    if (lower.contains('not allowed') ||
+        lower.contains('access rights') ||
+        lower.contains('change.password.wizard') ||
+        lower.contains('administration') ||
+        lower.contains('access denied')) {
+      return 'You do not have permission to change your password. '
+          'Please contact your administrator to request access.';
+    }
+
+    // Session expired
+    if (lower.contains('session expired') ||
+        lower.contains('sessionexpired') ||
+        lower.contains('not logged')) {
+      return 'Your session has expired. Please log in again.';
+    }
+
+    // Wrong / invalid password
+    if (lower.contains('invalid password') ||
+        lower.contains('wrong password') ||
+        lower.contains('incorrect password')) {
+      return 'The current password you entered is incorrect. Please try again.';
+    }
+
+    // Network / connection issues
+    if (lower.contains('socketexception') ||
+        lower.contains('connection refused') ||
+        lower.contains('network') ||
+        lower.contains('timeout')) {
+      return 'Network error. Please check your internet connection and try again.';
+    }
+
+    // Generic server error
+    if (lower.contains('internal server error') || lower.contains('500')) {
+      return 'A server error occurred. Please try again later.';
+    }
+
+    // Fallback — clean and readable
+    return 'Failed to update password. Please try again or contact your administrator.';
   }
 }

@@ -5,12 +5,14 @@ import 'package:flutter_app/features/profile/cubit/profile_cubit.dart';
 import 'package:flutter_app/features/profile/cubit/profile_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class JobDetailsPage extends StatelessWidget {
   const JobDetailsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<ProfileCubit, ProfileState>(
       builder: (context, state) {
         if (state.status == ProfileStatus.loading) {
@@ -22,8 +24,8 @@ class JobDetailsPage extends StatelessWidget {
 
         final employee = state.employee;
         if (employee == null) {
-          return const Scaffold(
-            body: Center(child: Text("No employee data found")),
+          return Scaffold(
+            body: Center(child: Text(l10n.no_employee_data_found)),
           );
         }
 
@@ -33,8 +35,8 @@ class JobDetailsPage extends StatelessWidget {
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             body: Column(
               children: [
-                _buildHeader(context, employee),
-                _buildTabBar(context),
+                _buildHeader(context, employee, l10n),
+                _buildTabBar(context, l10n),
                 Expanded(
                   child: TabBarView(
                     children: [
@@ -51,7 +53,7 @@ class JobDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, dynamic employee) {
+  Widget _buildHeader(BuildContext context, dynamic employee, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
       decoration: const BoxDecoration(
@@ -73,10 +75,10 @@ class JobDetailsPage extends StatelessWidget {
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
               ),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Employee Details',
-                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                  l10n.employee_details,
+                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -155,7 +157,7 @@ class JobDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTabBar(BuildContext context) {
+  Widget _buildTabBar(BuildContext context, AppLocalizations l10n) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
@@ -165,8 +167,8 @@ class JobDetailsPage extends StatelessWidget {
           BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
-      child: const TabBar(
-        indicator: BoxDecoration(
+      child: TabBar(
+        indicator: const BoxDecoration(
           color: AppColors.indigo,
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
@@ -174,11 +176,11 @@ class JobDetailsPage extends StatelessWidget {
         unselectedLabelColor: AppColors.textSecondary,
         dividerColor: Colors.transparent,
         indicatorSize: TabBarIndicatorSize.tab,
-        labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-        unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+        labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
         tabs: [
-          Tab(text: "Personal"),
-          Tab(text: "Work & Bank"),
+          Tab(text: l10n.personal),
+          Tab(text: l10n.work_bank),
         ],
       ),
     );
@@ -191,52 +193,53 @@ class _ProfileTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       physics: const BouncingScrollPhysics(),
       children: [
         _buildCard(
           context: context,
-          title: "Contact Information",
+          title: l10n.contact_information,
           icon: Icons.contact_mail_outlined,
           children: [
-            _detailRow(context, "Work Email", employee.workEmail),
-            _detailRow(context, "Mobile", employee.mobilePhone),
-            _detailRow(context, "Work Phone", employee.workPhone),
+            _detailRow(context, l10n.work_email, employee.workEmail),
+            _detailRow(context, l10n.mobile, employee.mobilePhone),
+            _detailRow(context, l10n.work_phone, employee.workPhone),
           ],
         ),
         const SizedBox(height: 16),
         _buildCard(
           context: context,
-          title: "Personal Details",
+          title: l10n.personal_details,
           icon: Icons.person_outline_rounded,
           children: [
-            _detailRow(context, "Gender", employee.gender),
-            _detailRow(context, "Birthday", employee.birthday != null ? DateFormat('dd MMM yyyy').format(employee.birthday!) : null),
-            _detailRow(context, "Marital Status", employee.marital),
-            _detailRow(context, "Blood Group", employee.bloodGroup),
+            _detailRow(context, l10n.gender, employee.gender),
+            _detailRow(context, l10n.birthday, employee.birthday != null ? DateFormat('dd MMM yyyy').format(employee.birthday!) : null),
+            _detailRow(context, l10n.marital_status, employee.marital),
+            _detailRow(context, l10n.blood_group, employee.bloodGroup),
           ],
         ),
         const SizedBox(height: 16),
         _buildCard(
           context: context,
-          title: "Documentation",
+          title: l10n.documentation,
           icon: Icons.assignment_ind_outlined,
           children: [
-            _detailRow(context, "Aadhar No", employee.aadharNo),
-            _detailRow(context, "PAN No", employee.panNo),
-            _detailRow(context, "Passport ID", employee.passportId),
-            _detailRow(context, "Identification ID", employee.identificationId),
+            _detailRow(context, l10n.aadhar_no, employee.aadharNo),
+            _detailRow(context, l10n.pan_no, employee.panNo),
+            _detailRow(context, l10n.passport_id, employee.passportId),
+            _detailRow(context, l10n.identification_id, employee.identificationId),
           ],
         ),
         const SizedBox(height: 16),
         _buildCard(
           context: context,
-          title: "Addresses",
+          title: l10n.addresses,
           icon: Icons.location_on_outlined,
           children: [
-            _detailRow(context, "Current Address", employee.address),
-            _detailRow(context, "Permanent Address", employee.permanentAddress),
+            _detailRow(context, l10n.current_address, employee.address),
+            _detailRow(context, l10n.permanent_address, employee.permanentAddress),
           ],
         ),
         const SizedBox(height: 24),
@@ -251,32 +254,33 @@ class _WorkTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       physics: const BouncingScrollPhysics(),
       children: [
         _buildCard(
           context: context,
-          title: "Employment Details",
+          title: l10n.employment_details,
           icon: Icons.work_outline_rounded,
           children: [
-            _detailRow(context, "Department", employee.departmentId?.name),
-            _detailRow(context, "Reporting Manager", employee.parentId?.name),
-            _detailRow(context, "Coach", employee.coachId?.name),
-            _detailRow(context, "Joining Date", employee.doj != null ? DateFormat('dd MMM yyyy').format(employee.doj!) : null),
-            _detailRow(context, "Employment Type", employee.empType?.name),
-            _detailRow(context, "Work Location", employee.workLocationId?.name),
+            _detailRow(context, l10n.department, employee.departmentId?.name),
+            _detailRow(context, l10n.reporting_manager, employee.parentId?.name),
+            _detailRow(context, l10n.coach, employee.coachId?.name),
+            _detailRow(context, l10n.date_of_joining, employee.doj != null ? DateFormat('dd MMM yyyy').format(employee.doj!) : null),
+            _detailRow(context, l10n.employment_type, employee.empType?.name),
+            _detailRow(context, l10n.work_location, employee.workLocationId?.name),
           ],
         ),
         const SizedBox(height: 16),
         _buildCard(
           context: context,
-          title: "Bank Information",
+          title: l10n.bank_information,
           icon: Icons.account_balance_outlined,
           children: [
-            _detailRow(context, "Bank Name", employee.bankName),
-            _detailRow(context, "Account Number", employee.bankAccountId),
-            _detailRow(context, "IFSC Code", employee.bankIfsc),
+            _detailRow(context, l10n.bank_name, employee.bankName),
+            _detailRow(context, l10n.account_number, employee.bankAccountId),
+            _detailRow(context, l10n.ifsc_code, employee.bankIfsc),
           ],
         ),
         const SizedBox(height: 24),

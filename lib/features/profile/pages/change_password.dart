@@ -3,6 +3,8 @@ import 'package:flutter_app/core/constants/app_colors.dart';
 import 'package:flutter_app/core/widget/custome_textfield.dart';
 import 'package:flutter_app/features/profile/cubit/change_password_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
+import 'package:flutter_app/routes.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});
@@ -37,6 +39,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocProvider(
       create: (context) => ChangePasswordCubit(),
       child: Scaffold(
@@ -44,17 +47,77 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         body: BlocListener<ChangePasswordCubit, ChangePasswordState>(
           listener: (context, state) {
             if (state.status == ChangePasswordStatus.success) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Password Updated Successfully"),
-                  backgroundColor: AppColors.successGreen,
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (ctx) => AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  icon: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.successGreen.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.check_circle_rounded,
+                      color: AppColors.successGreen,
+                      size: 40,
+                    ),
+                  ),
+                  title: Text(
+                    l10n.password_updated_success,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  content: Text(
+                    l10n.session_expired_relogin,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 14,
+                    ),
+                  ),
+                  actionsAlignment: MainAxisAlignment.center,
+                  actions: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                            Routes.login,
+                            (route) => false,
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.indigo,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        child: Text(
+                          l10n.okay,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               );
-              Navigator.pop(context);
             } else if (state.status == ChangePasswordStatus.failure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(state.errorMessage ?? "Failed to update password"),
+                  content: Text(state.errorMessage ?? l10n.failed_to_update_password),
                   backgroundColor: AppColors.dangerRed,
                 ),
               );
@@ -62,11 +125,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           },
           child: Column(
             children: [
-              _buildHeader(context),
+              _buildHeader(context, l10n),
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(24),
-                  child: _buildForm(context),
+                  child: _buildForm(context, l10n),
                 ),
               ),
             ],
@@ -76,7 +139,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 60, 20, 40),
       decoration: const BoxDecoration(
@@ -98,10 +161,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
               ),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Change Password',
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                  l10n.change_password,
+                  style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -122,7 +185,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     );
   }
 
-  Widget _buildForm(BuildContext context) {
+  Widget _buildForm(BuildContext context, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -142,19 +205,23 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
              Text(
-              "Security Settings",
+              l10n.security_settings,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
             ),
             const SizedBox(height: 8),
-            const Text(
-              "Please enter your new password below. Make sure it's strong and secure.",
-              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            Text(
+              l10n.enter_new_password_info,
+              style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
             ),
             const SizedBox(height: 32),
             
             /// New Password
             _buildPasswordField(
-              label: 'New Password',
+              context: context,
+              label: l10n.new_password,
+              hintText: l10n.please_enter(l10n.new_password),
+              errorEmpty: l10n.please_enter(l10n.new_password),
+              errorLength: l10n.password_min_length,
               controller: newPasswordController,
               isObscure: hideNew,
               onToggle: () => setState(() => hideNew = !hideNew),
@@ -163,13 +230,17 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
             /// Confirm Password
             _buildPasswordField(
-              label: 'Confirm Password',
+              context: context,
+              label: l10n.confirm_password,
+              hintText: l10n.please_enter(l10n.confirm_password),
+              errorEmpty: l10n.please_enter(l10n.confirm_password),
+              errorLength: l10n.password_min_length,
               controller: confirmPasswordController,
               isObscure: hideConfirm,
               onToggle: () => setState(() => hideConfirm = !hideConfirm),
               validator: (value) {
                 if (value != newPasswordController.text) {
-                  return "Passwords do not match";
+                  return l10n.passwords_do_not_match;
                 }
                 return null;
               },
@@ -192,9 +263,9 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     ),
                     child: state.status == ChangePasswordStatus.loading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            "Update Password",
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                        : Text(
+                            l10n.update_password,
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                   ),
                 );
@@ -206,9 +277,9 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               height: 56,
               child: TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text(
-                  "Cancel",
-                  style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.bold),
+                child: Text(
+                  l10n.cancel,
+                  style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -219,7 +290,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   }
 
   Widget _buildPasswordField({
+    required BuildContext context,
     required String label,
+    required String hintText,
+    required String errorEmpty,
+    required String errorLength,
     required TextEditingController controller,
     required bool isObscure,
     required VoidCallback onToggle,
@@ -228,7 +303,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     return CustomTextFormField(
       controller: controller,
       label: label,
-      hintText: 'Enter $label',
+      hintText: hintText,
       prefixIcon: Icons.vpn_key_outlined,
       obscureText: isObscure,
       suffixIcon: IconButton(
@@ -237,10 +312,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Please enter $label';
+          return errorEmpty;
         }
         if (value.length < 4) {
-          return 'Password must be at least 4 characters';
+          return errorLength;
         }
         if (validator != null) return validator(value);
         return null;

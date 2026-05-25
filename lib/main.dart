@@ -4,6 +4,8 @@ import 'package:flutter_app/l10n/app_localizations.dart';
 
 import 'package:flutter_app/splashscreen/splashscreen.dart';
 import 'package:flutter_app/features/auth/login/cubit/login_cubit.dart';
+import 'package:flutter_app/core/widget/network_wrapper.dart';
+import 'package:flutter_app/core/widget/in_app_notification_wrapper.dart';
 import 'package:flutter_app/core/localization/locale_cubit.dart';
 import 'package:flutter_app/features/leave/cubit/leave_cubit.dart';
 import 'package:flutter_app/features/notifications/cubit/notification_cubit.dart';
@@ -14,6 +16,8 @@ import 'package:flutter_app/features/events/cubit/event_cubit.dart';
 import 'package:flutter_app/features/profile/cubit/holiday_cubit.dart';
 import 'package:flutter_app/features/chat/cubit/chat_cubit.dart';
 import 'package:flutter_app/routes.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() {
   runApp(const MyApp());
@@ -41,8 +45,7 @@ class MyApp extends StatelessWidget {
           return BlocBuilder<LocaleCubit, String>(
             builder: (context, langCode) {
               return MaterialApp(
-                
-
+                navigatorKey: navigatorKey,
                 debugShowCheckedModeBanner: false,
                 locale: Locale(langCode),
                 localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -52,6 +55,13 @@ class MyApp extends StatelessWidget {
                 themeMode: themeMode,
                 routes: Routes.getAll(),
                 home: const SplashScreen(),
+                builder: (context, child) {
+                  return NetworkWrapper(
+                    child: InAppNotificationWrapper(
+                      child: child!,
+                    ),
+                  );
+                },
               );
             },
           );

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/core/constants/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:mime/mime.dart';
@@ -153,6 +154,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
     return AppBar(
       backgroundColor: isDark ? Theme.of(context).appBarTheme.backgroundColor : Colors.white,
       elevation: 0,
@@ -175,7 +177,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                 ),
                 Text(
                   widget.channel.type == ChannelType.chat 
-                      ? (widget.channel.imStatus != null ? widget.channel.imStatus![0].toUpperCase() + widget.channel.imStatus!.substring(1) : 'Offline') 
+                      ? (widget.channel.imStatus == 'online' ? l10n.online : l10n.offline) 
                       : '${widget.channel.memberCount} members',
                   style: TextStyle(
                     fontSize: 12, 
@@ -202,9 +204,10 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   }
 
   void _showFeatureSoon(BuildContext context, String feature) {
+    final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$feature feature is coming soon!'),
+        content: Text(l10n.feature_coming_soon(feature)),
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.indigo,
         margin: const EdgeInsets.all(16),
@@ -258,13 +261,14 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   }
 
   Widget _buildEmptyChat(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.chat_bubble_outline_rounded, size: 64, color: Colors.grey.withOpacity(0.2)),
           const SizedBox(height: 16),
-          const Text('No messages yet. Say hello!', style: TextStyle(color: Colors.grey)),
+          Text(l10n.say_hello, style: const TextStyle(color: Colors.grey)),
         ],
       ),
     );
@@ -334,7 +338,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             child: TextField(
               controller: _messageController,
               decoration: InputDecoration(
-                hintText: 'Type a message...',
+                hintText: AppLocalizations.of(context)!.type_a_message,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none),
                 filled: true,
                 fillColor: Colors.grey.withOpacity(0.05),
@@ -546,9 +550,10 @@ class _MessageBubble extends StatelessWidget {
   Future<void> _handleAttachmentClick(BuildContext context, ChatAttachment att) async {
     try {
       final cubit = context.read<ChatCubit>();
+      final l10n = AppLocalizations.of(context)!;
       
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Downloading ${att.name}...'), duration: const Duration(seconds: 1)),
+        SnackBar(content: Text(l10n.downloading(att.name)), duration: const Duration(seconds: 1)),
       );
 
       final bytes = await cubit.downloadAttachment(att.id);

@@ -1,50 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/core/widget/custome_card.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 import 'package:flutter_app/routes.dart';
 class AttendanceActions extends StatelessWidget {
   const AttendanceActions({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!; 
     final actions = [
       {
-        'title': 'Leaves',
+        'title': l10n.leaves,
         'icon': Icons.event_note_rounded,
         'color': const Color(0xFF8E7CF0),
         'routeName': Routes.leaveList,
       },
       {
-        'title': 'MyPay',
+        'title': l10n.my_pay,
         'icon': Icons.account_balance_wallet_rounded,
         'color': const Color(0xFF00C853),
         'routeName': Routes.myPay,
       },
       {
-        'title': 'In/Out Report',
+        'title': l10n.inout_report,
         'icon': Icons.analytics_rounded,
         'color': const Color(0xFFFF6D00),
         'routeName': Routes.inOutReport,
       },
       {
-        'title': 'Doc Box',
+        'title': l10n.doc_box,
         'icon': Icons.folder_copy_rounded,
         'color': const Color(0xFFFF4081),
         'routeName': Routes.docbox,
       },
       {
-        'title': 'Company Calendar',
+        'title': l10n.company_calendar,
         'icon': Icons.calendar_today_rounded,
         'color': const Color(0xFF00ACC1),
         'routeName': Routes.holidayCalendar,
       },
       {
-        'title': 'Ai Chat Bot',
+            'title': l10n.ai_chat_bot,
         'icon': Icons.smart_toy_rounded,
         'color': const Color(0xFFFF6D00),
         'routeName': Routes.aichatbot,
       },
       {
-        'title': 'Events',
+             'title': l10n.events_list,
         'icon': Icons.celebration_rounded,
         'color': const Color(0xFF6C63FF),
         'routeName': Routes.events,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/core/constants/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';  
+import 'package:flutter_app/l10n/app_localizations.dart';  
 import '../../../core/theme/app_theme.dart';
 import '../cubit/chat_cubit.dart';
 import '../cubit/chat_state.dart';
@@ -42,6 +43,7 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
       backgroundColor: Colors.transparent,
       builder: (context) {
         String searchQuery = "";
+        final l10n = AppLocalizations.of(context)!;
         return StatefulBuilder(
           builder: (context, setModalState) {
             final filteredContacts = allContacts.where((c) {
@@ -72,7 +74,7 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
                     child: Row(
                       children: [
                         Text(
-                          'Start New Chat',
+                          l10n.start_new_chat,
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -95,7 +97,7 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
                         setModalState(() => searchQuery = value);
                       },
                       decoration: InputDecoration(
-                        hintText: 'Search people...',
+                        hintText: l10n.search_people,
                         prefixIcon: const Icon(Icons.search_rounded, color: AppColors.indigo),
                         filled: true,
                         fillColor: Colors.grey.withOpacity(0.05),
@@ -117,7 +119,7 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
                                 Icon(Icons.person_search_rounded, size: 64, color: Colors.grey.shade200),
                                 const SizedBox(height: 16),
                                 Text(
-                                  searchQuery.isEmpty ? 'No contacts found' : 'No matches for "$searchQuery"',
+                                  searchQuery.isEmpty ? l10n.no_contacts_found : l10n.no_matches_for(searchQuery),
                                   style: TextStyle(color: Colors.grey.shade400),
                                 ),
                               ],
@@ -140,7 +142,7 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
                                 subtitle: Text(
                                   (contact['function'] is String ? contact['function'] : null) ??
                                       (contact['email'] is String ? contact['email'] : null) ??
-                                      'Employee',
+                                      l10n.employee,
                                   style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
                                 ),
                                 onTap: () async {
@@ -201,6 +203,7 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.white,
       appBar: AppBar(
@@ -238,9 +241,9 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
             ],
           ),
         ),
-        title: const Text(
-          'Messages',
-          style: TextStyle(
+        title: Text(
+          l10n.messages,
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 24,
@@ -253,9 +256,9 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
           indicatorColor: Colors.white,
           indicatorWeight: 3,
           indicatorSize: TabBarIndicatorSize.label,
-          tabs: const [
-            Tab(text: 'Channels'),
-            Tab(text: 'Direct Messages'),
+          tabs: [
+            Tab(text: l10n.channels),
+            Tab(text: l10n.direct_messages),
           ],
         ),
       ),
@@ -322,6 +325,7 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
   }
 
   Widget _buildEmptyState(ChannelType type) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -333,7 +337,7 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
           ),
           const SizedBox(height: 16),
           Text(
-            type == ChannelType.channel ? 'No Channels Found' : 'No Direct Messages',
+            type == ChannelType.channel ? l10n.no_channels_found : l10n.no_direct_messages,
             style: TextStyle(color: Colors.grey.withOpacity(0.6), fontSize: 16),
           ),
         ],
@@ -432,7 +436,7 @@ class _ChannelTile extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            channel.lastMessage.isEmpty ? 'No messages yet' : channel.lastMessage,
+                            channel.lastMessage.isEmpty ? AppLocalizations.of(context)!.no_messages_yet : channel.lastMessage,
                             style: TextStyle(
                               fontSize: 13,
                               color: channel.unreadCount > 0 ? Colors.black87 : Colors.grey.shade600,

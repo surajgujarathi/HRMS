@@ -7,6 +7,7 @@ import 'package:flutter_app/features/events/models/event_model.dart';
 import 'package:flutter_app/routes.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class EventsListPage extends StatelessWidget {
   const EventsListPage({super.key});
@@ -38,6 +39,7 @@ class _EventsListViewState extends State<_EventsListView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
@@ -49,7 +51,7 @@ class _EventsListViewState extends State<_EventsListView> {
                 if (state.status == EventStatus.loading) {
                   return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColor));
                 } else if (state.status == EventStatus.error) {
-                  return _buildErrorState(context, state.errorMessage ?? "An unexpected error occurred");
+                  return _buildErrorState(context, state.errorMessage ?? l10n.unexpected_error);
                 } else if (state.status == EventStatus.loaded) {
                   if (state.events.isEmpty) {
                     return _buildEmptyState(context);
@@ -77,6 +79,7 @@ class _EventsListViewState extends State<_EventsListView> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 60, 20, 32),
       decoration: const BoxDecoration(
@@ -96,10 +99,10 @@ class _EventsListViewState extends State<_EventsListView> {
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
           ),
-          const Expanded(
+          Expanded(
             child: Text(
-              'Company Events',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              l10n.company_events,
+              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
           ),
@@ -110,6 +113,7 @@ class _EventsListViewState extends State<_EventsListView> {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -124,12 +128,12 @@ class _EventsListViewState extends State<_EventsListView> {
           ),
           const SizedBox(height: 24),
           Text(
-            'No Upcoming Events',
+            l10n.no_upcoming_events,
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
-            'Check back later for new company events!',
+            l10n.check_back_later_events,
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 14),
           ),
         ],
@@ -138,6 +142,7 @@ class _EventsListViewState extends State<_EventsListView> {
   }
 
   Widget _buildErrorState(BuildContext context, String message) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -154,7 +159,7 @@ class _EventsListViewState extends State<_EventsListView> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Oops! Something went wrong',
+              l10n.something_went_wrong,
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
@@ -176,6 +181,7 @@ class _EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final dateStr = event.dateBegin != null 
         ? DateFormat('EEEE, dd MMM yyyy').format(event.dateBegin!) 
         : "N/A";
@@ -247,7 +253,7 @@ class _EventCard extends StatelessWidget {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            event.addressId?.name ?? "Company Venue",
+                            event.addressId?.name ?? l10n.company_venue,
                             style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 13),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -267,14 +273,14 @@ class _EventCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              "${event.seatsMax - event.seatsTaken} Seats Left",
+                              l10n.seats_left((event.seatsMax - event.seatsTaken).toString()),
                               style: const TextStyle(color: AppColors.indigo, fontSize: 11, fontWeight: FontWeight.bold),
                             ),
                           )
                         else
-                          const Text(
-                            "Open Registration",
-                            style: TextStyle(color: AppColors.successGreen, fontSize: 11, fontWeight: FontWeight.bold),
+                          Text(
+                            l10n.open_registration,
+                            style: const TextStyle(color: AppColors.successGreen, fontSize: 11, fontWeight: FontWeight.bold),
                           ),
                         BlocBuilder<EventCubit, EventState>(
                           builder: (context, state) {
@@ -285,13 +291,13 @@ class _EventCard extends StatelessWidget {
                                   color: AppColors.successGreen.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: const Row(
+                                child: Row(
                                   children: [
-                                    Icon(Icons.check_circle, color: AppColors.successGreen, size: 12),
-                                    SizedBox(width: 4),
+                                    const Icon(Icons.check_circle, color: AppColors.successGreen, size: 12),
+                                    const SizedBox(width: 4),
                                     Text(
-                                      "Registered",
-                                      style: TextStyle(color: AppColors.successGreen, fontSize: 11, fontWeight: FontWeight.bold),
+                                      l10n.registered,
+                                      style: const TextStyle(color: AppColors.successGreen, fontSize: 11, fontWeight: FontWeight.bold),
                                     ),
                                   ],
                                 ),
@@ -300,14 +306,14 @@ class _EventCard extends StatelessWidget {
                             return const SizedBox.shrink();
                           },
                         ),
-                        const Row(
+                        Row(
                           children: [
                             Text(
-                              "View Details",
-                              style: TextStyle(color: AppColors.indigo, fontWeight: FontWeight.bold, fontSize: 13),
+                              l10n.view_details,
+                              style: const TextStyle(color: AppColors.indigo, fontWeight: FontWeight.bold, fontSize: 13),
                             ),
-                            SizedBox(width: 4),
-                            Icon(Icons.arrow_forward_ios, size: 12, color: AppColors.indigo),
+                            const SizedBox(width: 4),
+                            const Icon(Icons.arrow_forward_ios, size: 12, color: AppColors.indigo),
                           ],
                         ),
                       ],

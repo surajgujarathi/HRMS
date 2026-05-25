@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class DocBoxPage extends StatelessWidget {
   const DocBoxPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final companyDocs = [
       {"title": "January Salary Slip", "type": "PDF", "date": "01 Feb 2026"},
       {"title": "Offer Letter", "type": "PDF", "date": "15 Jan 2025"},
@@ -23,9 +25,9 @@ class DocBoxPage extends StatelessWidget {
         appBar: AppBar(
           elevation: 0,
           centerTitle: true,
-          title: const Text(
-            "DOC BOX",
-            style: TextStyle(
+          title: Text(
+            l10n.doc_box,
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               letterSpacing: 1,
               color: Colors.white,
@@ -40,15 +42,15 @@ class DocBoxPage extends StatelessWidget {
               ),
             ),
           ),
-          bottom: const TabBar(
+          bottom: TabBar(
             indicatorColor: Colors.white,
-            labelStyle: TextStyle(
+            labelStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
             tabs: [
-              Tab(text: "Company Docs"),
-              Tab(text: "Personal Docs"),
+              Tab(text: l10n.company_docs),
+              Tab(text: l10n.personal_docs),
             ],
           ),
         ),
@@ -58,18 +60,18 @@ class DocBoxPage extends StatelessWidget {
             // Upload functionality
           },
           icon: const Icon(Icons.upload_file, color: Colors.white),
-          label: const Text("Upload", style: TextStyle(color: Colors.white)),
+          label: Text(l10n.upload, style: const TextStyle(color: Colors.white)),
         ),
         body: TabBarView(
-          children: [_buildDocList(companyDocs), _buildDocList(personalDocs)],
+          children: [_buildDocList(context, companyDocs, l10n), _buildDocList(context, personalDocs, l10n)],
         ),
       ),
     );
   }
 
-  Widget _buildDocList(List<Map<String, String>> documents) {
+  Widget _buildDocList(BuildContext context, List<Map<String, String>> documents, AppLocalizations l10n) {
     if (documents.isEmpty) {
-      return const Center(child: Text("No Documents Available"));
+      return Center(child: Text(l10n.no_documents));
     }
 
     return ListView.builder(
@@ -111,7 +113,7 @@ class DocBoxPage extends StatelessWidget {
             subtitle: Padding(
               padding: const EdgeInsets.only(top: 4),
               child: Text(
-                "Uploaded on ${doc["date"]}",
+                l10n.uploaded_on(doc["date"]!),
                 style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
               ),
             ),
@@ -122,10 +124,10 @@ class DocBoxPage extends StatelessWidget {
               onSelected: (value) {
                 // Handle actions
               },
-              itemBuilder: (context) => const [
-                PopupMenuItem(value: "view", child: Text("View")),
-                PopupMenuItem(value: "download", child: Text("Download")),
-                PopupMenuItem(value: "delete", child: Text("Delete")),
+              itemBuilder: (context) => [
+                PopupMenuItem(value: "view", child: Text(l10n.view)),
+                PopupMenuItem(value: "download", child: Text(l10n.download)),
+                PopupMenuItem(value: "delete", child: Text(l10n.delete)),
               ],
             ),
           ),

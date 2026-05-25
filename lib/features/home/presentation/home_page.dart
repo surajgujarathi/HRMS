@@ -23,6 +23,7 @@ import 'package:flutter_bloc/flutter_bloc.dart' show ReadContext;
 import 'package:flutter_app/features/attendance/cubit/attendance_cubit.dart';
 import 'package:flutter_app/features/chat/cubit/chat_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -35,11 +36,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   late AttendanceCubit _attendanceCubit;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  
+  late Future<dynamic> _employeeDataFuture;
+  late Future<String?> _profilePicFuture;
 
   @override
   void initState() {
     super.initState();
     _attendanceCubit = AttendanceCubit()..loadInitialStatus();
+    _employeeDataFuture = SharedPref().getObject('employee_data');
+    _profilePicFuture = SharedPref().getString('profile_pic');
     WidgetsBinding.instance.addObserver(this);
     
     _searchController.addListener(() {
@@ -80,17 +86,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final List<Map<String, dynamic>> features = [
-      {'title': 'Leave', 'route': Routes.leave, 'icon': Icons.calendar_today},
-      {'title': 'My Pay', 'route': Routes.myPay, 'icon': Icons.payment},
-      {'title': 'Profile', 'route': Routes.personalinf, 'icon': Icons.person},
-      {'title': 'Attendance Report', 'route': Routes.inOutReport, 'icon': Icons.access_time},
-      {'title': 'Company Calendar', 'route': Routes.companyCalendar, 'icon': Icons.event},
-      {'title': 'Chat Bot', 'route': Routes.aichatbot, 'icon': Icons.chat},
-      {'title': 'Documents', 'route': Routes.docbox, 'icon': Icons.folder},
-      {'title': 'Job Details', 'route': Routes.jobdetails, 'icon': Icons.work},
-      {'title': 'Notifications', 'route': Routes.notifications, 'icon': Icons.notifications},
-      {'title': 'Events', 'route': Routes.events, 'icon': Icons.event_available},
+      {'title': l10n.apply_leave, 'route': Routes.leave, 'icon': Icons.calendar_today},
+      {'title': l10n.my_pay, 'route': Routes.myPay, 'icon': Icons.payment},
+      {'title': l10n.personal_information, 'route': Routes.personalinf, 'icon': Icons.person},
+      {'title': l10n.attendance_report, 'route': Routes.inOutReport, 'icon': Icons.access_time},
+      {'title': l10n.company_calendar, 'route': Routes.companyCalendar, 'icon': Icons.event},
+      {'title': l10n.ai_chat_bot, 'route': Routes.aichatbot, 'icon': Icons.chat},
+      {'title': l10n.doc_box, 'route': Routes.docbox, 'icon': Icons.folder},
+      {'title': l10n.job_details, 'route': Routes.jobdetails, 'icon': Icons.work},
+      {'title': l10n.notifications, 'route': Routes.notifications, 'icon': Icons.notifications},
+      {'title': l10n.events_list, 'route': Routes.events, 'icon': Icons.event_available},
     ];
     
     final searchResults = _searchQuery.isEmpty 
@@ -110,9 +117,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
-                SliverToBoxAdapter(
-                  child: Container(
-                    padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 20, 20, 32),
+                SliverAppBar(
+                  pinned: true,
+                  automaticallyImplyLeading: false,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  toolbarHeight: 170, // Fixed height for header content
+                  flexibleSpace: Container(
+                    padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 16, 20, 24),
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
@@ -169,7 +181,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                     ),
                                     const SizedBox(width: 12),
                                     FutureBuilder<dynamic>(
-                                      future: SharedPref().getObject('employee_data'),
+                                      future: _employeeDataFuture,
                                       builder: (context, snapshot) {
                                         String name = "User";
                                         if (snapshot.hasData && snapshot.data is Map) {
@@ -179,7 +191,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Welcome,',
+                                              l10n.welcome_prefix,
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 color: Colors.white.withOpacity(0.8),
@@ -320,6 +332,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Widget _buildProfileMenu(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return PopupMenuButton<String>(
       color: Theme.of(context).colorScheme.surface,
       offset: const Offset(0, 45),
@@ -328,20 +341,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         if (value == "profile") {
           Navigator.pushNamed(context, Routes.personalinf);
         } else if (value == "logout") {
+          context.read<ProfileCubit>().resetProfile();
           context.read<LoginCubit>().logout();
           if (context.mounted) {
             Navigator.of(context).pushNamedAndRemoveUntil(Routes.login, (route) => false);
           }
         }
       },
-      itemBuilder: (context) => const [
+      itemBuilder: (context) => [
         PopupMenuItem<String>(
           value: "profile",
           child: Row(
             children: [
-              Icon(Icons.person_outline, color: AppColors.primaryPurple),
-              SizedBox(width: 12),
-              Text("Go to Profile", style: TextStyle(fontWeight: FontWeight.w600)),
+              const Icon(Icons.person_outline, color: AppColors.primaryPurple),
+              const SizedBox(width: 12),
+              Text(l10n.go_to_profile, style: const TextStyle(fontWeight: FontWeight.w600)),
             ],
           ),
         ),
@@ -349,15 +363,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           value: "logout",
           child: Row(
             children: [
-              Icon(Icons.logout_rounded, color: AppColors.dangerRed),
-              SizedBox(width: 12),
-              Text("Logout", style: TextStyle(color: AppColors.dangerRed, fontWeight: FontWeight.w600)),
+              const Icon(Icons.logout_rounded, color: AppColors.dangerRed),
+              const SizedBox(width: 12),
+              Text(l10n.logout, style: const TextStyle(color: AppColors.dangerRed, fontWeight: FontWeight.w600)),
             ],
           ),
         ),
       ],
       child: FutureBuilder<String?>(
-        future: SharedPref().getString('profile_pic'),
+        future: _profilePicFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircleAvatar(
@@ -377,6 +391,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 cleanedPicData = cleanedPicData.split(',').last;
               }
               final bytes = base64Decode(cleanedPicData);
+              
+              // Validate image magic bytes to prevent Android ImageDecoder console spam
+              bool isValidImage = false;
+              if (bytes.length >= 3) {
+                // Check for JPEG (FF D8 FF)
+                if (bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF) {
+                  isValidImage = true;
+                }
+                // Check for PNG (89 50 4E 47)
+                else if (bytes.length >= 4 && bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47) {
+                  isValidImage = true;
+                }
+              }
+
               return Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
@@ -386,15 +414,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   radius: 20,
                   backgroundColor: AppColors.lightPurple,
                   child: ClipOval(
-                    child: Image.memory(
-                      bytes,
-                      width: 40,
-                      height: 40,
-                      fit: BoxFit.cover,
-                      gaplessPlayback: true,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const Icon(Icons.person, size: 24, color: AppColors.primaryPurple),
-                    ),
+                    child: isValidImage 
+                      ? Image.memory(
+                          bytes,
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.cover,
+                          gaplessPlayback: true,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.person, size: 24, color: AppColors.primaryPurple),
+                        )
+                      : const Icon(Icons.person, size: 24, color: AppColors.primaryPurple),
                   ),
                 ),
               );

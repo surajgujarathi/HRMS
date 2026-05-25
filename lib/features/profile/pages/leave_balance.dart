@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class LeaveBalanceModernPage extends StatelessWidget {
   const LeaveBalanceModernPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
@@ -34,8 +36,8 @@ class LeaveBalanceModernPage extends StatelessWidget {
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
-                      SizedBox(height: 4),
-                      Text("Team Lead", style: TextStyle(color: Colors.grey)),
+                      const SizedBox(height: 4),
+                      const Text("Team Lead", style: TextStyle(color: Colors.grey)),
                     ],
                   ),
                   const Spacer(),
@@ -48,7 +50,7 @@ class LeaveBalanceModernPage extends StatelessWidget {
               const SizedBox(height: 24),
 
                Text(
-                "Leave Balance",
+                l10n.leave_balance,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
               ),
 
@@ -62,25 +64,25 @@ class LeaveBalanceModernPage extends StatelessWidget {
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
                 childAspectRatio: 1.4, // 🔥 reduced height
-                children: const [
+                children: [
                   LeaveCard(
                     icon: Icons.beach_access,
-                    title: "Total Leave",
+                    title: l10n.total_leave,
                     value: "12",
                   ),
                   LeaveCard(
                     icon: Icons.check_circle_outline,
-                    title: "Taken",
+                    title: l10n.taken,
                     value: "8",
                   ),
                   LeaveCard(
                     icon: Icons.wb_sunny_outlined,
-                    title: "Remaining",
+                    title: l10n.remaining,
                     value: "5",
                   ),
                   LeaveCard(
                     icon: Icons.medical_services_outlined,
-                    title: "Sick Leave",
+                    title: l10n.sick_leave,
                     value: "2 / 5",
                   ),
                 ],
@@ -89,9 +91,9 @@ class LeaveBalanceModernPage extends StatelessWidget {
               const SizedBox(height: 28),
 
               /// 🔹 Quick Actions
-              const Text(
-                "Quick Actions",
-                style: TextStyle(
+              Text(
+                l10n.quick_actions,
+                style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.bold,
                   color: Colors.blue,
@@ -102,18 +104,18 @@ class LeaveBalanceModernPage extends StatelessWidget {
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
+                children: [
                   QuickActionCard(
                     icon: Icons.beach_access,
-                    label: "Book Leave",
+                    label: l10n.book_leave,
                   ),
                   QuickActionCard(
                     icon: Icons.local_hospital,
-                    label: "Report Sick",
+                    label: l10n.report_sick,
                   ),
                   QuickActionCard(
                     icon: Icons.mail_outline,
-                    label: "Contact HR",
+                    label: l10n.contact_hr,
                   ),
                 ],
               ),
@@ -125,16 +127,16 @@ class LeaveBalanceModernPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                    Text(
-                    "Recent Activity",
+                    l10n.recent_activity,
                     style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
                   ),
                   GestureDetector(
                     onTap: () {
                       debugPrint("View All Clicked");
                     },
-                    child: const Text(
-                      "View all",
-                      style: TextStyle(color: Colors.blue),
+                    child: Text(
+                      l10n.view_all,
+                      style: const TextStyle(color: Colors.blue),
                     ),
                   ),
                 ],
@@ -142,19 +144,19 @@ class LeaveBalanceModernPage extends StatelessWidget {
 
               const SizedBox(height: 15),
 
-              const ActivityTile(
+              ActivityTile(
                 icon: Icons.beach_access,
-                title: "Annual Leave",
+                title: l10n.annual_leave,
                 subtitle: "3 days: Apr 4 - Apr 6, 2024",
               ),
-              const ActivityTile(
+              ActivityTile(
                 icon: Icons.local_hospital,
-                title: "Sick Leave",
+                title: l10n.sick_leave,
                 subtitle: "1 day: Mar 20, 2024",
               ),
-              const ActivityTile(
+              ActivityTile(
                 icon: Icons.beach_access,
-                title: "Annual Leave",
+                title: l10n.annual_leave,
                 subtitle: "1 day: Feb 10, 2024",
               ),
             ],

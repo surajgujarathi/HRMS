@@ -88,9 +88,17 @@ class LoginCubit extends Cubit<LoginState> {
       await prefs.saveObject('session', session);
       await prefs.saveString('baseUrl', baseUrl);
       await prefs.saveString('db', db);
-       await prefs.saveObject('port', 7075); // Example port value
+      await prefs.saveObject('port', 7075); // Example port value
       await prefs.saveBool('isLoggedIn', true);
       await prefs.saveBool('rememberMe', state.rememberMe);
+
+      if (state.rememberMe) {
+        await prefs.saveString('saved_username', username);
+        await prefs.saveString('saved_password', password);
+      } else {
+        await prefs.remove('saved_username');
+        await prefs.remove('saved_password');
+      }
 
       // 2. Get Employee Data
       debugPrint(
@@ -181,14 +189,17 @@ class LoginCubit extends Cubit<LoginState> {
   Future<void> checkLoginStatus() async {
     final prefs = SharedPref();
     final rememberMe = await prefs.getBool('rememberMe') ?? false;
-    final sessionData = await prefs.getObject('session');
+    final savedUsername = await prefs.getString('saved_username') ?? '';
+    final savedPassword = await prefs.getString('saved_password') ?? '';
 
-    if (!rememberMe) {
-      debugPrint('Remember Me is disabled. Requiring fresh login.');
-      await _clearSessionData(prefs);
-      emit(state.copyWith(status: LoginStatus.initial));
-      return;
-    }
+    // Initialize state with remembered credentials if available
+    emit(state.copyWith(
+      rememberMe: rememberMe,
+      username: savedUsername,
+      password: savedPassword,
+    ));
+
+    final sessionData = await prefs.getObject('session');
 
     if (sessionData != null && sessionData is Map && sessionData.isNotEmpty) {
       final baseUrl =
@@ -257,7 +268,10 @@ class LoginCubit extends Cubit<LoginState> {
     await prefs.remove('profile_pic');
     await prefs.remove('partner_id');
     await prefs.remove('isInternalUser');
-    await prefs.remove('rememberMe');
+    
+    // Do NOT remove rememberMe, saved_username, saved_password here,
+    // so they persist after logout for pre-filling the login screen.
+    
     // Clear chat related data too if it exists
     await prefs.remove('chat_server_url');
     await prefs.remove('chat_db_name');

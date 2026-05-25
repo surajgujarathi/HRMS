@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class LeavePage extends StatefulWidget {
   const LeavePage({super.key});
@@ -43,7 +44,7 @@ class _LeavePageState extends State<LeavePage> {
     }
   }
 
-  void _openApplyLeaveSheet() {
+  void _openApplyLeaveSheet(AppLocalizations l10n) {
     String selectedType = "Casual Leave";
     DateTime? fromDate;
     DateTime? toDate;
@@ -52,7 +53,7 @@ class _LeavePageState extends State<LeavePage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
@@ -74,7 +75,7 @@ class _LeavePageState extends State<LeavePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Apply Leave",
+                        l10n.apply_leave,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -99,7 +100,7 @@ class _LeavePageState extends State<LeavePage> {
                           });
                         },
                         decoration: InputDecoration(
-                          labelText: "Leave Type",
+                          labelText: l10n.leave_type,
                           labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                           border: const OutlineInputBorder(),
                         ),
@@ -111,9 +112,9 @@ class _LeavePageState extends State<LeavePage> {
                         readOnly: true,
                         style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                         decoration: InputDecoration(
-                          labelText: "From Date",
+                          labelText: l10n.start_date,
                           labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
                           suffixIcon: Icon(Icons.calendar_today, color: Theme.of(context).primaryColor),
                         ),
                         controller: TextEditingController(
@@ -140,9 +141,9 @@ class _LeavePageState extends State<LeavePage> {
                         readOnly: true,
                         style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                         decoration: InputDecoration(
-                          labelText: "To Date",
+                          labelText: l10n.end_date,
                           labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
                           suffixIcon: Icon(Icons.calendar_today, color: Theme.of(context).primaryColor),
                         ),
                         controller: TextEditingController(
@@ -165,7 +166,7 @@ class _LeavePageState extends State<LeavePage> {
                       const SizedBox(height: 15),
 
                       Text(
-                        "Total Days: $days",
+                        "${l10n.total_days}: $days",
                         style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                       ),
                       const SizedBox(height: 15),
@@ -176,9 +177,9 @@ class _LeavePageState extends State<LeavePage> {
                         maxLines: 3,
                         style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                         decoration: InputDecoration(
-                          labelText: "Reason",
+                          labelText: l10n.reason,
                           labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -192,7 +193,7 @@ class _LeavePageState extends State<LeavePage> {
                               Navigator.pop(context);
                             }
                           },
-                          child: const Text("Submit"),
+                          child: Text(l10n.submit),
                         ),
                       ),
                     ],
@@ -208,8 +209,9 @@ class _LeavePageState extends State<LeavePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text("Leave Management"), centerTitle: true),
+      appBar: AppBar(title: Text(l10n.leave_management), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -239,7 +241,7 @@ class _LeavePageState extends State<LeavePage> {
                         ),
                         const Spacer(),
                         Text(
-                          "${leaveBalance[key]} Days",
+                          "${leaveBalance[key]} ${l10n.days}",
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -259,8 +261,8 @@ class _LeavePageState extends State<LeavePage> {
               width: double.infinity,
               height: 45,
               child: ElevatedButton(
-                onPressed: _openApplyLeaveSheet,
-                child: const Text("Apply Leave"),
+                onPressed: () => _openApplyLeaveSheet(l10n),
+                child: Text(l10n.apply_leave),
               ),
             ),
 
