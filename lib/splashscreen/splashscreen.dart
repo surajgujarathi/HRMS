@@ -4,10 +4,8 @@ import 'package:flutter_app/core/constants/app_images.dart';
 import 'package:flutter_app/core/utils/shared_pref.dart';
 import 'package:flutter_app/features/auth/login/cubit/login_cubit.dart';
 import 'package:flutter_app/features/auth/login/cubit/login_state.dart';
-import 'package:flutter_app/features/onboard/onboard_page.dart';
 import 'package:flutter_app/routes.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_app/core/localization/locale_cubit.dart';
 import 'package:flutter_app/l10n/app_localizations.dart';
 
 class SplashScreen extends StatefulWidget {

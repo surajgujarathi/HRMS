@@ -176,22 +176,18 @@ class AttendanceCubit extends Cubit<AttendanceState> {
     final int empId = rawEmpId is int ? rawEmpId : int.parse(rawEmpId.toString());
 
     try {
-      // Capture device IP and GPS location in parallel for better performance
-      // Added 5-second timeouts to prevent long loading times if network/GPS is slow
-      final results = await Future.wait([
-        _getIpAddress().timeout(const Duration(seconds: 5), onTimeout: () => "0.0.0.0"),
-        _getCurrentPosition().timeout(const Duration(seconds: 5), onTimeout: () => null),
-      ]);
+      // Capture GPS location first (MANDATORY)
+      final Position position = await _getCurrentPosition();
       
-      final String ipAddress = results[0] as String;
-      final Position? position = results[1] as Position?;
+      // Capture device IP (optional timeout)
+      final String ipAddress = await _getIpAddress().timeout(const Duration(seconds: 5), onTimeout: () => "0.0.0.0");
       
       // Perform the check-in/out action on the server
       await odooService.mobileCheckInOut(
         employeeId: empId,
         isCheckIn: currentlyCheckedIn, 
-        longitude: position?.longitude ?? 0,
-        latitude: position?.latitude ?? 0,
+        longitude: position.longitude,
+        latitude: position.latitude,
         ipAddress: ipAddress,
       );
 
@@ -218,7 +214,8 @@ class AttendanceCubit extends Cubit<AttendanceState> {
       }
     } catch (e) {
       debugPrint('AttendanceCubit Toggle Error: $e');
-      emit(state.copyWith(status: AttendanceStatus.failure, errorMessage: e.toString()));
+      final errorMsg = e.toString().replaceAll('Exception: ', '');
+      emit(state.copyWith(status: AttendanceStatus.failure, errorMessage: errorMsg));
     }
   }
 
@@ -238,24 +235,37 @@ class AttendanceCubit extends Cubit<AttendanceState> {
   }
 
   /// Requests location permissions and retrieves the current GPS coordinates.
-  Future<Position?> _getCurrentPosition() async {
-    try {
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-      if (permission == LocationPermission.whileInUse || permission == LocationPermission.always) {
-        // Try to get last known position first for near-instant response
-        final lastKnown = await Geolocator.getLastKnownPosition();
-        if (lastKnown != null) return lastKnown;
+  /// Throws an error string if permission is denied.
+  Future<Position> _getCurrentPosition() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      throw 'Location services are disabled. Please enable GPS in your device settings to check in/out.';
+    }
 
-        // Fallback to current position with a strict time limit
-        return await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.medium,
-          timeLimit: const Duration(seconds: 5),
-        );
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        throw 'Location permission is required to check in/out. Please grant permission when asked.';
       }
-    } catch (e) {}
-    return null;
+    }
+    
+    if (permission == LocationPermission.deniedForever) {
+      throw 'Location permissions are permanently denied. Please enable them in your phone settings to use attendance.';
+    }
+
+    try {
+      // Try to get last known position first for near-instant response
+      final lastKnown = await Geolocator.getLastKnownPosition();
+      if (lastKnown != null) return lastKnown;
+
+      // Fallback to current position with a strict time limit
+      return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.medium,
+        timeLimit: const Duration(seconds: 10),
+      );
+    } catch (e) {
+      throw 'Failed to acquire GPS location. Please make sure you are in a clear area and try again.';
+    }
   }
 }

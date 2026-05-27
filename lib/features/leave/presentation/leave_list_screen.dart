@@ -8,6 +8,7 @@ import 'package:flutter_app/core/constants/app_colors.dart';
 import 'package:flutter_app/routes.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_app/l10n/app_localizations.dart';
+import 'package:flutter_app/core/utils/responsive_util.dart';
 
 class LeaveListScreen extends StatefulWidget {
   const LeaveListScreen({super.key});
@@ -197,12 +198,17 @@ class _BalanceSummary extends StatelessWidget {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)
           ),
         ),
-        SizedBox(
-          height: 140,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: ResponsiveUtil.getCrossAxisCount(context, mobile: 2, tablet: 4),
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: ResponsiveUtil.isTablet(context) ? 1.0 : 1.2,
+            ),
             itemCount: leaveTypes.length,
             itemBuilder: (context, index) {
               final type = leaveTypes[index];
@@ -225,9 +231,7 @@ class _BalanceCard extends StatelessWidget {
     final color = Colors.primaries[(type.name.hashCode).abs() % Colors.primaries.length];
     
     return Container(
-      width: 160,
-      margin: const EdgeInsets.only(right: 12, bottom: 8, top: 4),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(24),

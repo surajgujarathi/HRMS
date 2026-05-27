@@ -6,6 +6,7 @@ import 'package:flutter_app/features/profile/cubit/holiday_cubit.dart';
 import 'package:flutter_app/features/profile/cubit/holiday_state.dart';
 import 'package:flutter_app/features/profile/models/holiday_model.dart';
 import 'package:flutter_app/l10n/app_localizations.dart';
+import 'package:flutter_app/core/utils/responsive_util.dart';
 
 class HolidayCalendarPage extends StatelessWidget {
   const HolidayCalendarPage({super.key});
@@ -59,64 +60,67 @@ class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
                   // Sort by date
                   displayHolidays.sort((a, b) => (a.dateFrom ?? DateTime(0)).compareTo(b.dateFrom ?? DateTime(0)));
 
-                  return SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildCalendarCard(holidays),
-                        const SizedBox(height: 24),
-                        _buildSearchBar(l10n),
-                        const SizedBox(height: 24),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "${l10n.holidays_calendar} ${currentMonth.year}",
-                              style:  TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: AppColors.indigo.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                "${displayHolidays.length} ${l10n.holidays_calendar}",
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.indigo,
+                  return ResponsiveUtil.buildConstrained(
+                    context,
+                    SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildCalendarCard(holidays),
+                          const SizedBox(height: 24),
+                          _buildSearchBar(l10n),
+                          const SizedBox(height: 24),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "${l10n.holidays_calendar} ${currentMonth.year}",
+                                style:  TextStyle(
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).colorScheme.onSurface,
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: AppColors.indigo.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  "${displayHolidays.length} ${l10n.holidays_calendar}",
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.indigo,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          if (displayHolidays.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 40),
+                              child: Center(
+                                child: Column(
+                                  children: [
+                                    Icon(Icons.event_busy_outlined, size: 48, color: AppColors.textSecondary.withOpacity(0.3)),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      l10n.no_holidays_found(currentMonth.year.toString()),
+                                      style: const TextStyle(color: AppColors.textSecondary),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        if (displayHolidays.isEmpty)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 40),
-                            child: Center(
-                              child: Column(
-                                children: [
-                                  Icon(Icons.event_busy_outlined, size: 48, color: AppColors.textSecondary.withOpacity(0.3)),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    l10n.no_holidays_found(currentMonth.year.toString()),
-                                    style: const TextStyle(color: AppColors.textSecondary),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ...displayHolidays.map((h) => _buildHolidayCard(h)),
-                        const SizedBox(height: 30),
-                      ],
+                          ...displayHolidays.map((h) => _buildHolidayCard(h)),
+                          const SizedBox(height: 30),
+                        ],
+                      ),
                     ),
                   );
                 }

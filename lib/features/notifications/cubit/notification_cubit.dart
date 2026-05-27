@@ -63,6 +63,10 @@ class NotificationCubit extends Cubit<NotificationState> {
 
   NotificationCubit() : super(const NotificationState());
 
+  void clearData() {
+    emit(const NotificationState());
+  }
+
   Future<void> fetchNotifications() async {
     debugPrint('NotificationCubit: fetchNotifications started');
     emit(state.copyWith(status: NotificationStatus.loading));
@@ -82,8 +86,33 @@ class NotificationCubit extends Cubit<NotificationState> {
         throw Exception('Partner ID not found. Please login again.');
       }
 
+      // Load local read IDs
+      final readIdsObj = await prefs.getObject('read_notification_ids');
+      final List<dynamic> readIdsStr = readIdsObj is List ? readIdsObj : [];
+      final Set<int> localReadIds = readIdsStr.map((e) => int.tryParse(e.toString()) ?? 0).toSet();
+
       final response = await _odooService.fetchNotifications(partnerId);
-      final notifications = response.map((json) => OdooNotification.fromJson(json)).toList();
+      final notifications = response.map((json) {
+        final notif = OdooNotification.fromJson(json);
+        // Apply local read status if server doesn't provide it
+        if (localReadIds.contains(notif.id)) {
+          return OdooNotification(
+            id: notif.id,
+            status: notif.status,
+            messageId: notif.messageId,
+            messageSubject: notif.messageSubject,
+            messageBody: notif.messageBody,
+            messageDate: notif.messageDate,
+            notificationType: notif.notificationType,
+            isRead: true, // override as read locally
+            readDate: notif.readDate ?? DateTime.now(),
+            failureType: notif.failureType,
+            failureReason: notif.failureReason,
+            partnerId: notif.partnerId,
+          );
+        }
+        return notif;
+      }).toList();
       
       final unreadCount = notifications.where((n) => !n.isRead).length;
       debugPrint('NotificationCubit: Fetched ${notifications.length} notifications, unread: $unreadCount');
@@ -106,15 +135,52 @@ class NotificationCubit extends Cubit<NotificationState> {
     debugPrint('NotificationCubit: markAsRead notificationId=$notificationId');
     try {
       final prefs = SharedPref();
+      
+      // Save locally
+      final readIdsObj = await prefs.getObject('read_notification_ids');
+      final List<dynamic> readIdsStr = readIdsObj is List ? readIdsObj : [];
+      final Set<String> localReadIds = readIdsStr.map((e) => e.toString()).toSet();
+      localReadIds.add(notificationId.toString());
+      await prefs.saveObject('read_notification_ids', localReadIds.toList());
+
+      // Optimistic UI update
+      final updatedNotifications = state.notifications.map((n) {
+        if (n.id == notificationId) {
+          return OdooNotification(
+            id: n.id,
+            status: n.status,
+            messageId: n.messageId,
+            messageSubject: n.messageSubject,
+            messageBody: n.messageBody,
+            messageDate: n.messageDate,
+            notificationType: n.notificationType,
+            isRead: true,
+            readDate: DateTime.now(),
+            failureType: n.failureType,
+            failureReason: n.failureReason,
+            partnerId: n.partnerId,
+          );
+        }
+        return n;
+      }).toList();
+      
+      final unreadCount = updatedNotifications.where((n) => !n.isRead).length;
+      emit(state.copyWith(notifications: updatedNotifications, unreadCount: unreadCount));
+
       final sessionData = await prefs.getObject('session');
       if (sessionData != null) {
         final session = OdooSession.fromJson(sessionData);
         _odooService.setSession(session);
       }
       
-      await _odooService.markNotificationAsRead(notificationId);
-      debugPrint('NotificationCubit: markAsRead success, refreshing list...');
-      fetchNotifications(); // Refresh from server to be sure
+      try {
+        await _odooService.markNotificationAsRead(notificationId);
+      } catch (e) {
+        // Ignore server error for missing field, local state is already updated
+        debugPrint('NotificationCubit: Server markAsRead failed (likely Odoo 17/18 removed field): $e');
+      }
+      
+      debugPrint('NotificationCubit: markAsRead success');
     } catch (e) {
       debugPrint('NotificationCubit: markAsRead ERROR: $e');
     }

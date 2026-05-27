@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/features/auth/login/cubit/login_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_app/features/chat/cubit/chat_cubit.dart';
 import 'package:flutter_app/features/chat/cubit/chat_state.dart';
 import 'package:flutter_app/features/chat/models/chat_model.dart';
 import 'package:flutter_app/features/chat/presentation/chat_detail_screen.dart';
 import 'package:flutter_app/features/notifications/cubit/notification_cubit.dart';
+import 'package:flutter_app/features/auth/login/cubit/login_cubit.dart';
 import 'package:flutter_app/routes.dart';
 import 'package:flutter_app/main.dart';
 
@@ -48,6 +50,10 @@ class _InAppNotificationWrapperState extends State<InAppNotificationWrapper> wit
   }
 
   void _showNotification(String title, String message, IconData icon, {String? route, VoidCallback? onTap}) {
+    if (context.read<LoginCubit>().state.status != LoginStatus.success) {
+      return; // Do not show notifications if not fully logged in
+    }
+
     setState(() {
       _title = title;
       _message = message;
@@ -96,7 +102,7 @@ class _InAppNotificationWrapperState extends State<InAppNotificationWrapper> wit
               for (var channel in allChannels) {
                 final prevChannel = _previousChannels.firstWhere(
                   (c) => c.id == channel.id, 
-                  orElse: () => channel
+                  orElse: () => channel.copyWith(unreadCount: 0)
                 );
                 
                 if (channel.unreadCount > prevChannel.unreadCount && state.currentChatId != channel.id.toString()) {

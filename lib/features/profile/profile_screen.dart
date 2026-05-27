@@ -4,11 +4,18 @@ import 'package:flutter_app/features/auth/login/cubit/login_cubit.dart';
 import 'package:flutter_app/features/profile/cubit/profile_cubit.dart';
 import 'package:flutter_app/features/profile/cubit/profile_state.dart';
 import 'package:flutter_app/features/notifications/cubit/notification_cubit.dart';
+import 'package:flutter_app/features/chat/cubit/chat_cubit.dart';
+import 'package:flutter_app/features/projects/cubit/projects_cubit.dart';
+import 'package:flutter_app/features/projects/cubit/project_tasks_cubit.dart';
+import 'package:flutter_app/features/leave/cubit/leave_cubit.dart';
+import 'package:flutter_app/features/events/cubit/event_cubit.dart';
+import 'package:flutter_app/features/profile/cubit/holiday_cubit.dart';
 import 'package:flutter_app/core/theme/theme_cubit.dart';
 import 'package:flutter_app/routes.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_app/core/constants/app_colors.dart';
 import 'package:flutter_app/l10n/app_localizations.dart';
+import 'package:flutter_app/core/utils/responsive_util.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -18,6 +25,14 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: BlocBuilder<ProfileCubit, ProfileState>(
+        buildWhen: (previous, current) {
+          // Prevent UI rebuild during logout when state is reset to initial.
+          // This keeps the profile UI painted while the navigator transitions, preventing a white flash.
+          if (current.status == ProfileStatus.initial && previous.status != ProfileStatus.initial) {
+            return false;
+          }
+          return true;
+        },
         builder: (context, state) {
           final l10n = AppLocalizations.of(context)!;
           if (state.status == ProfileStatus.loading) {
@@ -29,9 +44,12 @@ class ProfileScreen extends StatelessWidget {
             return Center(child: Text(l10n.no_employee_data_found));
           }
 
-          return Stack(
-            children: [
-              // 🎨 Gradient Header Background
+          return ResponsiveUtil.buildConstrained(
+            context,
+            maxWidth: 800,
+            Stack(
+              children: [
+                // 🎨 Gradient Header Background
               Container(
                 height: 240,
                 decoration: BoxDecoration(
@@ -411,9 +429,36 @@ class ProfileScreen extends StatelessWidget {
                                     titleColor: Colors.redAccent,
                                     iconColor: Colors.redAccent,
                                     onTap: () async {
-                                      context.read<ProfileCubit>().resetProfile();
+                                      final shouldLogout = await showDialog<bool>(
+                                        context: context,
+                                        builder: (dialogContext) => AlertDialog(
+                                          title: Text(l10n.logout),
+                                          content: const Text('Are you sure you want to logout?'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.of(dialogContext).pop(false),
+                                              child: Text(l10n.cancel, style: const TextStyle(color: Colors.grey)),
+                                            ),
+                                            TextButton(
+                                              onPressed: () => Navigator.of(dialogContext).pop(true),
+                                              child: Text(l10n.logout, style: const TextStyle(color: Colors.redAccent)),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+
+                                      if (shouldLogout != true || !context.mounted) return;
+
                                       await context.read<LoginCubit>().logout();
                                       if (context.mounted) {
+                                        context.read<ChatCubit>().clearData();
+                                        context.read<NotificationCubit>().clearData();
+                                        context.read<ProjectsCubit>().clearData();
+                                        context.read<ProjectTasksCubit>().clearData();
+                                        context.read<LeaveCubit>().clearData();
+                                        context.read<EventCubit>().clearData();
+                                        context.read<HolidayCubit>().clearData();
+                                        context.read<ProfileCubit>().resetProfile();
                                         Navigator.of(context).pushNamedAndRemoveUntil(Routes.login, (route) => false);
                                       }
                                     },
@@ -428,8 +473,9 @@ class ProfileScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-              ),
-            ],
+                ),
+              ],
+            ),
           );
         },
       ),

@@ -1,7 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:odoo_rpc/odoo_rpc.dart';
-import 'package:flutter/foundation.dart';
-
+import 'package:flutter/material.dart';
+import 'package:flutter_app/main.dart';
 class OdooService {
   final String baseUrl;
   OdooClient _client;
@@ -107,6 +107,7 @@ class OdooService {
     String method,
     List<dynamic> args, {
     Map<String, dynamic>? kwargs,
+    bool silent = false,
   }) async {
     debugPrint(
       'OdooService: executeModelMethod model=$model method=$method args=$args kwargs=$kwargs',
@@ -117,7 +118,39 @@ class OdooService {
       'args': args,
       'kwargs': kwargs ?? {},
     };
-    return _client.callKw(payload);
+    
+    try {
+      return await _client.callKw(payload);
+    } catch (e) {
+      String errorStr = e.toString().toLowerCase();
+      debugPrint('================ ODOO RPC EXCEPTION ================');
+      debugPrint('Payload: $payload');
+      debugPrint('Error: $e');
+      debugPrint('====================================================');
+
+      if (!silent && (errorStr.contains('socketexception') || 
+          errorStr.contains('connection refused') || 
+          errorStr.contains('failed host lookup') || 
+          errorStr.contains('clientexception') ||
+          errorStr.contains('network') ||
+          errorStr.contains('timeout'))) {
+        
+        if (navigatorKey.currentContext != null) {
+          ScaffoldMessenger.of(navigatorKey.currentContext!).hideCurrentSnackBar();
+          ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
+            SnackBar(
+              content: const Text("Server is currently unavailable. Please check your connection or try again later."),
+              backgroundColor: Colors.red.shade600,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+          );
+        }
+        
+        throw Exception("Server unavailable");
+      }
+      rethrow;
+    }
   }
 
   /// Alternative way to call a method using a pre-built payload.
@@ -602,14 +635,18 @@ class OdooService {
       'search_read',
       [],
       kwargs: {
-        'domain': [['res_partner_id', '=', partnerId]],
+        'domain': [
+          ['res_partner_id', '=', partnerId],
+          ['notification_type', '=', 'inbox']
+        ],
         'fields': [
           'id', 'notification_status', 'mail_message_id', 'notification_type',
-          'is_read', 'read_date', 'failure_type', 'failure_reason', 'res_partner_id'
+          'failure_type', 'failure_reason', 'res_partner_id', 'is_read', 'read_date'
         ],
         'order': 'id desc',
         'limit': 50,
       },
+      silent: true,
     );
 
     debugPrint('OdooService: fetchNotifications Metadata Response: $notifications');
@@ -639,6 +676,7 @@ class OdooService {
         'domain': [['id', 'in', messageIds]],
         'fields': ['id', 'subject', 'body', 'date'],
       },
+      silent: true,
     );
 
     debugPrint('OdooService: fetchNotifications Message Details Response: $messages');
@@ -672,6 +710,7 @@ class OdooService {
         'is_read': true,
         'read_date': DateTime.now().toUtc().toIso8601String(),
       }],
+      silent: true,
     );
     debugPrint('OdooService: markNotificationAsRead - Success');
   }

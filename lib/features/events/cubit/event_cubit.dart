@@ -8,7 +8,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
 
 class EventCubit extends Cubit<EventState> {
-  EventCubit() : super(EventState());
+  EventCubit() : super( EventState());
+
+  void clearData() {
+    emit( EventState());
+  }
 
   Future<void> fetchEvents() async {
     if (isClosed) return;

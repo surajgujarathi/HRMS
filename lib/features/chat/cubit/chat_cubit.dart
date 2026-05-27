@@ -123,7 +123,6 @@ class ChatCubit extends Cubit<ChatState> {
             'custom_channel_name',
             'is_pinned',
             'seen_message_id',
-            'fetched_message_id',
             'last_interest_dt'
           ],
         },
@@ -176,10 +175,12 @@ class ChatCubit extends Cubit<ChatState> {
           'model': 'res.partner',
           'method': 'read',
           'args': [partnerIdsToFetch, ['im_status', 'image_128']],
-          'kwargs': {},
+          'kwargs': {
+            'context': {'bin_size': false}
+          },
         });
         for (var p in (partners as List)) {
-          partnerStatuses[p['id']] = p['im_status'] ?? 'offline';
+          partnerStatuses[p['id']] = p['im_status'] is String ? p['im_status'] : 'offline';
           partnerImages[p['id']] = p['image_128'] is String ? p['image_128'] : null;
         }
       }
@@ -301,12 +302,25 @@ class ChatCubit extends Cubit<ChatState> {
         else channels.add(updatedChannel);
       }
 
-      channels.sort((a, b) => (b.lastMessageRaw ?? DateTime(0)).compareTo(a.lastMessageRaw ?? DateTime(0)));
-      dms.sort((a, b) => (b.lastMessageRaw ?? DateTime(0)).compareTo(a.lastMessageRaw ?? DateTime(0)));
+      int _sortChannels(ChatChannel a, ChatChannel b) {
+        if (a.lastMessageRaw != null && b.lastMessageRaw != null) {
+          return b.lastMessageRaw!.compareTo(a.lastMessageRaw!);
+        } else if (a.lastMessageRaw != null) {
+          return -1;
+        } else if (b.lastMessageRaw != null) {
+          return 1;
+        }
+        return b.id.compareTo(a.id);
+      }
+
+      dms.sort(_sortChannels);
+      channels.sort(_sortChannels);
 
       emit(state.copyWith(status: ChatStatus.loaded, channels: channels, directMessages: dms));
     } catch (e) {
-      debugPrint('ChatCubit: Fetch Channels Error: $e');
+      debugPrint('================ CHAT CUBIT EXCEPTION (Fetch Channels) ================');
+      debugPrint('Fetch Channels Error: $e');
+      debugPrint('====================================================');
     }
   }
 
@@ -417,7 +431,9 @@ class ChatCubit extends Cubit<ChatState> {
       }
       return null;
     } catch (e) {
+      debugPrint('================ CHAT CUBIT EXCEPTION ================');
       debugPrint('Create DM Error: $e');
+      debugPrint('====================================================');
       return null;
     }
   }
@@ -585,8 +601,6 @@ class ChatCubit extends Cubit<ChatState> {
                 'method': 'write',
                 'args': [[myMemberId], {
                   'seen_message_id': newestId,
-                  'fetched_message_id': newestId,
-                  'message_unread_counter': 0,
                 }],
                 'kwargs': {},
               });
@@ -606,14 +620,16 @@ class ChatCubit extends Cubit<ChatState> {
 
       emit(state.copyWith(
         status: ChatStatus.loaded,
-        activeMessages: messages.reversed.toList(),
+        activeMessages: messages,
         currentChatId: channelId.toString(),
         partnerLastSeenMessageId: partnerLastSeenId,
       ));
 
       if (!quiet) await fetchChannels();
     } catch (e) {
-      debugPrint('ChatCubit: Fetch Messages Error: $e');
+      debugPrint('================ CHAT CUBIT EXCEPTION (Fetch Messages) ================');
+      debugPrint('Fetch Messages Error: $e');
+      debugPrint('====================================================');
       emit(state.copyWith(status: ChatStatus.loaded));
     }
   }
@@ -689,9 +705,12 @@ class ChatCubit extends Cubit<ChatState> {
 
       final result = await client.callKw({
         'model': 'ir.attachment',
-        'method': 'read',
-        'args': [[attachmentId], ['datas']],
-        'kwargs': {'context': {'bin_size': false}},
+        'method': 'search_read',
+        'args': [[['id', '=', attachmentId]]],
+        'kwargs': {
+          'fields': ['datas'],
+          'context': {'bin_size': false}
+        },
       });
 
       if (result != null && (result as List).isNotEmpty) {
@@ -701,8 +720,10 @@ class ChatCubit extends Cubit<ChatState> {
             final cleanedDatas = datas.trim().replaceAll(RegExp(r'\s+'), '');
             final actualBase64 = cleanedDatas.contains(',') ? cleanedDatas.split(',').last : cleanedDatas;
             final bytes = base64Decode(actualBase64);
-            _attachmentCache[attachmentId] = bytes;
-            return bytes;
+            if (bytes.isNotEmpty) {
+              _attachmentCache[attachmentId] = bytes;
+              return bytes;
+            }
           } catch (e) {
             debugPrint('ChatCubit: Base64 decode failed for attachment $attachmentId: $e');
             return null;
@@ -739,16 +760,24 @@ class ChatCubit extends Cubit<ChatState> {
         .trim();
   }
 
-  DateTime? _parseOdooDate(String? dateStr) {
-    if (dateStr == null || dateStr == "false" || dateStr.isEmpty) return null;
+  DateTime? _parseOdooDate(dynamic dateRaw) {
+    if (dateRaw == null || dateRaw == false || dateRaw == "false" || dateRaw.toString().isEmpty) return null;
+    String dateStr = dateRaw.toString();
     try {
       String normalized = dateStr.trim();
       if (!normalized.contains('T')) normalized = normalized.replaceFirst(' ', 'T');
       if (!normalized.endsWith('Z') && !normalized.contains('+')) normalized = '${normalized}Z';
       return DateTime.parse(normalized).toLocal();
     } catch (e) {
-      return DateTime.tryParse(dateStr!)?.toLocal();
+      return DateTime.tryParse(dateStr)?.toLocal();
     }
+  }
+
+  void clearData() {
+    _channelReadTimestamps.clear();
+    _attachmentCache.clear();
+    _pollingTimer?.cancel();
+    emit(const ChatState());
   }
 
   @override

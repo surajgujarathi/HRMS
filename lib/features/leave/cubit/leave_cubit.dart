@@ -10,6 +10,10 @@ import 'package:odoo_rpc/odoo_rpc.dart';
 class LeaveCubit extends Cubit<LeaveState> {
   LeaveCubit() : super(const LeaveState());
 
+  void clearData() {
+    emit(const LeaveState());
+  }
+
   Future<void> fetchLeavesAndTypes() async {
     if (isClosed) return;
     emit(state.copyWith(status: LeaveStatus.loading));

@@ -7,6 +7,7 @@ import 'package:flutter_app/features/leave/cubit/leave_state.dart';
 import 'package:flutter_app/features/leave/models/leave_type_model.dart';
 import 'package:flutter_app/core/constants/app_colors.dart';
 import 'package:flutter_app/l10n/app_localizations.dart';
+import 'package:flutter_app/core/utils/responsive_util.dart';
 
 class ApplyLeaveScreen extends StatefulWidget {
   const ApplyLeaveScreen({super.key});
@@ -117,31 +118,34 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
           builder: (context, state) {
             return Form(
               key: _formKey,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildSectionHeader(l10n.leave_type, Icons.category_outlined),
-                    const SizedBox(height: 12),
-                    _buildLeaveTypeSelector(state, l10n),
-                    
-                    const SizedBox(height: 32),
-                    _buildSectionHeader(l10n.date_duration, Icons.calendar_month_outlined),
-                    const SizedBox(height: 12),
-                    _buildDatePickerSection(l10n),
-                    
-                    const SizedBox(height: 24),
-                    _buildHalfDayToggle(l10n),
-                    
-                    const SizedBox(height: 32),
-                    _buildSectionHeader(l10n.additional_details, Icons.description_outlined),
-                    const SizedBox(height: 12),
-                    _buildDescriptionField(l10n),
-                    
-                    const SizedBox(height: 48),
-                    _buildSubmitButton(context, state, l10n),
-                  ],
+              child: ResponsiveUtil.buildConstrained(
+                context,
+                SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionHeader(l10n.leave_type, Icons.category_outlined),
+                      const SizedBox(height: 12),
+                      _buildLeaveTypeSelector(state, l10n),
+                      
+                      const SizedBox(height: 32),
+                      _buildSectionHeader(l10n.date_duration, Icons.calendar_month_outlined),
+                      const SizedBox(height: 12),
+                      _buildDatePickerSection(l10n),
+                      
+                      const SizedBox(height: 24),
+                      _buildHalfDayToggle(l10n),
+                      
+                      const SizedBox(height: 32),
+                      _buildSectionHeader(l10n.additional_details, Icons.description_outlined),
+                      const SizedBox(height: 12),
+                      _buildDescriptionField(l10n),
+                      
+                      const SizedBox(height: 48),
+                      _buildSubmitButton(context, state, l10n),
+                    ],
+                  ),
                 ),
               ),
             );

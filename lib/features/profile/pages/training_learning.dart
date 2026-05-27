@@ -431,7 +431,7 @@ class CourseDetailsPage extends StatelessWidget {
       padding: const EdgeInsets.all(15),
 
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant ?? Theme.of(context).dividerColor.withOpacity(0.1),
+        color: Theme.of(context).colorScheme.surfaceVariant,
         borderRadius: BorderRadius.circular(12),
       ),
 

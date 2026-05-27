@@ -41,21 +41,21 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) {
+      builder: (sheetContext) {
         String searchQuery = "";
-        final l10n = AppLocalizations.of(context)!;
+        final l10n = AppLocalizations.of(sheetContext)!;
         return StatefulBuilder(
-          builder: (context, setModalState) {
+          builder: (builderContext, setModalState) {
             final filteredContacts = allContacts.where((c) {
               final name = (c['name'] ?? '').toString().toLowerCase();
               return name.contains(searchQuery.toLowerCase());
             }).toList();
 
-            final isDark = Theme.of(context).brightness == Brightness.dark;
+            final isDark = Theme.of(builderContext).brightness == Brightness.dark;
             return Container(
-              height: MediaQuery.of(context).size.height * 0.85,
+              height: MediaQuery.of(builderContext).size.height * 0.85,
               decoration: BoxDecoration(
-                color: isDark ? Theme.of(context).colorScheme.surface : Colors.white,
+                color: isDark ? Theme.of(builderContext).colorScheme.surface : Colors.white,
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
               ),
               child: Column(
@@ -78,13 +78,13 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: Theme.of(builderContext).colorScheme.onSurface,
                             letterSpacing: -0.5,
                           ),
                         ),
                         const Spacer(),
                         IconButton(
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () => Navigator.pop(builderContext),
                           icon: Icon(Icons.close_rounded, color: Colors.grey.shade400),
                         ),
                       ],
@@ -128,8 +128,8 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
                         : ListView.separated(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                             itemCount: filteredContacts.length,
-                            separatorBuilder: (context, index) => const SizedBox(height: 4),
-                            itemBuilder: (context, index) {
+                            separatorBuilder: (listContext, index) => const SizedBox(height: 4),
+                            itemBuilder: (listContext, index) {
                               final contact = filteredContacts[index];
                               return ListTile(
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -148,13 +148,13 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
                                 onTap: () async {
                                   final partnerId = contact['id'];
                                   if (partnerId != null) {
-                                    Navigator.pop(context); // Close sheet
+                                    Navigator.pop(builderContext); // Close sheet
                                     final ChatChannel? channel = await context.read<ChatCubit>().createDirectMessage(partnerId);
                                     if (channel != null && mounted) {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => ChatDetailScreen(channel: channel),
+                                          builder: (navContext) => ChatDetailScreen(channel: channel),
                                         ),
                                       ).then((_) {
                                         if (mounted) {
@@ -180,7 +180,10 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
   Widget _buildContactAvatar(dynamic imageBase64) {
     if (imageBase64 is String && imageBase64 != "false" && imageBase64.isNotEmpty) {
       try {
-        final bytes = base64Decode(imageBase64.trim());
+        final cleanedDatas = imageBase64.trim().replaceAll(RegExp(r'\s+'), '');
+        final actualBase64 = cleanedDatas.contains(',') ? cleanedDatas.split(',').last : cleanedDatas;
+        final bytes = base64Decode(actualBase64);
+        if (bytes.isEmpty) throw 'Empty image data';
         return CircleAvatar(
           radius: 20,
           child: ClipOval(
@@ -307,7 +310,7 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
         return RefreshIndicator(
           onRefresh: () => context.read<ChatCubit>().fetchChannels(),
           child: ListView.builder(
-            padding: const EdgeInsets.symmetric(vertical: 12),
+            padding: const EdgeInsets.only(top: 12, bottom: 120),
             itemCount: items.length,
             // FIX: Use ValueKey with channel ID so Flutter ALWAYS maps
             // the correct widget to the correct channel — prevents wrong chat opening.
@@ -473,7 +476,10 @@ class _ChannelTile extends StatelessWidget {
   Widget _buildAvatar(BuildContext context) {
     if (channel.image != null && channel.image != "false" && channel.image!.isNotEmpty) {
       try {
-        final bytes = base64Decode(channel.image!.trim());
+        final cleanedDatas = channel.image!.trim().replaceAll(RegExp(r'\s+'), '');
+        final actualBase64 = cleanedDatas.contains(',') ? cleanedDatas.split(',').last : cleanedDatas;
+        final bytes = base64Decode(actualBase64);
+        if (bytes.isEmpty) throw 'Empty image data';
         return CircleAvatar(
           radius: 28,
           child: ClipOval(

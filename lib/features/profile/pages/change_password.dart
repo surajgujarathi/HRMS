@@ -4,6 +4,7 @@ import 'package:flutter_app/core/widget/custome_textfield.dart';
 import 'package:flutter_app/features/profile/cubit/change_password_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_app/l10n/app_localizations.dart';
+import 'package:flutter_app/core/utils/responsive_util.dart';
 import 'package:flutter_app/routes.dart';
 
 class ChangePasswordPage extends StatefulWidget {
@@ -127,9 +128,12 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             children: [
               _buildHeader(context, l10n),
               Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(24),
-                  child: _buildForm(context, l10n),
+                child: ResponsiveUtil.buildConstrained(
+                  context,
+                  SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: _buildForm(context, l10n),
+                  ),
                 ),
               ),
             ],

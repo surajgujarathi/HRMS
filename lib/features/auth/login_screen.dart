@@ -9,6 +9,7 @@ import 'package:flutter_app/features/auth/login/cubit/login_state.dart';
 import 'package:flutter_app/features/main/presentation/main_page.dart';
 import 'package:flutter_app/core/localization/locale_cubit.dart';
 import 'package:flutter_app/features/profile/cubit/profile_cubit.dart';
+import 'package:flutter_app/core/utils/responsive_util.dart';
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
@@ -82,8 +83,10 @@ class LoginScreen extends StatelessWidget {
 
             // 🚀 Main Scrollable Content
             Positioned.fill(
-              child: CustomScrollView(
-                physics: const BouncingScrollPhysics(),
+              child: ResponsiveUtil.buildConstrained(
+                context,
+                CustomScrollView(
+                  physics: const BouncingScrollPhysics(),
                 slivers: [
                   // Header Content
                   SliverToBoxAdapter(
@@ -228,13 +231,13 @@ class LoginScreen extends StatelessWidget {
                                   );
                                 },
                               ),
-                              TextButton(
-                                onPressed: () {},
-                                child: Text(
-                                  l10n.forgot_password,
-                                  style: const TextStyle(color: AppColors.brightBlue, fontWeight: FontWeight.w600),
-                                ),
-                              ),
+                              // TextButton(
+                              //   onPressed: () {},
+                              //   child: Text(
+                              //     l10n.forgot_password,
+                              //     style: const TextStyle(color: AppColors.brightBlue, fontWeight: FontWeight.w600),
+                              //   ),
+                              // ),
                             ],
                           ),
 
@@ -299,7 +302,7 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                ],
+          ]),
               ),
             ),
           ],

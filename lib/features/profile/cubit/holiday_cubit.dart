@@ -9,6 +9,10 @@ import 'holiday_state.dart';
 class HolidayCubit extends Cubit<HolidayState> {
   HolidayCubit() : super(HolidayInitial());
 
+  void clearData() {
+    emit(HolidayInitial());
+  }
+
   Future<void> fetchHolidays() async {
     emit(HolidayLoading());
 

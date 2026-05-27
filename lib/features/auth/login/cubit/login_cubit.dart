@@ -174,10 +174,23 @@ class LoginCubit extends Cubit<LoginState> {
       );
     } catch (e) {
       debugPrint('--- Login Process Failed: Unexpected Error ($e) ---');
+      
+      String errorMsg = "An unexpected error occurred. Please try again later.";
+      String errorStr = e.toString().toLowerCase();
+      
+      if (errorStr.contains('socketexception') || 
+          errorStr.contains('connection refused') || 
+          errorStr.contains('failed host lookup') || 
+          errorStr.contains('clientexception') ||
+          errorStr.contains('network') ||
+          errorStr.contains('timeout')) {
+        errorMsg = "Authentication server is currently unavailable. Please check your connection or try again later.";
+      }
+
       emit(
         state.copyWith(
           status: LoginStatus.failure,
-          errorMessage: "An error occurred: ${e.toString()}",
+          errorMessage: errorMsg,
         ),
       );
     } finally {
@@ -261,21 +274,19 @@ class LoginCubit extends Cubit<LoginState> {
 
   Future<void> _clearSessionData(SharedPref prefs) async {
     debugPrint('Clearing session data from SharedPref...');
-    await prefs.remove('session');
-    await prefs.remove('isLoggedIn');
-    await prefs.remove('employee_data');
-    await prefs.remove('employee_id');
-    await prefs.remove('profile_pic');
-    await prefs.remove('partner_id');
-    await prefs.remove('isInternalUser');
-    
-    // Do NOT remove rememberMe, saved_username, saved_password here,
-    // so they persist after logout for pre-filling the login screen.
-    
-    // Clear chat related data too if it exists
-    await prefs.remove('chat_server_url');
-    await prefs.remove('chat_db_name');
-    await prefs.remove('chat_username');
-    await prefs.remove('chat_password');
+    await Future.wait([
+      prefs.remove('session'),
+      prefs.remove('isLoggedIn'),
+      prefs.remove('employee_data'),
+      prefs.remove('employee_id'),
+      prefs.remove('profile_pic'),
+      prefs.remove('partner_id'),
+      prefs.remove('isInternalUser'),
+      prefs.remove('chat_server_url'),
+      prefs.remove('chat_db_name'),
+      prefs.remove('chat_username'),
+      prefs.remove('chat_password'),
+      prefs.remove('read_notification_ids'),
+    ]);
   }
 }

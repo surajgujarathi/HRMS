@@ -65,8 +65,10 @@ class ChatChannel extends Equatable {
 
     return ChatChannel(
       id: json['id'],
-      name: json['name'] ?? '',
-      displayName: json['display_name'] ?? '',
+      name: json['name'] is String ? json['name'] : '',
+      displayName: (json['display_name'] is String && json['display_name'].isNotEmpty) 
+          ? json['display_name'] 
+          : (json['name'] is String ? json['name'] : ''),
       type: type,
       memberCount: (json['channel_member_ids'] as List?)?.length ?? 0,
       image: json['image_128'] is String ? json['image_128'] : null,

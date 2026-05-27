@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/core/widget/custome_card.dart';
 import 'package:flutter_app/l10n/app_localizations.dart';
 import 'package:flutter_app/routes.dart';
+import 'package:flutter_app/core/utils/responsive_util.dart';
 class AttendanceActions extends StatelessWidget {
   const AttendanceActions({super.key});
 
@@ -51,17 +52,23 @@ class AttendanceActions extends StatelessWidget {
         'color': const Color(0xFF6C63FF),
         'routeName': Routes.events,
       },
+      {
+        'title': 'My Projects',
+        'icon': Icons.assignment_rounded,
+        'color': const Color(0xFF3F51B5), // AppColors.indigo equivalent
+        'routeName': Routes.projects,
+      },
     ];
 
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: actions.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: ResponsiveUtil.getCrossAxisCount(context, mobile: 2, tablet: 4),
         crossAxisSpacing: 14,
         mainAxisSpacing: 14,
-        childAspectRatio: 1.55,
+        childAspectRatio: ResponsiveUtil.isTablet(context) ? 1.2 : 1.55,
       ),
       itemBuilder: (context, index) {
         final action = actions[index];

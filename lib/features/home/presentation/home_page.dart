@@ -6,6 +6,11 @@ import 'package:flutter_app/features/home/presentation/feature_search_delegate.d
 import 'package:flutter_app/features/notifications/cubit/notification_cubit.dart';
 import 'package:flutter_app/features/profile/cubit/profile_cubit.dart';
 import 'package:flutter_app/features/auth/login/cubit/login_cubit.dart';
+import 'package:flutter_app/features/projects/cubit/projects_cubit.dart';
+import 'package:flutter_app/features/projects/cubit/project_tasks_cubit.dart';
+import 'package:flutter_app/features/leave/cubit/leave_cubit.dart';
+import 'package:flutter_app/features/events/cubit/event_cubit.dart';
+import 'package:flutter_app/features/profile/cubit/holiday_cubit.dart';
 import 'package:flutter_app/routes.dart';
 import 'package:flutter_app/core/utils/shared_pref.dart';
 import 'package:flutter_app/core/constants/app_colors.dart';
@@ -54,10 +59,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       });
     });
     
-    // CRITICAL: Initialize Chat background polling & WebSockets immediately at app launch
+    // CRITICAL: Initialize background data immediately at app launch
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         context.read<ChatCubit>().initChat();
+        context.read<NotificationCubit>().fetchNotifications();
+        context.read<ProjectsCubit>().fetchProjects();
+        context.read<LeaveCubit>().fetchLeavesAndTypes();
+        context.read<EventCubit>().fetchEvents();
+        context.read<HolidayCubit>().fetchHolidays();
       }
     });
   }
@@ -98,6 +108,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       {'title': l10n.job_details, 'route': Routes.jobdetails, 'icon': Icons.work},
       {'title': l10n.notifications, 'route': Routes.notifications, 'icon': Icons.notifications},
       {'title': l10n.events_list, 'route': Routes.events, 'icon': Icons.event_available},
+      {'title': 'Projects', 'route': Routes.projects, 'icon': Icons.assignment},
     ];
     
     final searchResults = _searchQuery.isEmpty 
@@ -337,13 +348,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       color: Theme.of(context).colorScheme.surface,
       offset: const Offset(0, 45),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      onSelected: (value) {
+      onSelected: (value) async {
         if (value == "profile") {
           Navigator.pushNamed(context, Routes.personalinf);
         } else if (value == "logout") {
-          context.read<ProfileCubit>().resetProfile();
-          context.read<LoginCubit>().logout();
+          await context.read<LoginCubit>().logout();
           if (context.mounted) {
+            context.read<ChatCubit>().clearData();
+            context.read<NotificationCubit>().clearData();
+            context.read<ProjectsCubit>().clearData();
+            context.read<ProjectTasksCubit>().clearData();
+            context.read<LeaveCubit>().clearData();
+            context.read<EventCubit>().clearData();
+            context.read<HolidayCubit>().clearData();
+            context.read<ProfileCubit>().resetProfile();
             Navigator.of(context).pushNamedAndRemoveUntil(Routes.login, (route) => false);
           }
         }

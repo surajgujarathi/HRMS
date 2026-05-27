@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/core/constants/app_images.dart';
 import 'package:flutter_app/core/widget/custome_appbar.dart';
-import 'package:flutter_app/features/home/widgets/anniversary.dart';
 import 'package:flutter_app/features/payroll/Salary_breakdown.dart';
 import 'package:flutter_app/features/payroll/payslip_current_month.dart';
 import 'package:flutter_app/features/payroll/recent_payslip_page.dart';
-import 'package:flutter_app/features/payroll/recent_payslips_months.dart';
 
 class PayrollScreen extends StatelessWidget {
   const PayrollScreen({super.key});

@@ -9,7 +9,6 @@ import 'package:flutter_app/features/profile/pages/holidays_calendar.dart';
 import 'package:flutter_app/features/profile/pages/job_details.dart';
 import 'package:flutter_app/features/profile/pages/language.dart';
 import 'package:flutter_app/features/profile/pages/leave_balance.dart';
-import 'package:flutter_app/features/profile/pages/notifications.dart';
 import 'package:flutter_app/features/profile/pages/perform_review.dart';
 import 'package:flutter_app/features/profile/pages/reimbursement_page.dart';
 import 'package:flutter_app/features/profile/pages/training_learning.dart';
@@ -17,7 +16,6 @@ import 'package:flutter_app/features/screens/ai_chat_bot_page.dart';
 import 'package:flutter_app/features/screens/company_cal.dart';
 import 'package:flutter_app/features/screens/doc_box_page.dart';
 import 'package:flutter_app/features/attendance/presentation/attendance_report.dart';
-import 'package:flutter_app/features/screens/leave_page.dart';
 import 'package:flutter_app/features/leave/presentation/leave_list_screen.dart';
 import 'package:flutter_app/features/leave/presentation/apply_leave_screen.dart';
 import 'package:flutter_app/features/maintenance/presentation/assigned_assets_page.dart';
@@ -26,9 +24,7 @@ import 'package:flutter_app/features/maintenance/presentation/new_equipment_page
 import 'package:flutter_app/features/events/presentation/events_list_page.dart';
 import 'package:flutter_app/features/events/presentation/event_details_page.dart';
 import 'package:flutter_app/features/events/models/event_model.dart';
-
-import 'package:flutter_app/features/events/cubit/event_cubit.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_app/features/projects/presentation/projects_page.dart';
 
 class Routes {
   Routes._();
@@ -59,6 +55,7 @@ class Routes {
   static String newEquipment = '/new-equipment';
   static const String events = "/events";
   static const String eventDetails = "/event-details";
+  static const String projects = "/projects";
   static Map<String, WidgetBuilder> getAll() {
     return {
       onboarding: (c) => const OnboardingScreen(),
@@ -67,7 +64,7 @@ class Routes {
       main: (c) => MainPage(),
       leaveList: (c) => const LeaveListScreen(),
       applyLeave: (c) => const ApplyLeaveScreen(),
-      leave: (c) => LeavePage(),
+     
       myPay: (c) => PayrollScreen(),
       inOutReport: (c) => InOutReportPage(),
       docbox: (c) => DocBoxPage(),
@@ -87,6 +84,7 @@ class Routes {
       newEquipment: (c) => const NewEquipmentPage(),
       events: (c) => const EventsListPage(),
       eventDetails: (c) => EventDetailsPage(event: ModalRoute.of(c)!.settings.arguments as EventModel),
+      projects: (c) => const ProjectsPage(),
     };
   }
 }

@@ -50,7 +50,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
+          0.0, // Since list is reversed, 0.0 is the bottom
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
@@ -61,22 +61,27 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   Future<void> _pickFiles() async {
     final result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
-      withData: true,
+      withData: false,
     );
 
     if (result != null) {
-      setState(() {
-        for (var file in result.files) {
-          if (file.bytes != null) {
-            _pendingAttachments.add(ChatAttachment(
-              id: 0,
-              name: file.name,
-              bytes: file.bytes!,
-              mimeType: lookupMimeType(file.name) ?? 'application/octet-stream',
-            ));
+      for (var file in result.files) {
+        if (file.path != null) {
+          try {
+            final bytes = await File(file.path!).readAsBytes();
+            setState(() {
+              _pendingAttachments.add(ChatAttachment(
+                id: 0,
+                name: file.name,
+                bytes: bytes,
+                mimeType: lookupMimeType(file.name) ?? 'application/octet-stream',
+              ));
+            });
+          } catch (e) {
+            debugPrint('Failed to read file: $e');
           }
         }
-      });
+      }
     }
   }
 
@@ -125,7 +130,9 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                 }
               },
               builder: (context, state) {
-                if (state.status == ChatStatus.loading && state.activeMessages.isEmpty) {
+                final isCurrentChat = state.currentChatId == widget.channel.id.toString();
+
+                if (!isCurrentChat || (state.status == ChatStatus.loading && state.activeMessages.isEmpty)) {
                   return const Center(child: CircularProgressIndicator(color: AppColors.indigo));
                 }
 
@@ -135,6 +142,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
                 return ListView.builder(
                   controller: _scrollController,
+                  reverse: true, // This makes it render from bottom-to-top like a real chat!
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                   itemCount: state.activeMessages.length,
                   itemBuilder: (context, index) {
@@ -219,7 +227,10 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   Widget _buildSmallAvatar() {
     if (widget.channel.image != null && widget.channel.image != "false" && widget.channel.image!.isNotEmpty) {
       try {
-        final bytes = base64Decode(widget.channel.image!.trim());
+        final cleanedDatas = widget.channel.image!.trim().replaceAll(RegExp(r'\s+'), '');
+        final actualBase64 = cleanedDatas.contains(',') ? cleanedDatas.split(',').last : cleanedDatas;
+        final bytes = base64Decode(actualBase64);
+        if (bytes.isEmpty) throw 'Empty image data';
         return CircleAvatar(
           radius: 18,
           child: ClipOval(
@@ -470,32 +481,54 @@ class _MessageBubble extends StatelessWidget {
   }
 
   Widget _buildImageAttachment(BuildContext context, ChatAttachment att) {
-    return GestureDetector(
-      onTap: () => _handleAttachmentClick(context, att),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          width: 200,
-          height: 200,
-          color: Colors.black.withOpacity(0.05),
-          child: FutureBuilder<Uint8List?>(
-            future: context.read<ChatCubit>().downloadAttachment(att.id),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)));
-              }
-              if (snapshot.hasData && snapshot.data != null) {
-                return Image.memory(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: 200,
+        height: 200,
+        color: Colors.black.withOpacity(0.05),
+        child: FutureBuilder<Uint8List?>(
+          future: context.read<ChatCubit>().downloadAttachment(att.id),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)));
+            }
+            if (snapshot.hasData && snapshot.data != null) {
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => Scaffold(
+                        backgroundColor: Colors.black,
+                        appBar: AppBar(
+                          backgroundColor: Colors.black,
+                          iconTheme: const IconThemeData(color: Colors.white),
+                          elevation: 0,
+                        ),
+                        body: Center(
+                          child: InteractiveViewer(
+                            child: Image.memory(snapshot.data!),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                child: Image.memory(
                   snapshot.data!,
                   width: 200,
                   height: 200,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => const Center(child: Icon(Icons.broken_image_rounded, color: Colors.grey)),
-                );
-              }
-              return const Center(child: Icon(Icons.image_rounded, color: Colors.grey));
-            },
-          ),
+                ),
+              );
+            }
+            return GestureDetector(
+              onTap: () => _handleAttachmentClick(context, att),
+              child: const Center(child: Icon(Icons.image_rounded, color: Colors.grey)),
+            );
+          },
         ),
       ),
     );
