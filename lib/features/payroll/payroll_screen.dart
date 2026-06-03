@@ -10,8 +10,9 @@ class PayrollScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+   final  isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F2FB),
+      backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
       appBar: CustomAppBar(
         title: 'Payroll',
         subtitle: 'View your salary details',

@@ -98,11 +98,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final List<Map<String, dynamic>> features = [
-      {'title': l10n.apply_leave, 'route': Routes.leave, 'icon': Icons.calendar_today},
+      
       {'title': l10n.my_pay, 'route': Routes.myPay, 'icon': Icons.payment},
       {'title': l10n.personal_information, 'route': Routes.personalinf, 'icon': Icons.person},
       {'title': l10n.attendance_report, 'route': Routes.inOutReport, 'icon': Icons.access_time},
-      {'title': l10n.company_calendar, 'route': Routes.companyCalendar, 'icon': Icons.event},
+      {'title': l10n.company_calendar, 'route': Routes.holidayCalendar, 'icon': Icons.event},
       {'title': l10n.ai_chat_bot, 'route': Routes.aichatbot, 'icon': Icons.chat},
       {'title': l10n.doc_box, 'route': Routes.docbox, 'icon': Icons.folder},
       {'title': l10n.job_details, 'route': Routes.jobdetails, 'icon': Icons.work},
@@ -242,7 +242,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   ),
                 ),
                 _searchQuery.isEmpty ? SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 100), // Extra bottom padding for floating nav bar
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 20), // Extra bottom padding for floating nav bar
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
                       const CheckInOutCard(),

@@ -447,7 +447,7 @@ class _ChannelTile extends StatelessWidget {
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                          ),
+                          ), 
                         ),
                         if (channel.unreadCount > 0)
                           Container(

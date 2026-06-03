@@ -7,7 +7,7 @@ class FeatureSearchDelegate extends SearchDelegate<String?> {
     {'title': 'My Pay', 'route': Routes.myPay, 'icon': Icons.payment},
     {'title': 'Profile', 'route': Routes.personalinf, 'icon': Icons.person},
     {'title': 'Attendance Report', 'route': Routes.inOutReport, 'icon': Icons.access_time},
-    {'title': 'Company Calendar', 'route': Routes.companyCalendar, 'icon': Icons.event},
+    {'title': 'Company Calendar', 'route': Routes.holidayCalendar, 'icon': Icons.event},
     {'title': 'Chat Bot', 'route': Routes.aichatbot, 'icon': Icons.chat},
     {'title': 'Documents', 'route': Routes.docbox, 'icon': Icons.folder},
     {'title': 'Job Details', 'route': Routes.jobdetails, 'icon': Icons.work},

@@ -67,14 +67,14 @@
         navigationBarTheme: NavigationBarThemeData(
           backgroundColor: AppColors.white,
           indicatorColor: AppColors.primaryPurple.withOpacity(0.1),
-          iconTheme: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.selected)) {
+          iconTheme: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
               return const IconThemeData(color: AppColors.primaryPurple);
             }
             return const IconThemeData(color: AppColors.textGrey);
           }),
-          labelTextStyle: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.selected)) {
+          labelTextStyle: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
               return const TextStyle(color: AppColors.primaryPurple, fontWeight: FontWeight.bold);
             }
             return const TextStyle(color: AppColors.textGrey);
@@ -159,14 +159,14 @@
         navigationBarTheme: NavigationBarThemeData(
           backgroundColor: darkSurface,
           indicatorColor: AppColors.primaryPurple.withOpacity(0.2),
-          iconTheme: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.selected)) {
+          iconTheme: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
               return const IconThemeData(color: AppColors.primaryPurple);
             }
             return const IconThemeData(color: darkTextSecondary);
           }),
-          labelTextStyle: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.selected)) {
+          labelTextStyle: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
               return const TextStyle(color: AppColors.primaryPurple, fontWeight: FontWeight.bold);
             }
             return const TextStyle(color: darkTextSecondary);

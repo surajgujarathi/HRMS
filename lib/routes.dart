@@ -38,7 +38,7 @@ class Routes {
   static String myPay = '/myPay';
   static String inOutReport = '/inout-report';
   static String docbox = '/docbox';
-  static String companyCalendar = '/companyCalendar';
+ 
   static String aichatbot = '/aichatbot';
   // profilepage
   static String jobdetails = '/jobdetails';
@@ -68,7 +68,6 @@ class Routes {
       myPay: (c) => PayrollScreen(),
       inOutReport: (c) => InOutReportPage(),
       docbox: (c) => DocBoxPage(),
-      companyCalendar: (c) => CompanyCalendarPage(),
       aichatbot: (c) => AiChatBotPage(),
       jobdetails: (c) => JobDetailsPage(),
       personalinf: (c) => const ProfileFullDetailsPage(),
