@@ -194,7 +194,7 @@ class ChatCubit extends Cubit<ChatState> {
           'method': 'search_read',
           'args': [[['res_id', 'in', channelIds], ['model', '=', 'discuss.channel']]],
           'kwargs': {
-            'fields': ['id', 'res_id', 'body', 'date'],
+            'fields': ['id', 'res_id', 'body', 'date', 'attachment_ids'],
             'order': 'date desc',
             'limit': 1000,
           },
@@ -204,9 +204,16 @@ class ChatCubit extends Cubit<ChatState> {
           final msgId = m['id'] as int? ?? 0;
           if (resId != null && msgId > 0) {
             if (!lastMessages.containsKey(resId)) {
+              var previewText = _stripHtml(m['body'] is String ? m['body'] : '');
+              if (previewText.isEmpty) {
+                final atts = m['attachment_ids'];
+                if (atts is List && atts.isNotEmpty) {
+                  previewText = '📷 Attachment';
+                }
+              }
               lastMessages[resId] = {
                 'id': msgId,
-                'body': _stripHtml(m['body'] is String ? m['body'] : ''),
+                'body': previewText,
                 'date': m['date']
               };
             }

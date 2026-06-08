@@ -1,3 +1,4 @@
+import 'package:shimmer/shimmer.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -133,7 +134,36 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                 final isCurrentChat = state.currentChatId == widget.channel.id.toString();
 
                 if (!isCurrentChat || (state.status == ChatStatus.loading && state.activeMessages.isEmpty)) {
-                  return const Center(child: CircularProgressIndicator(color: AppColors.indigo));
+                  final isDark = Theme.of(context).brightness == Brightness.dark;
+                  return Shimmer.fromColors(
+                    baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+                    highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
+                    child: ListView.builder(
+                      reverse: true,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                      itemCount: 8,
+                      itemBuilder: (context, index) {
+                        final isMe = index % 2 == 0;
+                        return Align(
+                          alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                          child: Container(
+                            height: 60,
+                            width: MediaQuery.of(context).size.width * 0.55,
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                topLeft: const Radius.circular(20),
+                                topRight: const Radius.circular(20),
+                                bottomLeft: Radius.circular(isMe ? 20 : 0),
+                                bottomRight: Radius.circular(isMe ? 0 : 20),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
                 }
 
                 if (state.activeMessages.isEmpty && state.status == ChatStatus.loaded) {
@@ -491,7 +521,15 @@ class _MessageBubble extends StatelessWidget {
           future: context.read<ChatCubit>().downloadAttachment(att.id),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)));
+              return Shimmer.fromColors(
+                baseColor: Colors.grey[400]!,
+                highlightColor: Colors.grey[200]!,
+                child: Container(
+                  width: 200,
+                  height: 200,
+                  color: Colors.white,
+                ),
+              );
             }
             if (snapshot.hasData && snapshot.data != null) {
               return GestureDetector(

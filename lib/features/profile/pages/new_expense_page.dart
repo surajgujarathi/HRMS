@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter_app/features/profile/cubit/expense_cubit.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class NewExpensePage extends StatefulWidget {
   const NewExpensePage({super.key});
@@ -60,11 +61,12 @@ class _NewExpensePageState extends State<NewExpensePage> {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<ExpenseCubit>();
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text("New Expense", style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
+        title: Text(l10n.new_expense, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onSurface),
@@ -76,21 +78,21 @@ class _NewExpensePageState extends State<NewExpensePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionTitle("General Information"),
+              _buildSectionTitle(l10n.general_information),
               const SizedBox(height: 15),
               
               _buildTextField(
                 controller: _nameController,
-                label: "Description (Expense Title)",
+                label: l10n.expense_title,
                 hint: "e.g. Office Supplies",
                 icon: Icons.description_outlined,
-                validator: (val) => val == null || val.isEmpty ? "Required" : null,
+                validator: (val) => val == null || val.isEmpty ? l10n.required_field : null,
               ),
               
               const SizedBox(height: 15),
               
               _buildDropdown(
-                label: "Category",
+                label: l10n.category,
                 value: _selectedProductId,
                 items: cubit.products.map((p) => DropdownMenuItem(
                   value: p['id'] as int,
@@ -101,7 +103,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
               ),
 
               const SizedBox(height: 25),
-              _buildSectionTitle("Amount & Taxes"),
+              _buildSectionTitle(l10n.amount_taxes),
               const SizedBox(height: 15),
 
               Row(
@@ -110,18 +112,18 @@ class _NewExpensePageState extends State<NewExpensePage> {
                     flex: 2,
                     child: _buildTextField(
                       controller: _amountController,
-                      label: "Total Amount",
+                      label: l10n.total_amount,
                       hint: "0.00",
                       keyboardType: TextInputType.number,
                       icon: Icons.payments_outlined,
-                      validator: (val) => val == null || val.isEmpty ? "Required" : null,
+                      validator: (val) => val == null || val.isEmpty ? l10n.required_field : null,
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     flex: 1,
                     child: _buildDropdown(
-                      label: "Currency",
+                      label: l10n.currency,
                       value: _selectedCurrencyId,
                       items: cubit.currencies.map((c) => DropdownMenuItem(
                         value: c['id'] as int,
@@ -141,22 +143,22 @@ class _NewExpensePageState extends State<NewExpensePage> {
 
               _buildTextField(
                 controller: _taxAmountController,
-                label: "Tax Amount",
+                label: l10n.tax_amount,
                 hint: "0.00",
                 keyboardType: TextInputType.number,
                 icon: Icons.receipt_long_outlined,
               ),
 
               const SizedBox(height: 25),
-              _buildSectionTitle("Payment & Date"),
+              _buildSectionTitle(l10n.payment_date),
               const SizedBox(height: 15),
 
               _buildDropdown(
-                label: "Paid By",
+                label: l10n.paid_by,
                 value: _selectedPaymentMode,
-                items: const [
-                  DropdownMenuItem(value: 'own_account', child: Text("Employee (to reimburse)")),
-                  DropdownMenuItem(value: 'company_account', child: Text("Company")),
+                items: [
+                  DropdownMenuItem(value: 'own_account', child: Text(l10n.paid_by_employee)),
+                  DropdownMenuItem(value: 'company_account', child: Text(l10n.paid_by_company)),
                 ],
                 onChanged: (val) {
                   setState(() {
@@ -170,7 +172,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
               if (_selectedPaymentMode == 'company_account') ...[
                 const SizedBox(height: 15),
                 _buildDropdown(
-                  label: "Vendor",
+                  label: l10n.vendor,
                   value: _selectedVendorId,
                   items: cubit.vendors.map((v) => DropdownMenuItem(
                     value: v['id'] as int,
@@ -194,7 +196,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
                   if (picked != null) setState(() => _selectedDate = picked);
                 },
                 child: _buildFakeField(
-                  label: "Expense Date",
+                  label: l10n.expense_date,
                   value: DateFormat('yyyy-MM-dd').format(_selectedDate),
                   icon: Icons.calendar_today_outlined,
                 ),
@@ -204,23 +206,23 @@ class _NewExpensePageState extends State<NewExpensePage> {
 
               _buildTextField(
                 controller: _notesController,
-                label: "Internal Notes",
+                label: l10n.internal_notes,
                 hint: "Add notes...",
                 maxLines: 3,
                 icon: Icons.note_alt_outlined,
               ),
 
               const SizedBox(height: 25),
-              _buildSectionTitle("Supporting Documents"),
+              _buildSectionTitle(l10n.supporting_documents),
               const SizedBox(height: 15),
 
               InkWell(
                 onTap: _pickFile,
                 child: _buildFakeField(
-                  label: "Attach Receipt / Bill",
+                  label: l10n.attach_receipt,
                   value: _selectedFile != null 
                       ? _selectedFile!.path.split(Platform.pathSeparator).last 
-                      : "No file selected",
+                      : l10n.no_file_selected,
                   icon: Icons.attach_file_outlined,
                 ),
               ),
@@ -237,9 +239,9 @@ class _NewExpensePageState extends State<NewExpensePage> {
                     elevation: 0,
                   ),
                   onPressed: _submitForm,
-                  child: const Text(
-                    "CREATE EXPENSE",
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                  child: Text(
+                    l10n.create_expense,
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ),
               ),
@@ -252,8 +254,9 @@ class _NewExpensePageState extends State<NewExpensePage> {
   }
 
   Widget _buildTaxSelector(ExpenseCubit cubit) {
+    final l10n = AppLocalizations.of(context)!;
     return _buildDropdown<int>(
-      label: "Included Taxes",
+      label: l10n.included_taxes,
       value: _selectedTaxIds.isNotEmpty ? _selectedTaxIds.first : null,
       items: cubit.taxes.map((t) => DropdownMenuItem(
         value: t['id'] as int,
@@ -390,16 +393,17 @@ class _NewExpensePageState extends State<NewExpensePage> {
   }
 
   void _submitForm() {
+    final l10n = AppLocalizations.of(context)!;
     debugPrint('Submitting Expense Form...');
     if (_formKey.currentState!.validate()) {
       if (_selectedProductId == null) {
         debugPrint('Validation Failed: Category not selected');
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select a category"), backgroundColor: Colors.orange));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.please_select_category), backgroundColor: Colors.orange));
         return;
       }
       if (_selectedCurrencyId == null) {
         debugPrint('Validation Failed: Currency not selected');
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select a currency"), backgroundColor: Colors.orange));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.please_select_currency), backgroundColor: Colors.orange));
         return;
       }
 
@@ -421,7 +425,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
       final expenseCubit = context.read<ExpenseCubit>();
       
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Creating expense..."), duration: Duration(seconds: 1)),
+        SnackBar(content: Text(l10n.creating_expense), duration: const Duration(seconds: 1)),
       );
 
       expenseCubit.addExpense(data, file: _selectedFile).then((success) {
@@ -429,7 +433,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
           debugPrint('Expense added successfully.');
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Expense created successfully"), backgroundColor: Colors.green),
+            SnackBar(content: Text(l10n.expense_created_success), backgroundColor: Colors.green),
           );
         } else {
           final errorState = expenseCubit.state;
@@ -445,8 +449,8 @@ class _NewExpensePageState extends State<NewExpensePage> {
     } else {
       debugPrint('Form Validation Failed');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please fill in all required fields correctly"),
+        SnackBar(
+          content: Text(l10n.fill_required_fields),
           backgroundColor: Colors.redAccent,
         ),
       );

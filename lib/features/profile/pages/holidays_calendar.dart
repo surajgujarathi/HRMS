@@ -1,3 +1,4 @@
+import 'package:shimmer/shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -44,7 +45,55 @@ class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
             child: BlocBuilder<HolidayCubit, HolidayState>(
               builder: (context, state) {
                 if (state is HolidayLoading || state is HolidayInitial) {
-                  return const Center(child: CircularProgressIndicator(color: AppColors.primaryPurple));
+                  final isDark = Theme.of(context).brightness == Brightness.dark;
+                  return Shimmer.fromColors(
+                    baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+                    highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
+                    child: SingleChildScrollView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 280,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          Container(
+                            height: 48,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          Container(
+                            height: 20,
+                            width: 150,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Container(
+                            height: 80,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
                 } else if (state is HolidayError) {
                   return Center(child: Text("Error: ${state.message}"));
                 } else if (state is HolidayLoaded) {

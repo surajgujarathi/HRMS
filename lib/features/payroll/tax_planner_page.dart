@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/core/constants/app_colors.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class TaxPlannerPage extends StatefulWidget {
   const TaxPlannerPage({super.key});
@@ -66,10 +67,11 @@ class _TaxPlannerPageState extends State<TaxPlannerPage> {
   /// ---------------- UI ----------------
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Tax Planner'),
+        title: Text(l10n.tax_planner),
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
       ),
@@ -79,14 +81,14 @@ class _TaxPlannerPageState extends State<TaxPlannerPage> {
           children: [
             _card(
               context: context,
-              title: 'Tax Regime',
+              title: l10n.tax_regime,
               child: DropdownButtonFormField(
                 value: regime,
                 dropdownColor: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
                 style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-                items: const [
-                  DropdownMenuItem(value: 'Old', child: Text('Old Regime')),
-                  DropdownMenuItem(value: 'New', child: Text('New Regime')),
+                items: [
+                  DropdownMenuItem(value: 'Old', child: Text(l10n.old_regime)),
+                  DropdownMenuItem(value: 'New', child: Text(l10n.new_regime)),
                 ],
                 onChanged: (v) => setState(() => regime = v!),
                 decoration: InputDecoration(
@@ -98,8 +100,8 @@ class _TaxPlannerPageState extends State<TaxPlannerPage> {
 
             _card(
               context: context,
-              title: 'Salary Details',
-              child: _input(context, 'Annual CTC', ctcCtrl),
+              title: l10n.salary_details,
+              child: _input(context, l10n.annual_ctc, ctcCtrl),
             ),
 
             if (regime == 'Old') ...[
@@ -108,18 +110,18 @@ class _TaxPlannerPageState extends State<TaxPlannerPage> {
                 title: 'HRA',
                 child: Column(
                   children: [
-                    _input(context, 'HRA Received', hraCtrl),
-                    _input(context, 'Rent Paid (Yearly)', rentCtrl),
+                    _input(context, l10n.hra_received, hraCtrl),
+                    _input(context, l10n.rent_paid_yearly, rentCtrl),
                   ],
                 ),
               ),
               _card(
                 context: context,
-                title: 'Deductions',
+                title: l10n.deductions,
                 child: Column(
                   children: [
-                    _input(context, 'Section 80C', sec80cCtrl),
-                    _input(context, 'Section 80D', sec80dCtrl),
+                    _input(context, l10n.section_80c, sec80cCtrl),
+                    _input(context, l10n.section_80d, sec80dCtrl),
                   ],
                 ),
               ),
@@ -139,14 +141,14 @@ class _TaxPlannerPageState extends State<TaxPlannerPage> {
                   ),
                 ),
                 onPressed: calculateTax,
-                child: const Text('Calculate Tax', style: TextStyle(fontWeight: FontWeight.bold)),
+                child: Text(l10n.calculate_tax, style: const TextStyle(fontWeight: FontWeight.bold)),
               ),
             ),
 
             const SizedBox(height: 20),
 
-            _resultTile(context, 'Yearly Tax', '₹${yearlyTax.toStringAsFixed(0)}'),
-            _resultTile(context, 'Monthly TDS', '₹${monthlyTds.toStringAsFixed(0)}'),
+            _resultTile(context, l10n.yearly_tax, '₹${yearlyTax.toStringAsFixed(0)}'),
+            _resultTile(context, l10n.monthly_tds, '₹${monthlyTds.toStringAsFixed(0)}'),
           ],
         ),
       ),

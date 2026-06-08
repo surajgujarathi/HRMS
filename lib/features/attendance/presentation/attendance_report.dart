@@ -1,3 +1,4 @@
+import 'package:shimmer/shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/core/constants/app_colors.dart';
 import 'package:flutter_app/features/attendance/cubit/attendance_report_cubit.dart';
@@ -26,7 +27,23 @@ class InOutReportPage extends StatelessWidget {
                 builder: (context, state) {
                   // Show loading spinner while fetching data
                   if (state.status == ReportStatus.loading) {
-                    return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColor));
+                    final isDark = Theme.of(context).brightness == Brightness.dark;
+                    return Shimmer.fromColors(
+                      baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+                      highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(20),
+                        itemCount: 4,
+                        itemBuilder: (context, index) => Container(
+                          height: 120,
+                          margin: const EdgeInsets.only(bottom: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
+                    );
                   }
                   
                   // Show empty state if no records exist for the selected range

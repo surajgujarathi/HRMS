@@ -25,6 +25,8 @@ import 'package:flutter_app/features/events/presentation/events_list_page.dart';
 import 'package:flutter_app/features/events/presentation/event_details_page.dart';
 import 'package:flutter_app/features/events/models/event_model.dart';
 import 'package:flutter_app/features/projects/presentation/projects_page.dart';
+import 'package:flutter_app/features/payroll/presentation/it_declaration_page.dart';
+import 'package:flutter_app/features/payroll/presentation/tax_regime_comparison_page.dart';
 
 class Routes {
   Routes._();
@@ -56,6 +58,8 @@ class Routes {
   static const String events = "/events";
   static const String eventDetails = "/event-details";
   static const String projects = "/projects";
+  static String itDeclarations = '/it-declarations';
+  static String taxComparison = '/tax-comparison';
   static Map<String, WidgetBuilder> getAll() {
     return {
       onboarding: (c) => const OnboardingScreen(),
@@ -84,6 +88,8 @@ class Routes {
       events: (c) => const EventsListPage(),
       eventDetails: (c) => EventDetailsPage(event: ModalRoute.of(c)!.settings.arguments as EventModel),
       projects: (c) => const ProjectsPage(),
+      itDeclarations: (c) => const ItDeclarationPage(),
+      taxComparison: (c) => const TaxRegimeComparisonPage(),
     };
   }
 }

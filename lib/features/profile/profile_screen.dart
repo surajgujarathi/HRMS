@@ -1,3 +1,4 @@
+import 'package:shimmer/shimmer.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/features/auth/login/cubit/login_cubit.dart';
@@ -36,7 +37,42 @@ class ProfileScreen extends StatelessWidget {
         builder: (context, state) {
           final l10n = AppLocalizations.of(context)!;
           if (state.status == ProfileStatus.loading) {
-            return const Center(child: CircularProgressIndicator());
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+            return Shimmer.fromColors(
+              baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+              highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
+                child: Column(
+                  children: [
+                    Container(
+                      height: 180,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: 4,
+                        padding: EdgeInsets.zero,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) => Container(
+                          height: 70,
+                          margin: const EdgeInsets.only(bottom: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
 
           final employee = state.employee;
@@ -433,7 +469,7 @@ class ProfileScreen extends StatelessWidget {
                                         context: context,
                                         builder: (dialogContext) => AlertDialog(
                                           title: Text(l10n.logout),
-                                          content: const Text('Are you sure you want to logout?'),
+                                          content: Text(l10n.logout_confirm_q),
                                           actions: [
                                             TextButton(
                                               onPressed: () => Navigator.of(dialogContext).pop(false),

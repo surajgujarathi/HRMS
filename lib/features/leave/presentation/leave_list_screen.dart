@@ -1,3 +1,4 @@
+import 'package:shimmer/shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_app/features/leave/cubit/leave_cubit.dart';
@@ -46,8 +47,70 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
                     physics: const AlwaysScrollableScrollPhysics(),
                     slivers: [
                       if (state.status == LeaveStatus.loading && state.leaves.isEmpty)
-                        const SliverFillRemaining(
-                          child: Center(child: CircularProgressIndicator(color: AppColors.indigo)),
+                        SliverFillRemaining(
+                          child: Shimmer.fromColors(
+                            baseColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey[800]! : Colors.grey[300]!,
+                            highlightColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[100]!,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    height: 20,
+                                    width: 140,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  GridView.builder(
+                                    shrinkWrap: true,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: 12,
+                                      mainAxisSpacing: 12,
+                                      childAspectRatio: 1.2,
+                                    ),
+                                    itemCount: 4,
+                                    itemBuilder: (context, index) => Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(24),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 32),
+                                  Container(
+                                    height: 20,
+                                    width: 120,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Expanded(
+                                    child: ListView.builder(
+                                      itemCount: 2,
+                                      padding: EdgeInsets.zero,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      itemBuilder: (context, index) => Container(
+                                        height: 100,
+                                        margin: const EdgeInsets.only(bottom: 16),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(24),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         )
                       else if (state.status == LeaveStatus.failure && state.leaves.isEmpty)
                         SliverFillRemaining(
@@ -84,7 +147,11 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
           ),
         ],
       ),
-      floatingActionButton: _buildFAB(context, l10n),
+      floatingActionButton: BlocBuilder<LeaveCubit, LeaveState>(
+        builder: (context, state) {
+          return _buildFAB(context, l10n, state);
+        },
+      ),
     );
   }
 
@@ -124,13 +191,19 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
     );
   }
 
-  Widget _buildFAB(BuildContext context, AppLocalizations l10n) {
+  Widget _buildFAB(BuildContext context, AppLocalizations l10n, LeaveState state) {
+    double totalRemaining = 0.0;
+    for (var t in state.leaveTypes) {
+      totalRemaining += t.remainingLeaves;
+    }
+    final bool hasNoLeaves = state.status == LeaveStatus.success && totalRemaining <= 0.0;
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.indigo.withOpacity(0.3),
+            color: (hasNoLeaves ? Colors.grey : AppColors.indigo).withOpacity(0.3),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -138,12 +211,22 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
       ),
       child: FloatingActionButton.extended(
         onPressed: () async {
+          if (hasNoLeaves) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("You don't have any leaves available."),
+                backgroundColor: Colors.redAccent,
+                duration: Duration(seconds: 3),
+              ),
+            );
+            return;
+          }
           final result = await Navigator.pushNamed(context, Routes.applyLeave);
           if (result == true && mounted) {
             context.read<LeaveCubit>().fetchLeavesAndTypes();
           }
         },
-        backgroundColor: AppColors.indigo,
+        backgroundColor: hasNoLeaves ? Colors.grey.shade400 : AppColors.indigo,
         icon: const Icon(Icons.add_rounded, color: Colors.white),
         label: Text(l10n.request_leave, 
           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 0.5)

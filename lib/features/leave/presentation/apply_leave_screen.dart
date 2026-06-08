@@ -1,3 +1,4 @@
+import 'package:shimmer/shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/core/utils/shared_pref.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -167,7 +168,19 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
 
   Widget _buildLeaveTypeSelector(LeaveState state, AppLocalizations l10n) {
     if (state.status == LeaveStatus.loading) {
-      return const Center(child: Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator(strokeWidth: 2)));
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+      return Shimmer.fromColors(
+        baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+        highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
+        child: Container(
+          height: 54,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+      );
     }
     return Container(
       decoration: BoxDecoration(

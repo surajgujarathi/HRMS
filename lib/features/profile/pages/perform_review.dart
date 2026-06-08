@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class PerformanceReviewPage extends StatelessWidget {
   PerformanceReviewPage({super.key});
@@ -44,10 +45,11 @@ class PerformanceReviewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text("Employee Performance Review", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+        title: Text(l10n.performance_review_title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -112,7 +114,7 @@ class PerformanceReviewPage extends StatelessWidget {
 
               // Performance Ratings
               Text(
-                "Performance Ratings",
+                l10n.performance_ratings,
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
               ),
               const SizedBox(height: 10),
@@ -144,7 +146,7 @@ class PerformanceReviewPage extends StatelessWidget {
 
               // Manager Comments
               Text(
-                "Manager's Comments",
+                l10n.managers_comments,
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
               ),
               const SizedBox(height: 10),
@@ -177,7 +179,7 @@ class PerformanceReviewPage extends StatelessWidget {
 
               // Review Summary
               Text(
-                "Review Summary",
+                l10n.review_summary,
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
               ),
               const SizedBox(height: 10),
@@ -194,14 +196,14 @@ class PerformanceReviewPage extends StatelessWidget {
                         children: [
                           Column(
                             children: [
-                              Text("Overall Rating", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                              Text(l10n.overall_rating_label, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                               const SizedBox(height: 4),
                               buildStarRating(overallRating),
                             ],
                           ),
                           Column(
                             children: [
-                              Text("Goals Achieved", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                              Text(l10n.goals_achieved, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                               const SizedBox(height: 4),
                               Text(goalsAchieved, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                             ],
@@ -236,18 +238,18 @@ class PerformanceReviewPage extends StatelessWidget {
                   children: [
                     OutlinedButton(
                       onPressed: () {},
-                      child: const Text("Previous Reviews"),
+                      child: Text(l10n.previous_reviews),
                     ),
                     const SizedBox(width: 8),
                     OutlinedButton.icon(
                       onPressed: () {},
                       icon: const Icon(Icons.download),
-                      label: const Text("Download PDF"),
+                      label: Text(l10n.download_pdf),
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton(
                       onPressed: () {},
-                      child: const Text("Submit Review"),
+                      child: Text(l10n.submit_review),
                     ),
                   ],
                 ),

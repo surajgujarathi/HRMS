@@ -1110,4 +1110,125 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get additional_notes => 'Additional Notes';
+
+  @override
+  String get logout_confirm_q => 'Are you sure you want to logout?';
+
+  @override
+  String get download_payslip => 'Download Payslip';
+
+  @override
+  String payslip_downloaded(Object month) {
+    return '$month payslip downloaded';
+  }
+
+  @override
+  String get tax_regime => 'Tax Regime';
+
+  @override
+  String get old_regime => 'Old Regime';
+
+  @override
+  String get new_regime => 'New Regime';
+
+  @override
+  String get salary_details => 'Salary Details';
+
+  @override
+  String get annual_ctc => 'Annual CTC';
+
+  @override
+  String get hra_received => 'HRA Received';
+
+  @override
+  String get rent_paid_yearly => 'Rent Paid (Yearly)';
+
+  @override
+  String get deductions => 'Deductions';
+
+  @override
+  String get section_80c => 'Section 80C';
+
+  @override
+  String get section_80d => 'Section 80D';
+
+  @override
+  String get calculate_tax => 'Calculate Tax';
+
+  @override
+  String get yearly_tax => 'Yearly Tax';
+
+  @override
+  String get monthly_tds => 'Monthly TDS';
+
+  @override
+  String get no_deadline => 'No deadline';
+
+  @override
+  String get no_client => 'No client';
+
+  @override
+  String get unknown_manager => 'Unknown Manager';
+
+  @override
+  String get no_manager => 'No manager';
+
+  @override
+  String tasks_count(Object count) {
+    return '$count tasks';
+  }
+
+  @override
+  String get search_projects => 'Search projects...';
+
+  @override
+  String get no_projects_available => 'No projects available';
+
+  @override
+  String get no_users_assigned => 'No users assigned';
+
+  @override
+  String get low_priority => 'Low Priority';
+
+  @override
+  String get high_priority => 'High Priority';
+
+  @override
+  String get normal_priority => 'Normal';
+
+  @override
+  String get status_label => 'Status';
+
+  @override
+  String get hours_label => 'Hours';
+
+  @override
+  String get deadline_label => 'Deadline';
+
+  @override
+  String get description_label => 'Description';
+
+  @override
+  String get search_tasks => 'Search tasks...';
+
+  @override
+  String get no_tasks_in_project => 'No tasks in this project';
+
+  @override
+  String get paid_by_employee => 'Employee (to reimburse)';
+
+  @override
+  String get paid_by_company => 'Company';
+
+  @override
+  String get please_select_currency => 'Please select a currency';
+
+  @override
+  String get creating_expense => 'Creating expense...';
+
+  @override
+  String get tax_planner => 'Tax Planner';
+
+  @override
+  String get projects => 'Projects';
 }

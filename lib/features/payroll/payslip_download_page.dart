@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class PayslipDownloadPage extends StatelessWidget {
   final String month;
@@ -7,12 +8,13 @@ class PayslipDownloadPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        title: Text('Download Payslip', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+        title: Text(l10n.download_payslip, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.onSurface),
@@ -54,11 +56,11 @@ class PayslipDownloadPage extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('$month payslip downloaded')),
+                    SnackBar(content: Text(l10n.payslip_downloaded(month))),
                   );
                 },
                 icon: const Icon(Icons.download),
-                label: const Text('Download PDF'),
+                label: Text(l10n.download_pdf),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color.fromARGB(255, 156, 204, 223),
                   padding: const EdgeInsets.symmetric(

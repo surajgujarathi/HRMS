@@ -1,9 +1,11 @@
+import 'package:shimmer/shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_app/core/constants/app_colors.dart';
 import '../cubit/project_tasks_cubit.dart';
 import '../cubit/project_tasks_state.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class ProjectTasksPage extends StatefulWidget {
   final int projectId;
@@ -99,20 +101,20 @@ class _ProjectTasksPageState extends State<ProjectTasksPage> {
   //   }
   // }
 
-  String _formatDate(DateTime? date) {
-    if (date == null) return 'No deadline';
+  String _formatDate(DateTime? date, AppLocalizations l10n) {
+    if (date == null) return l10n.no_deadline;
     return DateFormat('dd MMM yyyy').format(date);
   }
 
-  Widget _buildAssignedUsers(List<int> userIds, List<Map<String, dynamic>> allUsers) {
+  Widget _buildAssignedUsers(List<int> userIds, List<Map<String, dynamic>> allUsers, AppLocalizations l10n) {
     if (userIds.isEmpty) {
-      return const Text('No users assigned', style: TextStyle(color: Colors.grey, fontSize: 13));
+      return Text(l10n.no_users_assigned, style: const TextStyle(color: Colors.grey, fontSize: 13));
     }
 
     final assignedUsers = allUsers.where((user) => userIds.contains(user['id'])).toList();
 
     if (assignedUsers.isEmpty) {
-      return const Text('No users assigned', style: TextStyle(color: Colors.grey, fontSize: 13));
+      return Text(l10n.no_users_assigned, style: const TextStyle(color: Colors.grey, fontSize: 13));
     }
 
     return Wrap(
@@ -147,14 +149,14 @@ class _ProjectTasksPageState extends State<ProjectTasksPage> {
     }
   }
 
-  String _getPriorityText(String priority) {
+  String _getPriorityText(String priority, AppLocalizations l10n) {
     switch (priority) {
       case '0':
-        return 'Low Priority';
+        return l10n.low_priority;
       case '1':
-        return 'High Priority';
+        return l10n.high_priority;
       default:
-        return 'Normal';
+        return l10n.normal_priority;
     }
   }
 
@@ -179,6 +181,7 @@ class _ProjectTasksPageState extends State<ProjectTasksPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.grey.shade50,
@@ -239,7 +242,7 @@ class _ProjectTasksPageState extends State<ProjectTasksPage> {
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
-                      hintText: 'Search tasks...',
+                      hintText: l10n.search_tasks,
                       prefixIcon: const Icon(Icons.search, color: Colors.grey),
                       filled: true,
                       fillColor: isDark ? Colors.grey.shade900 : Colors.white,
@@ -262,8 +265,23 @@ class _ProjectTasksPageState extends State<ProjectTasksPage> {
                 ),
               ),
               if (state.status == ProjectTasksStatus.loading && state.tasks.isEmpty)
-                const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator(color: AppColors.indigo)),
+                SliverFillRemaining(
+                  child: Shimmer.fromColors(
+                    baseColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey[800]! : Colors.grey[300]!,
+                    highlightColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[100]!,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      itemCount: 5,
+                      itemBuilder: (context, index) => Container(
+                        height: 90,
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                    ),
+                  ),
                 )
               else if (state.status == ProjectTasksStatus.error && state.tasks.isEmpty)
                 SliverFillRemaining(
@@ -278,7 +296,7 @@ class _ProjectTasksPageState extends State<ProjectTasksPage> {
                         Icon(Icons.task_outlined, size: 64, color: isDark ? Colors.grey.shade700 : Colors.grey.shade400),
                         const SizedBox(height: 16),
                         Text(
-                          _searchQuery.isNotEmpty ? 'No matches found' : 'No tasks in this project',
+                          _searchQuery.isNotEmpty ? l10n.no_contacts_found : l10n.no_tasks_in_project,
                           style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 18, fontWeight: FontWeight.w500)
                         ),
                       ],
@@ -337,11 +355,11 @@ class _ProjectTasksPageState extends State<ProjectTasksPage> {
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Text(
-                                        _getPriorityText(task.priority),
+                                        _getPriorityText(task.priority, l10n),
                                         style: TextStyle(color: _getPriorityColor(task.priority), fontSize: 12, fontWeight: FontWeight.w600),
                                       ),
                                     ),
-                                    _buildAssignedUsers(task.userIds, state.users),
+                                    _buildAssignedUsers(task.userIds, state.users, l10n),
                                   ],
                                 ),
                               ),
@@ -361,19 +379,19 @@ class _ProjectTasksPageState extends State<ProjectTasksPage> {
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          _buildInfoChip(Icons.linear_scale_rounded, 'Status', task.stageName ?? 'New'),
-                                          _buildInfoChip(Icons.timer_outlined, 'Hours', '${task.effectiveHours} / ${task.allocatedHours}'),
+                                          _buildInfoChip(Icons.linear_scale_rounded, l10n.status_label, task.stageName ?? 'New'),
+                                          _buildInfoChip(Icons.timer_outlined, l10n.hours_label, '${task.effectiveHours} / ${task.allocatedHours}'),
                                         ],
                                       ),
                                       const SizedBox(height: 12),
                                       if (task.dateDeadline != null)
-                                        _buildInfoChip(Icons.event_outlined, 'Deadline', _formatDate(DateTime.tryParse(task.dateDeadline!))),
+                                        _buildInfoChip(Icons.event_outlined, l10n.deadline_label, _formatDate(DateTime.tryParse(task.dateDeadline!), l10n)),
                                       
                                       if (task.description.isNotEmpty && task.description != 'false') ...[
                                         const SizedBox(height: 16),
-                                        const Text(
-                                          'Description',
-                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.indigo),
+                                        Text(
+                                          l10n.description_label,
+                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.indigo),
                                         ),
                                         const SizedBox(height: 8),
                                         Text(

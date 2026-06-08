@@ -1,3 +1,4 @@
+import 'package:shimmer/shimmer.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,6 +7,7 @@ import '../cubit/projects_cubit.dart';
 import '../cubit/projects_state.dart';
 import '../models/project_model.dart';
 import 'project_tasks_page.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class ProjectsPage extends StatefulWidget {
   const ProjectsPage({super.key});
@@ -39,8 +41,8 @@ class _ProjectsPageState extends State<ProjectsPage> {
     });
   }
 
-  String _formatDate(String? dateString) {
-    if (dateString == null) return 'No deadline';
+  String _formatDate(String? dateString, AppLocalizations l10n) {
+    if (dateString == null) return l10n.no_deadline;
     try {
       final date = DateTime.parse(dateString);
       return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
@@ -49,9 +51,9 @@ class _ProjectsPageState extends State<ProjectsPage> {
     }
   }
 
-  Widget _buildProjectCard(ProjectModel project) {
-    final partner = project.partnerName ?? 'No client';
-    final userName = project.userName ?? 'Unknown Manager';
+  Widget _buildProjectCard(ProjectModel project, AppLocalizations l10n) {
+    final partner = project.partnerName ?? l10n.no_client;
+    final userName = project.userName ?? l10n.unknown_manager;
 
     return Container(
       
@@ -145,7 +147,7 @@ class _ProjectsPageState extends State<ProjectsPage> {
                         const Icon(Icons.task_alt_rounded, size: 14, color: AppColors.brightBlue),
                         const SizedBox(width: 4),
                         Text(
-                          '${project.taskCount} tasks',
+                          l10n.tasks_count(project.taskCount),
                           style: const TextStyle(color: AppColors.brightBlue, fontWeight: FontWeight.bold, fontSize: 12),
                         ),
                       ],
@@ -169,7 +171,7 @@ class _ProjectsPageState extends State<ProjectsPage> {
                         ),
                       const SizedBox(width: 8),
                       Text(
-                        project.userId != null ? userName : 'No manager',
+                        project.userId != null ? userName : l10n.no_manager,
                         style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurface),
                       ),
                     ],
@@ -179,7 +181,7 @@ class _ProjectsPageState extends State<ProjectsPage> {
                       const Icon(Icons.calendar_today_rounded, size: 14, color: Colors.grey),
                       const SizedBox(width: 4),
                       Text(
-                        _formatDate(project.date),
+                        _formatDate(project.date, l10n),
                         style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 13, fontWeight: FontWeight.w500),
                       ),
                     ],
@@ -216,6 +218,7 @@ class _ProjectsPageState extends State<ProjectsPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
     
     return Scaffold(
       backgroundColor: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.grey.shade50,
@@ -253,9 +256,9 @@ class _ProjectsPageState extends State<ProjectsPage> {
                   child: FlexibleSpaceBar(
                     centerTitle: true,
                     titlePadding: const EdgeInsets.only(bottom: 16),
-                    title: const Text(
-                      'Projects',
-                      style: TextStyle(
+                    title: Text(
+                      l10n.projects,
+                      style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                         fontSize: 18,
@@ -287,7 +290,7 @@ class _ProjectsPageState extends State<ProjectsPage> {
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
-                      hintText: 'Search projects...',
+                      hintText: l10n.search_projects,
                       prefixIcon: const Icon(Icons.search, color: Colors.grey),
                       filled: true,
                       fillColor: isDark ? Colors.grey.shade900 : Colors.white,
@@ -310,8 +313,23 @@ class _ProjectsPageState extends State<ProjectsPage> {
                 ),
               ),
               if (state.status == ProjectsStatus.loading && state.projects.isEmpty)
-                const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator(color: AppColors.indigo)),
+                SliverFillRemaining(
+                  child: Shimmer.fromColors(
+                    baseColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey[800]! : Colors.grey[300]!,
+                    highlightColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[100]!,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      itemCount: 4,
+                      itemBuilder: (context, index) => Container(
+                        height: 120,
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                      ),
+                    ),
+                  ),
                 )
               else if (state.status == ProjectsStatus.error && state.projects.isEmpty)
                 SliverFillRemaining(
@@ -326,7 +344,7 @@ class _ProjectsPageState extends State<ProjectsPage> {
                         Icon(Icons.assignment_outlined, size: 64, color: Colors.grey.shade400),
                         const SizedBox(height: 16),
                         Text(
-                          _searchQuery.isNotEmpty ? 'No matches found' : 'No projects available',
+                          _searchQuery.isNotEmpty ? l10n.no_contacts_found : l10n.no_projects_available,
                           style: TextStyle(color: Colors.grey.shade600, fontSize: 16, fontWeight: FontWeight.w500),
                         ),
                       ],
@@ -339,7 +357,7 @@ class _ProjectsPageState extends State<ProjectsPage> {
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        return _buildProjectCard(filteredProjects[index]);
+                        return _buildProjectCard(filteredProjects[index], l10n);
                       },
                       childCount: filteredProjects.length,
                     ),

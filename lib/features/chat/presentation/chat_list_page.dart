@@ -1,3 +1,4 @@
+import 'package:shimmer/shimmer.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/core/constants/app_colors.dart';
@@ -273,7 +274,7 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
         ],
       ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 100.0), // Added padding to prevent overlap with bottom navigation bar
+        padding: const EdgeInsets.only(bottom: 140.0), // Added padding to prevent overlap with bottom navigation bar
         child: FloatingActionButton(
           onPressed: _showContactPicker,
           backgroundColor: AppColors.indigo,
@@ -296,9 +297,56 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
                prevItems != currItems;
       },
       builder: (context, state) {
-        // Only show full spinner on very first load (no data yet)
         if (state.status == ChatStatus.loading && state.channels.isEmpty && state.directMessages.isEmpty) {
-          return const Center(child: CircularProgressIndicator(color: AppColors.indigo));
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          return Shimmer.fromColors(
+            baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+            highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              itemCount: 6,
+              itemBuilder: (context, index) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 16,
+                            width: 120,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            height: 12,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
         }
 
         final items = type == ChannelType.channel ? state.channels : state.directMessages;

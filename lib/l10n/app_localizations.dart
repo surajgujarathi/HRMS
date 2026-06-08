@@ -2223,6 +2223,240 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Additional Notes'**
   String get additional_notes;
+
+  /// No description provided for @logout_confirm_q.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to logout?'**
+  String get logout_confirm_q;
+
+  /// No description provided for @download_payslip.
+  ///
+  /// In en, this message translates to:
+  /// **'Download Payslip'**
+  String get download_payslip;
+
+  /// No description provided for @payslip_downloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'{month} payslip downloaded'**
+  String payslip_downloaded(Object month);
+
+  /// No description provided for @tax_regime.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax Regime'**
+  String get tax_regime;
+
+  /// No description provided for @old_regime.
+  ///
+  /// In en, this message translates to:
+  /// **'Old Regime'**
+  String get old_regime;
+
+  /// No description provided for @new_regime.
+  ///
+  /// In en, this message translates to:
+  /// **'New Regime'**
+  String get new_regime;
+
+  /// No description provided for @salary_details.
+  ///
+  /// In en, this message translates to:
+  /// **'Salary Details'**
+  String get salary_details;
+
+  /// No description provided for @annual_ctc.
+  ///
+  /// In en, this message translates to:
+  /// **'Annual CTC'**
+  String get annual_ctc;
+
+  /// No description provided for @hra_received.
+  ///
+  /// In en, this message translates to:
+  /// **'HRA Received'**
+  String get hra_received;
+
+  /// No description provided for @rent_paid_yearly.
+  ///
+  /// In en, this message translates to:
+  /// **'Rent Paid (Yearly)'**
+  String get rent_paid_yearly;
+
+  /// No description provided for @deductions.
+  ///
+  /// In en, this message translates to:
+  /// **'Deductions'**
+  String get deductions;
+
+  /// No description provided for @section_80c.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 80C'**
+  String get section_80c;
+
+  /// No description provided for @section_80d.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 80D'**
+  String get section_80d;
+
+  /// No description provided for @calculate_tax.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate Tax'**
+  String get calculate_tax;
+
+  /// No description provided for @yearly_tax.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly Tax'**
+  String get yearly_tax;
+
+  /// No description provided for @monthly_tds.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly TDS'**
+  String get monthly_tds;
+
+  /// No description provided for @no_deadline.
+  ///
+  /// In en, this message translates to:
+  /// **'No deadline'**
+  String get no_deadline;
+
+  /// No description provided for @no_client.
+  ///
+  /// In en, this message translates to:
+  /// **'No client'**
+  String get no_client;
+
+  /// No description provided for @unknown_manager.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Manager'**
+  String get unknown_manager;
+
+  /// No description provided for @no_manager.
+  ///
+  /// In en, this message translates to:
+  /// **'No manager'**
+  String get no_manager;
+
+  /// No description provided for @tasks_count.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} tasks'**
+  String tasks_count(Object count);
+
+  /// No description provided for @search_projects.
+  ///
+  /// In en, this message translates to:
+  /// **'Search projects...'**
+  String get search_projects;
+
+  /// No description provided for @no_projects_available.
+  ///
+  /// In en, this message translates to:
+  /// **'No projects available'**
+  String get no_projects_available;
+
+  /// No description provided for @no_users_assigned.
+  ///
+  /// In en, this message translates to:
+  /// **'No users assigned'**
+  String get no_users_assigned;
+
+  /// No description provided for @low_priority.
+  ///
+  /// In en, this message translates to:
+  /// **'Low Priority'**
+  String get low_priority;
+
+  /// No description provided for @high_priority.
+  ///
+  /// In en, this message translates to:
+  /// **'High Priority'**
+  String get high_priority;
+
+  /// No description provided for @normal_priority.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get normal_priority;
+
+  /// No description provided for @status_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status_label;
+
+  /// No description provided for @hours_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Hours'**
+  String get hours_label;
+
+  /// No description provided for @deadline_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Deadline'**
+  String get deadline_label;
+
+  /// No description provided for @description_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get description_label;
+
+  /// No description provided for @search_tasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Search tasks...'**
+  String get search_tasks;
+
+  /// No description provided for @no_tasks_in_project.
+  ///
+  /// In en, this message translates to:
+  /// **'No tasks in this project'**
+  String get no_tasks_in_project;
+
+  /// No description provided for @paid_by_employee.
+  ///
+  /// In en, this message translates to:
+  /// **'Employee (to reimburse)'**
+  String get paid_by_employee;
+
+  /// No description provided for @paid_by_company.
+  ///
+  /// In en, this message translates to:
+  /// **'Company'**
+  String get paid_by_company;
+
+  /// No description provided for @please_select_currency.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a currency'**
+  String get please_select_currency;
+
+  /// No description provided for @creating_expense.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating expense...'**
+  String get creating_expense;
+
+  /// No description provided for @tax_planner.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax Planner'**
+  String get tax_planner;
+
+  /// No description provided for @projects.
+  ///
+  /// In en, this message translates to:
+  /// **'Projects'**
+  String get projects;
 }
 
 class _AppLocalizationsDelegate

@@ -1110,4 +1110,125 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get additional_notes => 'अतिरिक्त नोट्स';
+
+  @override
+  String get logout_confirm_q => 'क्या आप वाकई लॉगआउट करना चाहते हैं?';
+
+  @override
+  String get download_payslip => 'पेस्लिप डाउनलोड करें';
+
+  @override
+  String payslip_downloaded(Object month) {
+    return '$month पेस्लिप डाउनलोड हो गई';
+  }
+
+  @override
+  String get tax_regime => 'कर व्यवस्था';
+
+  @override
+  String get old_regime => 'पुरानी व्यवस्था';
+
+  @override
+  String get new_regime => 'नई व्यवस्था';
+
+  @override
+  String get salary_details => 'वेतन विवरण';
+
+  @override
+  String get annual_ctc => 'वार्षिक सीटीसी';
+
+  @override
+  String get hra_received => 'प्राप्त एचआरए';
+
+  @override
+  String get rent_paid_yearly => 'किराया भुगतान (वार्षिक)';
+
+  @override
+  String get deductions => 'कटौतियां';
+
+  @override
+  String get section_80c => 'धारा 80C';
+
+  @override
+  String get section_80d => 'धारा 80D';
+
+  @override
+  String get calculate_tax => 'कर की गणना करें';
+
+  @override
+  String get yearly_tax => 'वार्षिक कर';
+
+  @override
+  String get monthly_tds => 'मासिक टीडीएस';
+
+  @override
+  String get no_deadline => 'कोई समय सीमा नहीं';
+
+  @override
+  String get no_client => 'कोई ग्राहक नहीं';
+
+  @override
+  String get unknown_manager => 'अज्ञात प्रबंधक';
+
+  @override
+  String get no_manager => 'कोई प्रबंधक नहीं';
+
+  @override
+  String tasks_count(Object count) {
+    return '$count कार्य';
+  }
+
+  @override
+  String get search_projects => 'परियोजनाएं खोजें...';
+
+  @override
+  String get no_projects_available => 'कोई परियोजना उपलब्ध नहीं है';
+
+  @override
+  String get no_users_assigned => 'कोई उपयोगकर्ता नहीं सौंपा गया';
+
+  @override
+  String get low_priority => 'कम प्राथमिकता';
+
+  @override
+  String get high_priority => 'उच्च प्राथमिकता';
+
+  @override
+  String get normal_priority => 'सामान्य';
+
+  @override
+  String get status_label => 'स्थिति';
+
+  @override
+  String get hours_label => 'घंटे';
+
+  @override
+  String get deadline_label => 'समय सीमा';
+
+  @override
+  String get description_label => 'विवरण';
+
+  @override
+  String get search_tasks => ' कार्य खोजें...';
+
+  @override
+  String get no_tasks_in_project => 'इस परियोजना में कोई कार्य नहीं है';
+
+  @override
+  String get paid_by_employee => 'कर्मचारी (प्रतिपूर्ति के लिए)';
+
+  @override
+  String get paid_by_company => 'कंपनी';
+
+  @override
+  String get please_select_currency => 'कृपया एक मुद्रा चुनें';
+
+  @override
+  String get creating_expense => 'खर्च बनाया जा रहा है...';
+
+  @override
+  String get tax_planner => 'कर योजनाकार';
+
+  @override
+  String get projects => 'परियोजनाएं';
 }

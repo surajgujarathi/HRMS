@@ -1112,4 +1112,126 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get additional_notes => 'అదనపు గమనికలు';
+
+  @override
+  String get logout_confirm_q =>
+      'మీరు ఖచ్చితంగా లాగ్ అవుట్ చేయాలనుకుంటున్నారా?';
+
+  @override
+  String get download_payslip => 'పేస్లిప్ డౌన్‌లోడ్ చేయండి';
+
+  @override
+  String payslip_downloaded(Object month) {
+    return '$month పేస్లిప్ డౌన్‌లోడ్ చేయబడింది';
+  }
+
+  @override
+  String get tax_regime => 'పన్ను విధానం';
+
+  @override
+  String get old_regime => 'పాత పద్ధతి';
+
+  @override
+  String get new_regime => 'కొత్త పద్ధతి';
+
+  @override
+  String get salary_details => 'జీతం వివరాలు';
+
+  @override
+  String get annual_ctc => 'వార్షిక CTC';
+
+  @override
+  String get hra_received => 'HRA పొందింది';
+
+  @override
+  String get rent_paid_yearly => 'చెల్లించిన అద్దె (వార్షిక)';
+
+  @override
+  String get deductions => 'మినహాయింపులు';
+
+  @override
+  String get section_80c => 'సెక్షన్ 80C';
+
+  @override
+  String get section_80d => 'సెక్షన్ 80D';
+
+  @override
+  String get calculate_tax => 'పన్నును లెక్కించు';
+
+  @override
+  String get yearly_tax => 'వార్షిక పన్ను';
+
+  @override
+  String get monthly_tds => 'నెలవారీ TDS';
+
+  @override
+  String get no_deadline => 'గడువు తేదీ లేదు';
+
+  @override
+  String get no_client => 'క్లయింట్ లేరు';
+
+  @override
+  String get unknown_manager => 'తెలియని మేనేజర్';
+
+  @override
+  String get no_manager => 'మేనేజర్ లేరు';
+
+  @override
+  String tasks_count(Object count) {
+    return '$count పనులు';
+  }
+
+  @override
+  String get search_projects => 'ప్రాజెక్ట్‌లను శోధించండి...';
+
+  @override
+  String get no_projects_available => 'ప్రాజెక్ట్‌లు అందుబాటులో లేవు';
+
+  @override
+  String get no_users_assigned => 'వినియోగదారులు కేటాయించబడలేదు';
+
+  @override
+  String get low_priority => 'తక్కువ ప్రాధాన్యత';
+
+  @override
+  String get high_priority => 'అధిక ప్రాధాన్యత';
+
+  @override
+  String get normal_priority => 'సాధారణ';
+
+  @override
+  String get status_label => 'స్థితి';
+
+  @override
+  String get hours_label => 'గంటలు';
+
+  @override
+  String get deadline_label => 'గడువు తేదీ';
+
+  @override
+  String get description_label => 'వివరణ';
+
+  @override
+  String get search_tasks => 'పనులను శోధించండి...';
+
+  @override
+  String get no_tasks_in_project => 'ఈ ప్రాజెక్ట్‌లో పనులు లేవు';
+
+  @override
+  String get paid_by_employee => 'ఉద్యోగి (తిరిగి చెల్లించడానికి)';
+
+  @override
+  String get paid_by_company => 'కంపెనీ';
+
+  @override
+  String get please_select_currency => 'దయచేసి కరెన్సీని ఎంచుకోండి';
+
+  @override
+  String get creating_expense => 'ఖర్చు సృష్టించబడుతోంది...';
+
+  @override
+  String get tax_planner => 'పన్ను ప్లానర్';
+
+  @override
+  String get projects => 'ప్రాజెక్ట్‌లు';
 }
