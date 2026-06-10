@@ -14,7 +14,7 @@ import 'package:flutter_app/features/profile/pages/reimbursement_page.dart';
 import 'package:flutter_app/features/profile/pages/training_learning.dart';
 import 'package:flutter_app/features/screens/ai_chat_bot_page.dart';
 import 'package:flutter_app/features/screens/company_cal.dart';
-import 'package:flutter_app/features/screens/doc_box_page.dart';
+import 'package:flutter_app/features/document/presentation/doc_box_page.dart';
 import 'package:flutter_app/features/attendance/presentation/attendance_report.dart';
 import 'package:flutter_app/features/leave/presentation/leave_list_screen.dart';
 import 'package:flutter_app/features/leave/presentation/apply_leave_screen.dart';
@@ -91,5 +91,34 @@ class Routes {
       itDeclarations: (c) => const ItDeclarationPage(),
       taxComparison: (c) => const TaxRegimeComparisonPage(),
     };
+  }
+
+  static Route<dynamic>? generateRoute(RouteSettings settings) {
+    final routes = getAll();
+    final builder = routes[settings.name];
+    if (builder != null) {
+      return PageRouteBuilder(
+        settings: settings,
+        pageBuilder: (context, animation, secondaryAnimation) => builder(context),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(0.0, 0.05); // Subtle slide up
+          const end = Offset.zero;
+          const curve = Curves.easeOutCubic;
+
+          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          var offsetAnimation = animation.drive(tween);
+
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: offsetAnimation,
+              child: child,
+            ),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 280),
+      );
+    }
+    return null;
   }
 }

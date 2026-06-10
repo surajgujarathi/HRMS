@@ -16,8 +16,10 @@ class CheckInOutCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    double size = 150;
-    double strokeWidth = 10;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isShortScreen = screenHeight < 780;
+    double size = isShortScreen ? 90 : 150;
+    double strokeWidth = isShortScreen ? 6 : 10;
 
     return BlocListener<AttendanceCubit, AttendanceState>(
       listener: (context, state) {
@@ -56,15 +58,28 @@ class CheckInOutCard extends StatelessWidget {
           final isCheckedIn = state.isCheckedIn;
           final todayHoursStr = state.todayHours;
           final isLoading = state.status == AttendanceStatus.loading;
-          double workedHours = double.tryParse(todayHoursStr) ?? 0.0;
+          double workedHours = 0.0;
+          if (todayHoursStr.contains(':')) {
+            final parts = todayHoursStr.split(':');
+            if (parts.length == 2) {
+              final h = double.tryParse(parts[0]) ?? 0.0;
+              final m = double.tryParse(parts[1]) ?? 0.0;
+              workedHours = h + (m / 60.0);
+            }
+          } else {
+            workedHours = double.tryParse(todayHoursStr) ?? 0.0;
+          }
           double progress = workedHours / 8.0;
           if (progress > 1.0) progress = 1.0;
 
           return Container(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.symmetric(
+              horizontal: isShortScreen ? 12 : 24,
+              vertical: isShortScreen ? 12 : 24,
+            ),
             decoration: BoxDecoration(
               color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(32),
+              borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.primaryPurple.withOpacity(0.08),
@@ -82,9 +97,9 @@ class CheckInOutCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(l10n.time.toUpperCase(), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         Text(DateFormat.jm().format(DateTime.now()),
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Theme.of(context).colorScheme.onSurface)),
+                            style: TextStyle(fontSize: isShortScreen ? 14 : 16, fontWeight: FontWeight.w800, color: Theme.of(context).colorScheme.onSurface)),
                       ],
                     ),
                     Column(
@@ -95,27 +110,16 @@ class CheckInOutCard extends StatelessWidget {
                           children: [
                             Text(l10n.date.toUpperCase(), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
                             const SizedBox(width: 8),
-                            // GestureDetector(
-                            //   onTap: () => Navigator.pushNamed(context, Routes.inOutReport),
-                            //   child: Container(
-                            //     padding: const EdgeInsets.all(4),
-                            //     decoration: BoxDecoration(
-                            //       color: AppColors.lightPurple.withOpacity(0.3),
-                            //       borderRadius: BorderRadius.circular(8),
-                            //     ),
-                            //     child: const Icon(Icons.history_rounded, size: 16, color: AppColors.primaryPurple),
-                            //   ),
-                            // ),
                           ],
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         Text(DateFormat('d MMM yyyy').format(DateTime.now()),
-                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface)),
+                            style: TextStyle(fontSize: isShortScreen ? 12 : 14, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface)),
                       ],
                     ),
                   ],
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: isShortScreen ? 8 : 24),
                 Stack(
                   alignment: Alignment.center,
                   children: [
@@ -134,19 +138,19 @@ class CheckInOutCard extends StatelessWidget {
                       children: [
                         Text(todayHoursStr,
                             style: TextStyle(
-                                fontSize: 28,
+                                fontSize: isShortScreen ? 18 : 28,
                                 fontWeight: FontWeight.w900,
                                 color: isCheckedIn ? AppColors.orange : AppColors.successGreen)),
-                        const SizedBox(height: 4),
-                        Text(l10n.working_hours, style: const TextStyle(color: AppColors.textGrey, fontSize: 13, fontWeight: FontWeight.w500)),
+                        const SizedBox(height: 2),
+                        Text(l10n.working_hours, style: const TextStyle(color: AppColors.textGrey, fontSize: 11, fontWeight: FontWeight.w500)),
                       ],
                     ),
                   ],
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: isShortScreen ? 8 : 24),
                 Container(
                   width: double.infinity,
-                  height: 56,
+                  height: isShortScreen ? 40 : 56,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(28),
                     boxShadow: [
@@ -167,18 +171,18 @@ class CheckInOutCard extends StatelessWidget {
                     onPressed: isLoading ? null : () => context.read<AttendanceCubit>().toggleAttendance(),
                     child: isLoading
                         ? const SizedBox(
-                            width: 24,
-                            height: 24,
+                            width: 20,
+                            height: 20,
                             child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
                           )
                         : Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(isCheckedIn ? Icons.logout_rounded : Icons.login_rounded, size: 22),
+                              Icon(isCheckedIn ? Icons.logout_rounded : Icons.login_rounded, size: isShortScreen ? 18 : 22),
                               const SizedBox(width: 12),
                               Text(
                                 isCheckedIn ? l10n.check_out : l10n.check_in,
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                                style: TextStyle(fontSize: isShortScreen ? 14 : 16, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                               ),
                             ],
                           ),

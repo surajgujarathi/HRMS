@@ -1234,4 +1234,187 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get projects => 'ప్రాజెక్ట్‌లు';
+
+  @override
+  String get current_password => 'ప్రస్తుత పాస్‌వర్డ్';
+
+  @override
+  String get please_enter_current_password =>
+      'దయచేసి ప్రస్తుత పాస్‌వర్డ్‌ను నమోదు చేయండి';
+
+  @override
+  String get folders => 'ఫోల్డర్లు';
+
+  @override
+  String get all_folders => 'అన్ని ఫోల్డర్లు';
+
+  @override
+  String get search_placeholder_doc => 'పేరు, యజమాని, పరిచయం శోధించండి...';
+
+  @override
+  String total_count_label(Object count) {
+    return '$count మొత్తం';
+  }
+
+  @override
+  String get no_documents_found => 'పత్రాలు కనుగొనబడలేదు';
+
+  @override
+  String get no_documents_matching =>
+      'ఈ శోధనకు సరిపోయే ఫైల్‌లు లేదా ఫోల్డర్‌లు ఏవీ లేవు.';
+
+  @override
+  String get archived => 'ఆర్కైవ్ చేయబడింది';
+
+  @override
+  String get type_label => 'రకం';
+
+  @override
+  String get file_name => 'ఫైల్ పేరు';
+
+  @override
+  String get url_label => 'URL';
+
+  @override
+  String get owner => 'యజమాని';
+
+  @override
+  String get folder => 'ఫోల్డర్';
+
+  @override
+  String get contact => 'పరిచయం';
+
+  @override
+  String get created_on => 'సృష్టించబడిన తేదీ';
+
+  @override
+  String get modified_on => 'సవరించబడిన తేదీ';
+
+  @override
+  String get open_label => 'ఓపెన్';
+
+  @override
+  String get edit_details => 'వివరాలను సవరించండి';
+
+  @override
+  String get add_document => 'పత్రాన్ని జోడించండి';
+
+  @override
+  String get upload_file => 'ఫైల్‌ను అప్‌లోడ్ చేయండి';
+
+  @override
+  String get url_link => 'URL లింక్';
+
+  @override
+  String get choose_file => 'ఫైల్‌ను ఎంచుకోండి';
+
+  @override
+  String get file_chosen => 'ఫైల్ ఎంచుకోబడింది';
+
+  @override
+  String get manage_payslips_declarations =>
+      'మీ జీతాల స్లిప్పులు & పన్ను డిక్లరేషన్లను నిర్వహించండి';
+
+  @override
+  String get payslip_month => 'జీతం స్లిప్ నెల';
+
+  @override
+  String get no_active_contract_or_payslip =>
+      'క్రియాశీల ఒప్పందం లేదా ధృవీకరించబడిన జీతం స్లిప్ కనుగొనబడలేదు';
+
+  @override
+  String get payroll_services => 'పేరోల్ సేవలు';
+
+  @override
+  String get income_tax_declarations => 'ఆదాయపు పన్ను ప్రకటనలు';
+
+  @override
+  String get income_tax_declarations_desc =>
+      'పెట్టుబడి రుజువు మరియు పన్ను పొదుపు వివరాలను సమర్పించండి';
+
+  @override
+  String get payslip_download_desc =>
+      'ZIP బ్యాచ్‌లు లేదా నెలవారీ జీతం స్లిప్ PDFలను పొందండి';
+
+  @override
+  String get new_it_declaration => 'కొత్త ఆదాయపు పన్ను డిక్లరేషన్';
+
+  @override
+  String get select_period_regime_info =>
+      'మీ డిక్లరేషన్‌ను సృష్టించడానికి వ్యవధి మరియు పన్ను విధానాన్ని ఎంచుకోండి.';
+
+  @override
+  String get payroll_period => 'పేరోల్ వ్యవధి';
+
+  @override
+  String get create_label => 'సృష్టించు';
+
+  @override
+  String get download_option => 'డౌన్‌లోడ్ ఎంపిక';
+
+  @override
+  String get single_month_pdf => 'సింగిల్ మంత్ (PDF)';
+
+  @override
+  String get full_period_zip => 'పూర్తి వ్యవధి (ZIP)';
+
+  @override
+  String get estimated_pay => 'అంచనా చెల్లింపు';
+
+  @override
+  String get net_salary => 'నికర జీతం';
+
+  @override
+  String get basic_pay => 'ప్రాథమిక వేతనం';
+
+  @override
+  String get allowance => 'భత్యం';
+
+  @override
+  String get salary_structure_breakdown => 'జీతాల నిర్మాణ విభజన';
+
+  @override
+  String get earnings => 'ఆర్జనలు';
+
+  @override
+  String get take_home_salary => 'నికర జీతం';
+
+  @override
+  String get house_rent_allowance => 'ఇంటి అద్దె భత్యం (HRA)';
+
+  @override
+  String get conveyance_allowance => 'ప్రయాణ భత్యం';
+
+  @override
+  String get professional_tax => 'వృత్తి పన్ను';
+
+  @override
+  String get income_tax => 'ఆదాయపు పన్ను';
+
+  @override
+  String get investment_overview => 'పెట్టుబడి అవలోకనం';
+
+  @override
+  String get declarations_label => 'ప్రకటనలు';
+
+  @override
+  String get submitted_label => 'సమర్పించబడింది';
+
+  @override
+  String get active_submissions => 'యాక్టివ్ సమర్పణలు';
+
+  @override
+  String get no_it_declarations_found => 'ఆదాయపు పన్ను ప్రకటనలు కనుగొనబడలేదు';
+
+  @override
+  String get tap_plus_to_create => 'సృష్టించడానికి + బటన్‌ను నొక్కండి.';
+
+  @override
+  String get investment_amount_inr => 'పెట్టుబడి మొత్తం (₹)';
+
+  @override
+  String get returned_label => 'తిరిగి పంపబడింది';
+
+  @override
+  String get total => 'మొత్తం';
 }

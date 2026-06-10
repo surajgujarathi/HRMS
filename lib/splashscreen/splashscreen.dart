@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/core/constants/app_colors.dart';
 import 'package:flutter_app/core/constants/app_images.dart';
 import 'package:flutter_app/core/utils/shared_pref.dart';
 import 'package:flutter_app/features/auth/login/cubit/login_cubit.dart';
@@ -84,9 +83,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             end: Alignment.bottomCenter,
             colors: isDark 
               ? [
-                  const Color(0xFF0F172A), // Slate 900
-                  const Color(0xFF1E293B), // Slate 800
-                  const Color(0xFF0F172A), // Slate 900
+                  const Color(0xFF0A192F), // Dark Navy
+                  const Color(0xFF172A45), // Medium Navy
+                  const Color(0xFF0A192F), // Dark Navy
                 ]
               : [
                   const Color(0xFF1E3A8A), // Deep Navy
@@ -139,7 +138,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           Container(
                             padding: const EdgeInsets.all(24),
                             decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                              color: isDark ? const Color(0xFF172A45) : Colors.white,
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
@@ -157,10 +156,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           ),
                           const SizedBox(height: 32),
                           // App Name
-                          Text(
+                          const Text(
                             "Opzento HR",
                             style: TextStyle(
-                              color: isDark ? AppColors.primaryPurple : Colors.white,
+                              color: Colors.white,
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.5,
@@ -170,7 +169,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           Text(
                             "Human Resource Management System",
                             style: TextStyle(
-                              color: (isDark ? Colors.white : Colors.white).withOpacity(0.6),
+                              color: Colors.white.withOpacity(0.6),
                               fontSize: 14,
                               letterSpacing: 0.5,
                             ),
@@ -190,11 +189,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               right: 0,
               child: Column(
                 children: [
-                  SizedBox(
-                    width: 40,
-                    child: LinearProgressIndicator(
-                      backgroundColor: Colors.white.withOpacity(0.1),
-                      valueColor: AlwaysStoppedAnimation<Color>(isDark ? AppColors.primaryPurple : Colors.white),
+                  const SizedBox(
+                    width: 28,
+                    height: 28,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      backgroundColor: Colors.white10,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   ),
                   const SizedBox(height: 40),

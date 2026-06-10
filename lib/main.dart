@@ -17,6 +17,7 @@ import 'package:flutter_app/features/profile/cubit/holiday_cubit.dart';
 import 'package:flutter_app/features/chat/cubit/chat_cubit.dart';
 import 'package:flutter_app/features/projects/cubit/projects_cubit.dart';
 import 'package:flutter_app/features/projects/cubit/project_tasks_cubit.dart';
+import 'package:flutter_app/features/document/cubit/document_cubit.dart';
 import 'package:flutter_app/routes.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -43,6 +44,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => ChatCubit()),
         BlocProvider(create: (context) => ProjectsCubit()),
         BlocProvider(create: (context) => ProjectTasksCubit()),
+        BlocProvider(create: (context) => DocumentCubit()..fetchDocuments()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
@@ -57,7 +59,7 @@ class MyApp extends StatelessWidget {
                 theme: AppTheme.lightTheme,
                 darkTheme: AppTheme.darkTheme,
                 themeMode: themeMode,
-                routes: Routes.getAll(),
+                onGenerateRoute: Routes.generateRoute,
                 home: const SplashScreen(),
                 builder: (context, child) {
                   return NetworkWrapper(

@@ -359,44 +359,47 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   }
 
   Widget _buildInputArea(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -4))],
-      ),
-      child: Row(
-        children: [
-          Container(
-            decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), shape: BoxShape.circle),
-            child: IconButton(
-              onPressed: _pickFiles, 
-              icon: const Icon(Icons.add, color: AppColors.indigo),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: TextField(
-              controller: _messageController,
-              decoration: InputDecoration(
-                hintText: AppLocalizations.of(context)!.type_a_message,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none),
-                filled: true,
-                fillColor: Colors.grey.withOpacity(0.05),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -4))],
+        ),
+        child: Row(
+          children: [
+            Container(
+              decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), shape: BoxShape.circle),
+              child: IconButton(
+                onPressed: _pickFiles, 
+                icon: const Icon(Icons.add, color: AppColors.indigo),
               ),
-              onSubmitted: (_) => _sendMessage(),
             ),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            decoration: const BoxDecoration(color: AppColors.indigo, shape: BoxShape.circle),
-            child: IconButton(
-              onPressed: _sendMessage,
-              icon: const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextField(
+                controller: _messageController,
+                decoration: InputDecoration(
+                  hintText: AppLocalizations.of(context)!.type_a_message,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none),
+                  filled: true,
+                  fillColor: Colors.grey.withOpacity(0.05),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                ),
+                onSubmitted: (_) => _sendMessage(),
+              ),
             ),
-          ),
-        ],
+            const SizedBox(width: 12),
+            Container(
+              decoration: const BoxDecoration(color: AppColors.indigo, shape: BoxShape.circle),
+              child: IconButton(
+                onPressed: _sendMessage,
+                icon: const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -305,7 +305,7 @@ class _ProjectTasksPageState extends State<ProjectTasksPage> {
                 )
               else
                 SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 40),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {

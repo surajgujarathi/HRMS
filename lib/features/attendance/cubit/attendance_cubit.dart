@@ -119,9 +119,19 @@ class AttendanceCubit extends Cubit<AttendanceState> {
     return duration.inSeconds / 3600.0;
   }
 
-  /// Formats double hours into "0.00" string format.
+  /// Formats double hours into "HH:mm" clock format.
   String _formatHours(double hours) {
-    return NumberFormat("0.00").format(hours);
+    if (hours < 0) hours = 0;
+    final int h = hours.floor();
+    final int m = ((hours - h) * 60).round();
+    
+    final int finalH = h + (m == 60 ? 1 : 0);
+    final int finalM = m == 60 ? 0 : m;
+
+    final String hourStr = finalH.toString().padLeft(2, '0');
+    final String minuteStr = finalM.toString().padLeft(2, '0');
+    
+    return '$hourStr:$minuteStr';
   }
 
   /// Fetches the sum of worked hours from already closed sessions for today.

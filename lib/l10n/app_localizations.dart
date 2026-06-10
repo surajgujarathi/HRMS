@@ -2457,6 +2457,354 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Projects'**
   String get projects;
+
+  /// No description provided for @current_password.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Password'**
+  String get current_password;
+
+  /// No description provided for @please_enter_current_password.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter current password'**
+  String get please_enter_current_password;
+
+  /// No description provided for @folders.
+  ///
+  /// In en, this message translates to:
+  /// **'Folders'**
+  String get folders;
+
+  /// No description provided for @all_folders.
+  ///
+  /// In en, this message translates to:
+  /// **'All Folders'**
+  String get all_folders;
+
+  /// No description provided for @search_placeholder_doc.
+  ///
+  /// In en, this message translates to:
+  /// **'Search name, owner, contact...'**
+  String get search_placeholder_doc;
+
+  /// No description provided for @total_count_label.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Total'**
+  String total_count_label(Object count);
+
+  /// No description provided for @no_documents_found.
+  ///
+  /// In en, this message translates to:
+  /// **'No Documents Found'**
+  String get no_documents_found;
+
+  /// No description provided for @no_documents_matching.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no files or folders matching this query.'**
+  String get no_documents_matching;
+
+  /// No description provided for @archived.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get archived;
+
+  /// No description provided for @type_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get type_label;
+
+  /// No description provided for @file_name.
+  ///
+  /// In en, this message translates to:
+  /// **'File Name'**
+  String get file_name;
+
+  /// No description provided for @url_label.
+  ///
+  /// In en, this message translates to:
+  /// **'URL'**
+  String get url_label;
+
+  /// No description provided for @owner.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner'**
+  String get owner;
+
+  /// No description provided for @folder.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder'**
+  String get folder;
+
+  /// No description provided for @contact.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get contact;
+
+  /// No description provided for @created_on.
+  ///
+  /// In en, this message translates to:
+  /// **'Created On'**
+  String get created_on;
+
+  /// No description provided for @modified_on.
+  ///
+  /// In en, this message translates to:
+  /// **'Modified On'**
+  String get modified_on;
+
+  /// No description provided for @open_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get open_label;
+
+  /// No description provided for @edit_details.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Details'**
+  String get edit_details;
+
+  /// No description provided for @add_document.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Document'**
+  String get add_document;
+
+  /// No description provided for @upload_file.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload File'**
+  String get upload_file;
+
+  /// No description provided for @url_link.
+  ///
+  /// In en, this message translates to:
+  /// **'URL Link'**
+  String get url_link;
+
+  /// No description provided for @choose_file.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose File'**
+  String get choose_file;
+
+  /// No description provided for @file_chosen.
+  ///
+  /// In en, this message translates to:
+  /// **'File Chosen'**
+  String get file_chosen;
+
+  /// No description provided for @manage_payslips_declarations.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your payslips & tax declarations'**
+  String get manage_payslips_declarations;
+
+  /// No description provided for @payslip_month.
+  ///
+  /// In en, this message translates to:
+  /// **'Payslip Month'**
+  String get payslip_month;
+
+  /// No description provided for @no_active_contract_or_payslip.
+  ///
+  /// In en, this message translates to:
+  /// **'No active contract or confirmed payslip found'**
+  String get no_active_contract_or_payslip;
+
+  /// No description provided for @payroll_services.
+  ///
+  /// In en, this message translates to:
+  /// **'PAYROLL SERVICES'**
+  String get payroll_services;
+
+  /// No description provided for @income_tax_declarations.
+  ///
+  /// In en, this message translates to:
+  /// **'Income Tax Declarations'**
+  String get income_tax_declarations;
+
+  /// No description provided for @income_tax_declarations_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit investment proof and tax saving details'**
+  String get income_tax_declarations_desc;
+
+  /// No description provided for @payslip_download_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Retrieve ZIP batches or monthly payslip PDFs'**
+  String get payslip_download_desc;
+
+  /// No description provided for @new_it_declaration.
+  ///
+  /// In en, this message translates to:
+  /// **'New IT Declaration'**
+  String get new_it_declaration;
+
+  /// No description provided for @select_period_regime_info.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a period and tax regime to create your declaration.'**
+  String get select_period_regime_info;
+
+  /// No description provided for @payroll_period.
+  ///
+  /// In en, this message translates to:
+  /// **'Payroll Period'**
+  String get payroll_period;
+
+  /// No description provided for @create_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get create_label;
+
+  /// No description provided for @download_option.
+  ///
+  /// In en, this message translates to:
+  /// **'Download Option'**
+  String get download_option;
+
+  /// No description provided for @single_month_pdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Single Month (PDF)'**
+  String get single_month_pdf;
+
+  /// No description provided for @full_period_zip.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Period (ZIP)'**
+  String get full_period_zip;
+
+  /// No description provided for @estimated_pay.
+  ///
+  /// In en, this message translates to:
+  /// **'ESTIMATED PAY'**
+  String get estimated_pay;
+
+  /// No description provided for @net_salary.
+  ///
+  /// In en, this message translates to:
+  /// **'Net Salary'**
+  String get net_salary;
+
+  /// No description provided for @basic_pay.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic Pay'**
+  String get basic_pay;
+
+  /// No description provided for @allowance.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowance'**
+  String get allowance;
+
+  /// No description provided for @salary_structure_breakdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Salary Structure Breakdown'**
+  String get salary_structure_breakdown;
+
+  /// No description provided for @earnings.
+  ///
+  /// In en, this message translates to:
+  /// **'EARNINGS'**
+  String get earnings;
+
+  /// No description provided for @take_home_salary.
+  ///
+  /// In en, this message translates to:
+  /// **'Take Home Salary'**
+  String get take_home_salary;
+
+  /// No description provided for @house_rent_allowance.
+  ///
+  /// In en, this message translates to:
+  /// **'House Rent Allowance (HRA)'**
+  String get house_rent_allowance;
+
+  /// No description provided for @conveyance_allowance.
+  ///
+  /// In en, this message translates to:
+  /// **'Conveyance Allowance'**
+  String get conveyance_allowance;
+
+  /// No description provided for @professional_tax.
+  ///
+  /// In en, this message translates to:
+  /// **'Professional Tax'**
+  String get professional_tax;
+
+  /// No description provided for @income_tax.
+  ///
+  /// In en, this message translates to:
+  /// **'Income Tax'**
+  String get income_tax;
+
+  /// No description provided for @investment_overview.
+  ///
+  /// In en, this message translates to:
+  /// **'Investment Overview'**
+  String get investment_overview;
+
+  /// No description provided for @declarations_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Declarations'**
+  String get declarations_label;
+
+  /// No description provided for @submitted_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted'**
+  String get submitted_label;
+
+  /// No description provided for @active_submissions.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Submissions'**
+  String get active_submissions;
+
+  /// No description provided for @no_it_declarations_found.
+  ///
+  /// In en, this message translates to:
+  /// **'No IT Declarations found'**
+  String get no_it_declarations_found;
+
+  /// No description provided for @tap_plus_to_create.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the + button to create one.'**
+  String get tap_plus_to_create;
+
+  /// No description provided for @investment_amount_inr.
+  ///
+  /// In en, this message translates to:
+  /// **'Investment Amount (₹)'**
+  String get investment_amount_inr;
+
+  /// No description provided for @returned_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Returned'**
+  String get returned_label;
+
+  /// No description provided for @total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get total;
 }
 
 class _AppLocalizationsDelegate

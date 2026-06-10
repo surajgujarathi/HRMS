@@ -35,6 +35,7 @@ class ChangePasswordCubit extends Cubit<ChangePasswordState> {
   ChangePasswordCubit() : super(const ChangePasswordState());
 
   Future<void> changePassword({
+    required String currentPassword,
     required String newPassword,
   }) async {
     debugPrint('ChangePasswordCubit: Starting password change process...');
@@ -52,16 +53,19 @@ class ChangePasswordCubit extends Cubit<ChangePasswordState> {
       final session = OdooSession.fromJson(sessionData);
       odooService.setSession(session);
 
+      final db = await prefs.getString('db') ?? ApiConfig.dbName;
       final userId = sessionData['userId'] is int
           ? sessionData['userId']
           : int.parse(sessionData['userId']?.toString() ?? '0');
       final userLogin = sessionData['userLogin']?.toString() ?? '';
 
-      debugPrint('ChangePasswordCubit: userId=$userId, userLogin=$userLogin');
+      debugPrint('ChangePasswordCubit: userId=$userId, userLogin=$userLogin, db=$db');
 
       await odooService.changePassword(
+        db: db,
         userId: userId,
         userLogin: userLogin,
+        currentPassword: currentPassword,
         newPassword: newPassword,
       );
 
@@ -100,6 +104,9 @@ class ChangePasswordCubit extends Cubit<ChangePasswordState> {
     }
 
     // Wrong / invalid password
+    if (lower.contains('incorrect current password')) {
+      return 'Incorrect current password.';
+    }
     if (lower.contains('invalid password') ||
         lower.contains('wrong password') ||
         lower.contains('incorrect password')) {

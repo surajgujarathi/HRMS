@@ -6,6 +6,7 @@ import 'package:flutter_app/features/profile/cubit/expense_cubit.dart';
 import 'package:flutter_app/features/profile/cubit/expense_state.dart';
 import 'package:flutter_app/features/profile/models/expense_model.dart';
 import 'package:flutter_app/features/profile/pages/new_expense_page.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class ReimbursementPage extends StatelessWidget {
   const ReimbursementPage({super.key});
@@ -24,6 +25,7 @@ class _ReimbursementView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
@@ -68,7 +70,7 @@ class _ReimbursementView extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                                Text(
-                                "My Expenses",
+                                l10n.my_expenses,
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -91,7 +93,7 @@ class _ReimbursementView extends StatelessWidget {
                                 children: [
                                   Icon(Icons.receipt_long_outlined, size: 48, color: AppColors.textSecondary.withOpacity(0.3)),
                                   const SizedBox(height: 12),
-                                  const Text("No reimbursement records found.", style: TextStyle(color: AppColors.textSecondary)),
+                                  Text(l10n.no_reimbursement_found, style: const TextStyle(color: AppColors.textSecondary)),
                                 ],
                               ),
                             ),
@@ -131,6 +133,7 @@ class _ReimbursementView extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
       decoration: const BoxDecoration(
@@ -150,10 +153,10 @@ class _ReimbursementView extends StatelessWidget {
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
           ),
-          const Expanded(
+          Expanded(
             child: Text(
-              'Reimbursement',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              l10n.reimbursement,
+              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
           ),
@@ -164,6 +167,7 @@ class _ReimbursementView extends StatelessWidget {
   }
 
   Widget _buildClaimCard(BuildContext context, double total, double pending, double rejected) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -179,9 +183,9 @@ class _ReimbursementView extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Text(
-            "Total Expenses",
-            style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+          Text(
+            l10n.total_expenses,
+            style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 8),
           Text(
@@ -192,11 +196,11 @@ class _ReimbursementView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _SummaryItem(title: "Pending", amount: "₹${pending.toStringAsFixed(0)}", color: Colors.orange),
+              _SummaryItem(title: l10n.pending, amount: "₹${pending.toStringAsFixed(0)}", color: Colors.orange),
               Container(width: 1, height: 30, color: Colors.grey.shade100),
-              _SummaryItem(title: "Rejected", amount: "₹${rejected.toStringAsFixed(0)}", color: Colors.red),
+              _SummaryItem(title: l10n.rejected, amount: "₹${rejected.toStringAsFixed(0)}", color: Colors.red),
               Container(width: 1, height: 30, color: Colors.grey.shade100),
-              _SummaryItem(title: "Verified", amount: "₹${(total - pending - rejected).toStringAsFixed(0)}", color: Colors.teal),
+              _SummaryItem(title: l10n.verified, amount: "₹${(total - pending - rejected).toStringAsFixed(0)}", color: Colors.teal),
             ],
           ),
         ],
@@ -205,26 +209,30 @@ class _ReimbursementView extends StatelessWidget {
   }
 
   Widget _buildReimbursementCard(BuildContext context, ExpenseModel expense) {
+    final l10n = AppLocalizations.of(context)!;
     Color statusColor = Colors.grey;
     String statusLabel = expense.state.toUpperCase();
 
     switch (expense.state) {
       case 'draft':
         statusColor = Colors.blue;
+        statusLabel = l10n.draft.toUpperCase();
         break;
       case 'reported':
         statusColor = Colors.orange;
-        statusLabel = 'SUBMITTED';
+        statusLabel = l10n.submitted.toUpperCase();
         break;
       case 'approved':
         statusColor = Colors.green;
+        statusLabel = l10n.approved.toUpperCase();
         break;
       case 'done':
         statusColor = Colors.teal;
-        statusLabel = 'PAID';
+        statusLabel = l10n.paid.toUpperCase();
         break;
       case 'refused':
         statusColor = Colors.red;
+        statusLabel = l10n.refused.toUpperCase();
         break;
     }
 
@@ -301,7 +309,7 @@ class _ReimbursementView extends StatelessWidget {
                     minimumSize: const Size(0, 36),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: const Text("SUBMIT", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                  child: Text(l10n.submit_label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                 )
               else if (expense.productId != null)
                 Container(

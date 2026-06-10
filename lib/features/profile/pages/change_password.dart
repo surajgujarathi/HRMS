@@ -15,9 +15,11 @@ class ChangePasswordPage extends StatefulWidget {
 }
 
 class _ChangePasswordPageState extends State<ChangePasswordPage> {
+  final TextEditingController currentPasswordController = TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
 
+  bool hideCurrent = true;
   bool hideNew = true;
   bool hideConfirm = true;
 
@@ -25,6 +27,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
   @override
   void dispose() {
+    currentPasswordController.dispose();
     newPasswordController.dispose();
     confirmPasswordController.dispose();
     super.dispose();
@@ -33,6 +36,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   void _handleSubmit(BuildContext context) {
     if (_formKey.currentState!.validate()) {
       context.read<ChangePasswordCubit>().changePassword(
+            currentPassword: currentPasswordController.text,
             newPassword: newPasswordController.text,
           );
     }
@@ -116,27 +120,45 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 ),
               );
             } else if (state.status == ChangePasswordStatus.failure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.errorMessage ?? l10n.failed_to_update_password),
-                  backgroundColor: AppColors.dangerRed,
-                ),
-              );
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const Icon(Icons.error_outline_rounded, color: Colors.white),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            state.errorMessage ?? l10n.failed_to_update_password,
+                            style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                    backgroundColor: AppColors.dangerRed,
+                    behavior: SnackBarBehavior.floating,
+                    margin: const EdgeInsets.all(16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                );
             }
           },
-          child: Column(
-            children: [
-              _buildHeader(context, l10n),
-              Expanded(
-                child: ResponsiveUtil.buildConstrained(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                _buildHeader(context, l10n),
+                ResponsiveUtil.buildConstrained(
                   context,
-                  SingleChildScrollView(
+                  Padding(
                     padding: const EdgeInsets.all(24),
                     child: _buildForm(context, l10n),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -219,6 +241,19 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             ),
             const SizedBox(height: 32),
             
+            /// Current Password
+            _buildPasswordField(
+              context: context,
+              label: l10n.current_password,
+              hintText: l10n.please_enter_current_password,
+              errorEmpty: l10n.please_enter_current_password,
+              errorLength: l10n.password_min_length,
+              controller: currentPasswordController,
+              isObscure: hideCurrent,
+              onToggle: () => setState(() => hideCurrent = !hideCurrent),
+            ),
+            const SizedBox(height: 20),
+
             /// New Password
             _buildPasswordField(
               context: context,

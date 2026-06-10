@@ -133,9 +133,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   automaticallyImplyLeading: false,
                   backgroundColor: Colors.transparent,
                   elevation: 0,
-                  toolbarHeight: 170, // Fixed height for header content
+                  toolbarHeight: MediaQuery.of(context).size.height < 780 ? 145 : 170, // Fixed height for header content
                   flexibleSpace: Container(
-                    padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 16, 20, 24),
+                    padding: EdgeInsets.fromLTRB(
+                      20, 
+                      MediaQuery.of(context).padding.top + (MediaQuery.of(context).size.height < 780 ? 8 : 16), 
+                      20, 
+                      MediaQuery.of(context).size.height < 780 ? 12 : 24
+                    ),
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
@@ -231,7 +236,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 24),
+                            SizedBox(height: MediaQuery.of(context).size.height < 780 ? 12 : 24),
                             CustomSearchBar(
                               controller: _searchController,
                             ),
@@ -242,7 +247,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   ),
                 ),
                 _searchQuery.isEmpty ? SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 20), // Extra bottom padding for floating nav bar
+                  padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).size.height < 780 ? 12 : 24, 20, 0), // Extra bottom padding for floating nav bar
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
                       const CheckInOutCard(),
@@ -252,7 +257,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       const UpcomingHolidaysSection(),
                       const SizedBox(height: 24),
                       const UpcomingEventsSection(),
-                      const SizedBox(height: 24),
                     ]),
                   ),
                 ) : SliverPadding(
@@ -343,51 +347,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Widget _buildProfileMenu(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return PopupMenuButton<String>(
-      color: Theme.of(context).colorScheme.surface,
-      offset: const Offset(0, 45),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      onSelected: (value) async {
-        if (value == "profile") {
-          Navigator.pushNamed(context, Routes.personalinf);
-        } else if (value == "logout") {
-          await context.read<LoginCubit>().logout();
-          if (context.mounted) {
-            context.read<ChatCubit>().clearData();
-            context.read<NotificationCubit>().clearData();
-            context.read<ProjectsCubit>().clearData();
-            context.read<ProjectTasksCubit>().clearData();
-            context.read<LeaveCubit>().clearData();
-            context.read<EventCubit>().clearData();
-            context.read<HolidayCubit>().clearData();
-            context.read<ProfileCubit>().resetProfile();
-            Navigator.of(context).pushNamedAndRemoveUntil(Routes.login, (route) => false);
-          }
-        }
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, Routes.personalinf);
       },
-      itemBuilder: (context) => [
-        PopupMenuItem<String>(
-          value: "profile",
-          child: Row(
-            children: [
-              const Icon(Icons.person_outline, color: AppColors.primaryPurple),
-              const SizedBox(width: 12),
-              Text(l10n.go_to_profile, style: const TextStyle(fontWeight: FontWeight.w600)),
-            ],
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: "logout",
-          child: Row(
-            children: [
-              const Icon(Icons.logout_rounded, color: AppColors.dangerRed),
-              const SizedBox(width: 12),
-              Text(l10n.logout, style: const TextStyle(color: AppColors.dangerRed, fontWeight: FontWeight.w600)),
-            ],
-          ),
-        ),
-      ],
       child: FutureBuilder<String?>(
         future: _profilePicFuture,
         builder: (context, snapshot) {

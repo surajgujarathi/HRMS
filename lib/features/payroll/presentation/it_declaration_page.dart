@@ -4,6 +4,7 @@ import 'package:flutter_app/core/constants/app_colors.dart';
 import 'package:flutter_app/features/payroll/cubit/it_declaration_cubit.dart';
 import 'package:flutter_app/features/profile/cubit/profile_cubit.dart';
 import 'package:flutter_app/network/payroll_api_service.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class ItDeclarationPage extends StatefulWidget {
   const ItDeclarationPage({super.key});
@@ -56,6 +57,7 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
     }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     showDialog(
       context: context,
@@ -72,7 +74,7 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'New IT Declaration',
+                      l10n.new_it_declaration,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
@@ -82,7 +84,7 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Select a period and tax regime to create your declaration.',
+                      l10n.select_period_regime_info,
                       style: TextStyle(
                         fontSize: 12.5,
                         color: Colors.grey.shade500,
@@ -93,7 +95,7 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                     DropdownButtonFormField<int>(
                       value: selectedPeriodId,
                       decoration: InputDecoration(
-                        labelText: 'Payroll Period',
+                        labelText: l10n.payroll_period,
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                       ),
@@ -107,9 +109,9 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                     ),
                     const SizedBox(height: 16),
                     
-                    const Text(
-                      'Tax Regime',
-                      style: TextStyle(
+                    Text(
+                      l10n.tax_regime,
+                      style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
                         color: Colors.grey,
@@ -136,7 +138,7 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                               ),
                               child: Center(
                                 child: Text(
-                                  'New Regime',
+                                  l10n.new_regime,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: selectedRegime == 'new'
@@ -167,7 +169,7 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                               ),
                               child: Center(
                                 child: Text(
-                                  'Old Regime',
+                                  l10n.old_regime,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: selectedRegime == 'old'
@@ -183,11 +185,11 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                     ),
                     const SizedBox(height: 16),
 
-                    TextField(
+                    TextFormField(
                       controller: amountController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        labelText: 'Investment Amount (₹)',
+                        labelText: l10n.investment_amount_inr,
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                       ),
@@ -203,7 +205,7 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                             foregroundColor: Colors.grey.shade600,
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           ),
-                          child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold)),
+                          child: Text(l10n.cancel, style: const TextStyle(fontWeight: FontWeight.bold)),
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton(
@@ -227,7 +229,7 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                           ),
-                          child: const Text('Create', style: TextStyle(fontWeight: FontWeight.bold)),
+                          child: Text(l10n.create_label, style: const TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
@@ -307,13 +309,15 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final l10n = AppLocalizations.of(context)!;
+
     if (_initializing || _cubit == null) {
       return Scaffold(
         backgroundColor: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.grey[50],
         appBar: AppBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
-          title: const Text('IT Declarations', style: TextStyle(fontWeight: FontWeight.bold)),
+          title: Text(l10n.income_tax_declarations, style: const TextStyle(fontWeight: FontWeight.bold)),
           centerTitle: true,
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.onSurface),
@@ -331,7 +335,7 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        title: const Text('IT Declarations', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(l10n.income_tax_declarations, style: const TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.onSurface),
@@ -407,7 +411,7 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Investment Overview',
+                            l10n.investment_overview,
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.9),
                               fontSize: 14,
@@ -449,7 +453,7 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                         children: [
                           Expanded(
                             child: _buildSummaryMiniCard(
-                              title: 'Declarations',
+                              title: l10n.declarations_label,
                               value: '${state.declarations.length}',
                               icon: Icons.folder_open_outlined,
                             ),
@@ -457,7 +461,7 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: _buildSummaryMiniCard(
-                              title: 'Submitted',
+                              title: l10n.submitted_label,
                               value: '$totalSubmittedCount',
                               icon: Icons.check_circle_outline,
                             ),
@@ -479,12 +483,12 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                           Icon(Icons.description_outlined, size: 64, color: Colors.grey[400]),
                           const SizedBox(height: 16),
                           Text(
-                            'No IT Declarations found',
+                            l10n.no_it_declarations_found,
                             style: TextStyle(color: Colors.grey[600], fontSize: 15, fontWeight: FontWeight.w500),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Tap the + button to create one.',
+                            l10n.tap_plus_to_create,
                             style: TextStyle(color: Colors.grey[500], fontSize: 13),
                           ),
                         ],
@@ -492,9 +496,9 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                     ),
                   ),
                 ] else ...[
-                  const Text(
-                    'Active Submissions',
-                    style: TextStyle(
+                  Text(
+                    l10n.active_submissions,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.5,
@@ -557,7 +561,9 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
-                                    '$taxRegime Regime',
+                                    taxRegime == 'OLD'
+                                        ? l10n.old_regime
+                                        : (taxRegime == 'NEW' ? l10n.new_regime : '$taxRegime Regime'),
                                     style: const TextStyle(
                                       color: Color(0xFF4e54c8),
                                       fontSize: 10.5,
@@ -567,7 +573,7 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'Total: ₹${totalInv.toStringAsFixed(0)}',
+                                  '${l10n.total}: ₹${totalInv.toStringAsFixed(0)}',
                                   style: TextStyle(color: Colors.grey.shade600, fontSize: 12, fontWeight: FontWeight.bold),
                                 ),
                               ],
@@ -597,7 +603,7 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                                           const SizedBox(width: 10),
                                           Expanded(
                                             child: Text(
-                                              'Returned: $returnReason',
+                                              '${l10n.returned_label}: $returnReason',
                                               style: const TextStyle(color: AppColors.dangerRed, fontSize: 12.5, fontWeight: FontWeight.w600),
                                             ),
                                           ),
@@ -622,7 +628,7 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                                               _cubit!.submitDeclaration(decId, _employeeId!);
                                             },
                                             icon: const Icon(Icons.send_rounded, size: 16, color: Colors.white),
-                                            label: const Text('Submit', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
+                                            label: Text(l10n.submit, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
                                           ),
                                         ),
                                       ],
@@ -645,7 +651,7 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                                               _cubit!.deleteDeclaration(decId, _employeeId!);
                                             },
                                             icon: const Icon(Icons.delete_outline, size: 16),
-                                            label: const Text('Delete', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
+                                            label: Text(l10n.delete, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
                                           ),
                                         ),
                                       ],

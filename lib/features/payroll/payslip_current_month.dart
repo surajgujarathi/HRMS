@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/core/constants/app_colors.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class CurrentMonthCard extends StatelessWidget {
   final Map<String, dynamic>? payslipData;
+  final bool showSalary;
+  final VoidCallback onToggleShowSalary;
 
-  const CurrentMonthCard({super.key, this.payslipData});
+  const CurrentMonthCard({
+    super.key,
+    this.payslipData,
+    required this.showSalary,
+    required this.onToggleShowSalary,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +70,6 @@ class CurrentMonthCard extends StatelessWidget {
         allowance = 0.0;
       } else {
         allowance = allowance + hra + conveyance;
-        // Make sure individual components are positive for display when overall is positive
         basicPay = basicPay.abs();
         hra = hra.abs();
         conveyance = conveyance.abs();
@@ -162,17 +169,16 @@ class CurrentMonthCard extends StatelessWidget {
                             Text(
                               currentMonth,
                               style: const TextStyle(
-                                fontSize: 13, 
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
                             ),
                           ],
                         ),
                       ),
-                      const Text(
-                        'ESTIMATED PAY',
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context)!.estimated_pay,
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
                           color: Colors.white70,
@@ -182,18 +188,30 @@ class CurrentMonthCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  
-                  const Text(
-                    'Net Salary',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.white70,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.net_salary,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Colors.white70,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: onToggleShowSalary,
+                        child: Icon(
+                          showSalary ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                          color: Colors.white70,
+                          size: 18,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    format(netSalary),
+                    showSalary ? format(netSalary) : '₹ ••••••',
                     style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w800,
@@ -212,9 +230,9 @@ class CurrentMonthCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildMiniCol('Basic Pay', format(basicPay), Colors.white),
-                      _buildMiniCol('Allowance', format(allowance), Colors.white),
-                      _buildMiniCol('Deductions', '- ${format(deductions)}', const Color(0xFFFF8A8A)),
+                      _buildMiniCol(AppLocalizations.of(context)!.basic_pay, showSalary ? format(basicPay) : '₹ •••••', Colors.white),
+                      _buildMiniCol(AppLocalizations.of(context)!.allowance, showSalary ? format(allowance) : '₹ •••••', Colors.white),
+                      _buildMiniCol(AppLocalizations.of(context)!.deductions, showSalary ? '- ${format(deductions)}' : '- ₹ •••••', const Color(0xFFFF8A8A)),
                     ],
                   ),
                 ],

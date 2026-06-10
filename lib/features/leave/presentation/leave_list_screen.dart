@@ -196,7 +196,8 @@ class _LeaveListScreenState extends State<LeaveListScreen> {
     for (var t in state.leaveTypes) {
       totalRemaining += t.remainingLeaves;
     }
-    final bool hasNoLeaves = state.status == LeaveStatus.success && totalRemaining <= 0.0;
+    final bool hasUnpaid = state.leaveTypes.any((t) => t.name.toLowerCase().contains('unpaid'));
+    final bool hasNoLeaves = state.status == LeaveStatus.success && totalRemaining <= 0.0 && !hasUnpaid;
 
     return Container(
       decoration: BoxDecoration(

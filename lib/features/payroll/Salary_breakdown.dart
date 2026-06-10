@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class SalaryBreakdownCard extends StatelessWidget {
   final Map<String, dynamic>? payslipData;
+  final bool showSalary;
 
-  const SalaryBreakdownCard({super.key, this.payslipData});
+  const SalaryBreakdownCard({super.key, this.payslipData, this.showSalary = false});
 
   @override
   Widget build(BuildContext context) {
@@ -61,14 +63,12 @@ class SalaryBreakdownCard extends StatelessWidget {
         conveyance = 0.0;
       } else {
         totalEarnings = rawEarnings;
-        // Make sure individual components are positive for display when overall is positive
         basicPay = basicPay.abs();
         hra = hra.abs();
         conveyance = conveyance.abs();
       }
 
       totalDeductions = rawDeductions.abs();
-      // Make sure individual deductions are positive for display
       professionalTax = professionalTax.abs();
       incomeTax = incomeTax.abs();
 
@@ -105,9 +105,9 @@ class SalaryBreakdownCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Salary Structure Breakdown',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.salary_structure_breakdown,
+            style: const TextStyle(
               fontSize: 16, 
               fontWeight: FontWeight.bold,
               letterSpacing: 0.2,
@@ -116,19 +116,19 @@ class SalaryBreakdownCard extends StatelessWidget {
           const SizedBox(height: 20),
 
           // Earnings Section
-          _buildSectionHeader('EARNINGS', format(totalEarnings), Colors.green),
+          _buildSectionHeader(AppLocalizations.of(context)!.earnings, format(totalEarnings), Colors.green),
           const SizedBox(height: 10),
-          _buildItemRow('Basic Pay', basicPay, totalEarnings, const Color(0xFF4e54c8)),
-          if (hra > 0) _buildItemRow('House Rent Allowance (HRA)', hra, totalEarnings, const Color(0xFF4e54c8)),
-          if (conveyance > 0) _buildItemRow('Conveyance Allowance', conveyance, totalEarnings, const Color(0xFF4e54c8)),
+          _buildItemRow(AppLocalizations.of(context)!.basic_pay, basicPay, totalEarnings, const Color(0xFF4e54c8)),
+          if (hra > 0) _buildItemRow(AppLocalizations.of(context)!.house_rent_allowance, hra, totalEarnings, const Color(0xFF4e54c8)),
+          if (conveyance > 0) _buildItemRow(AppLocalizations.of(context)!.conveyance_allowance, conveyance, totalEarnings, const Color(0xFF4e54c8)),
 
           const SizedBox(height: 24),
           
           // Deductions Section
-          _buildSectionHeader('DEDUCTIONS', '- ${format(totalDeductions)}', Colors.red),
+          _buildSectionHeader(AppLocalizations.of(context)!.deductions.toUpperCase(), '- ${format(totalDeductions)}', Colors.red),
           const SizedBox(height: 10),
-          if (professionalTax > 0) _buildItemRow('Professional Tax', professionalTax, totalDeductions, Colors.redAccent, isDeduction: true),
-          if (incomeTax > 0) _buildItemRow('Income Tax', incomeTax, totalDeductions, Colors.redAccent, isDeduction: true),
+          if (professionalTax > 0) _buildItemRow(AppLocalizations.of(context)!.professional_tax, professionalTax, totalDeductions, Colors.redAccent, isDeduction: true),
+          if (incomeTax > 0) _buildItemRow(AppLocalizations.of(context)!.income_tax, incomeTax, totalDeductions, Colors.redAccent, isDeduction: true),
 
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 16.0),
@@ -139,9 +139,9 @@ class SalaryBreakdownCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Take Home Salary',
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.take_home_salary,
+                style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),
@@ -153,7 +153,7 @@ class SalaryBreakdownCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  format(netSalary),
+                  showSalary ? format(netSalary) : '₹ ••••••',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w900,
@@ -182,7 +182,7 @@ class SalaryBreakdownCard extends StatelessWidget {
           ),
         ),
         Text(
-          totalValue,
+          showSalary ? totalValue : (title.contains('DEDUCTIONS') ? '- ₹ •••••' : '₹ •••••'),
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.bold,
@@ -213,7 +213,9 @@ class SalaryBreakdownCard extends StatelessWidget {
                 ),
               ),
               Text(
-                "${isDeduction ? '-' : ''}₹${value.toStringAsFixed(0)}",
+                showSalary 
+                    ? "${isDeduction ? '-' : ''}₹${value.toStringAsFixed(0)}"
+                    : "${isDeduction ? '-' : ''}₹ ••••",
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,

@@ -324,9 +324,9 @@ class LoginScreen extends StatelessWidget {
     return PopupMenuButton<String>(
       onSelected: (code) => context.read<LocaleCubit>().changeLanguage(code),
       itemBuilder: (context) => [
-        _buildPopupMenuItem('English', 'en', langCode == 'en'),
-        _buildPopupMenuItem('हिंदी (Hindi)', 'hi', langCode == 'hi'),
-        _buildPopupMenuItem('తెలుగు (Telugu)', 'te', langCode == 'te'),
+        _buildPopupMenuItem(context, 'English', 'en', langCode == 'en'),
+        _buildPopupMenuItem(context, 'हिंदी (Hindi)', 'hi', langCode == 'hi'),
+        _buildPopupMenuItem(context, 'తెలుగు (Telugu)', 'te', langCode == 'te'),
       ],
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -347,14 +347,19 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  PopupMenuItem<String> _buildPopupMenuItem(String label, String code, bool isActive) {
+  PopupMenuItem<String> _buildPopupMenuItem(BuildContext context, String label, String code, bool isActive) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final activeColor = isDark ? Colors.white : AppColors.indigo;
+    final inactiveColor = isDark ? Colors.white70 : AppColors.textPrimary;
+    final inactiveIconColor = isDark ? Colors.white38 : AppColors.grey;
+
     return PopupMenuItem<String>(
       value: code,
       child: Row(
         children: [
           Icon(
             isActive ? Icons.check_circle : Icons.circle_outlined,
-            color: isActive ? AppColors.indigo : AppColors.grey,
+            color: isActive ? activeColor : inactiveIconColor,
             size: 18,
           ),
           const SizedBox(width: 12),
@@ -362,7 +367,7 @@ class LoginScreen extends StatelessWidget {
             label,
             style: TextStyle(
               fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-              color: isActive ? AppColors.indigo : AppColors.textPrimary,
+              color: isActive ? activeColor : inactiveColor,
             ),
           ),
         ],

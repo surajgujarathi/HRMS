@@ -1231,4 +1231,186 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get projects => 'Projects';
+
+  @override
+  String get current_password => 'Current Password';
+
+  @override
+  String get please_enter_current_password => 'Please enter current password';
+
+  @override
+  String get folders => 'Folders';
+
+  @override
+  String get all_folders => 'All Folders';
+
+  @override
+  String get search_placeholder_doc => 'Search name, owner, contact...';
+
+  @override
+  String total_count_label(Object count) {
+    return '$count Total';
+  }
+
+  @override
+  String get no_documents_found => 'No Documents Found';
+
+  @override
+  String get no_documents_matching =>
+      'There are no files or folders matching this query.';
+
+  @override
+  String get archived => 'Archived';
+
+  @override
+  String get type_label => 'Type';
+
+  @override
+  String get file_name => 'File Name';
+
+  @override
+  String get url_label => 'URL';
+
+  @override
+  String get owner => 'Owner';
+
+  @override
+  String get folder => 'Folder';
+
+  @override
+  String get contact => 'Contact';
+
+  @override
+  String get created_on => 'Created On';
+
+  @override
+  String get modified_on => 'Modified On';
+
+  @override
+  String get open_label => 'Open';
+
+  @override
+  String get edit_details => 'Edit Details';
+
+  @override
+  String get add_document => 'Add Document';
+
+  @override
+  String get upload_file => 'Upload File';
+
+  @override
+  String get url_link => 'URL Link';
+
+  @override
+  String get choose_file => 'Choose File';
+
+  @override
+  String get file_chosen => 'File Chosen';
+
+  @override
+  String get manage_payslips_declarations =>
+      'Manage your payslips & tax declarations';
+
+  @override
+  String get payslip_month => 'Payslip Month';
+
+  @override
+  String get no_active_contract_or_payslip =>
+      'No active contract or confirmed payslip found';
+
+  @override
+  String get payroll_services => 'PAYROLL SERVICES';
+
+  @override
+  String get income_tax_declarations => 'Income Tax Declarations';
+
+  @override
+  String get income_tax_declarations_desc =>
+      'Submit investment proof and tax saving details';
+
+  @override
+  String get payslip_download_desc =>
+      'Retrieve ZIP batches or monthly payslip PDFs';
+
+  @override
+  String get new_it_declaration => 'New IT Declaration';
+
+  @override
+  String get select_period_regime_info =>
+      'Select a period and tax regime to create your declaration.';
+
+  @override
+  String get payroll_period => 'Payroll Period';
+
+  @override
+  String get create_label => 'Create';
+
+  @override
+  String get download_option => 'Download Option';
+
+  @override
+  String get single_month_pdf => 'Single Month (PDF)';
+
+  @override
+  String get full_period_zip => 'Full Period (ZIP)';
+
+  @override
+  String get estimated_pay => 'ESTIMATED PAY';
+
+  @override
+  String get net_salary => 'Net Salary';
+
+  @override
+  String get basic_pay => 'Basic Pay';
+
+  @override
+  String get allowance => 'Allowance';
+
+  @override
+  String get salary_structure_breakdown => 'Salary Structure Breakdown';
+
+  @override
+  String get earnings => 'EARNINGS';
+
+  @override
+  String get take_home_salary => 'Take Home Salary';
+
+  @override
+  String get house_rent_allowance => 'House Rent Allowance (HRA)';
+
+  @override
+  String get conveyance_allowance => 'Conveyance Allowance';
+
+  @override
+  String get professional_tax => 'Professional Tax';
+
+  @override
+  String get income_tax => 'Income Tax';
+
+  @override
+  String get investment_overview => 'Investment Overview';
+
+  @override
+  String get declarations_label => 'Declarations';
+
+  @override
+  String get submitted_label => 'Submitted';
+
+  @override
+  String get active_submissions => 'Active Submissions';
+
+  @override
+  String get no_it_declarations_found => 'No IT Declarations found';
+
+  @override
+  String get tap_plus_to_create => 'Tap the + button to create one.';
+
+  @override
+  String get investment_amount_inr => 'Investment Amount (₹)';
+
+  @override
+  String get returned_label => 'Returned';
+
+  @override
+  String get total => 'Total';
 }

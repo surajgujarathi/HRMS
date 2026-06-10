@@ -1231,4 +1231,186 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get projects => 'परियोजनाएं';
+
+  @override
+  String get current_password => 'वर्तमान पासवर्ड';
+
+  @override
+  String get please_enter_current_password => 'कृपया वर्तमान पासवर्ड दर्ज करें';
+
+  @override
+  String get folders => 'फ़ोल्डर';
+
+  @override
+  String get all_folders => 'सभी फ़ोल्डर';
+
+  @override
+  String get search_placeholder_doc => 'नाम, स्वामी, संपर्क खोजें...';
+
+  @override
+  String total_count_label(Object count) {
+    return '$count कुल';
+  }
+
+  @override
+  String get no_documents_found => 'कोई दस्तावेज़ नहीं मिला';
+
+  @override
+  String get no_documents_matching =>
+      'इस खोज से मेल खाने वाले कोई फ़ाइल या फ़ोल्डर नहीं हैं।';
+
+  @override
+  String get archived => 'अभिलेखागार';
+
+  @override
+  String get type_label => 'प्रकार';
+
+  @override
+  String get file_name => 'फ़ाइल का नाम';
+
+  @override
+  String get url_label => 'यूआरएल';
+
+  @override
+  String get owner => 'स्वामी';
+
+  @override
+  String get folder => 'फ़ोल्डर';
+
+  @override
+  String get contact => 'संपर्क';
+
+  @override
+  String get created_on => 'बनाया गया';
+
+  @override
+  String get modified_on => 'संशोधित किया गया';
+
+  @override
+  String get open_label => 'खोलें';
+
+  @override
+  String get edit_details => 'विवरण संपादित करें';
+
+  @override
+  String get add_document => 'दस्तावेज़ जोड़ें';
+
+  @override
+  String get upload_file => 'फ़ाइल अपलोड करें';
+
+  @override
+  String get url_link => 'यूआरएल लिंक';
+
+  @override
+  String get choose_file => 'फ़ाइल चुनें';
+
+  @override
+  String get file_chosen => 'फ़ाइल चुनी गई';
+
+  @override
+  String get manage_payslips_declarations =>
+      'अपने वेतन पर्ची और कर घोषणाओं को प्रबंधित करें';
+
+  @override
+  String get payslip_month => 'वेतन पर्ची का महीना';
+
+  @override
+  String get no_active_contract_or_payslip =>
+      'कोई सक्रिय अनुबंध या पुष्ट वेतन पर्ची नहीं मिली';
+
+  @override
+  String get payroll_services => 'पेरोल सेवाएं';
+
+  @override
+  String get income_tax_declarations => 'आयकर घोषणाएं';
+
+  @override
+  String get income_tax_declarations_desc =>
+      'निवेश प्रमाण और कर बचत विवरण जमा करें';
+
+  @override
+  String get payslip_download_desc =>
+      'ज़िप बैच या मासिक वेतन पर्ची पीडीएफ प्राप्त करें';
+
+  @override
+  String get new_it_declaration => 'नई आयकर घोषणा';
+
+  @override
+  String get select_period_regime_info =>
+      'अपनी घोषणा बनाने के लिए एक अवधि और कर व्यवस्था चुनें।';
+
+  @override
+  String get payroll_period => 'पेरोल अवधि';
+
+  @override
+  String get create_label => 'बनाएं';
+
+  @override
+  String get download_option => 'डाउनलोड विकल्प';
+
+  @override
+  String get single_month_pdf => 'एकल महीना (PDF)';
+
+  @override
+  String get full_period_zip => 'पूर्ण अवधि (ZIP)';
+
+  @override
+  String get estimated_pay => 'अनुमानित भुगतान';
+
+  @override
+  String get net_salary => 'शुद्ध वेतन';
+
+  @override
+  String get basic_pay => 'मूल वेतन';
+
+  @override
+  String get allowance => 'भत्ता';
+
+  @override
+  String get salary_structure_breakdown => 'वेतन संरचना विवरण';
+
+  @override
+  String get earnings => 'कमाई';
+
+  @override
+  String get take_home_salary => 'घर ले जाने वाला वेतन';
+
+  @override
+  String get house_rent_allowance => 'मकान किराया भत्ता (HRA)';
+
+  @override
+  String get conveyance_allowance => 'वाहन भत्ता';
+
+  @override
+  String get professional_tax => 'व्यावसायिक कर';
+
+  @override
+  String get income_tax => 'आयकर';
+
+  @override
+  String get investment_overview => 'निवेश अवलोकन';
+
+  @override
+  String get declarations_label => 'घोषणाएं';
+
+  @override
+  String get submitted_label => 'जमा की गई';
+
+  @override
+  String get active_submissions => 'सक्रिय प्रस्तुतियाँ';
+
+  @override
+  String get no_it_declarations_found => 'कोई आयकर घोषणा नहीं मिली';
+
+  @override
+  String get tap_plus_to_create => 'बनाने के लिए + बटन दबाएं।';
+
+  @override
+  String get investment_amount_inr => 'निवेश राशि (₹)';
+
+  @override
+  String get returned_label => 'लौटाया गया';
+
+  @override
+  String get total => 'कुल';
 }

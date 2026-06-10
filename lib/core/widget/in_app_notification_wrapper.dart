@@ -35,6 +35,7 @@ class _InAppNotificationWrapperState extends State<InAppNotificationWrapper> wit
   int _previousNotificationCount = 0;
   bool _isFirstLoad = true;
   bool _isFirstNotifLoad = true;
+  bool _isDismissed = false;
 
   @override
   void initState() {
@@ -60,13 +61,14 @@ class _InAppNotificationWrapperState extends State<InAppNotificationWrapper> wit
       _icon = icon;
       _routeToOpen = route;
       _customOnTap = onTap;
+      _isDismissed = false;
     });
     
     _controller.forward();
     
     _hideTimer?.cancel();
     _hideTimer = Timer(const Duration(seconds: 5), () {
-      if (mounted) _controller.reverse();
+      if (mounted && !_isDismissed) _controller.reverse();
     });
   }
 
@@ -156,65 +158,78 @@ class _InAppNotificationWrapperState extends State<InAppNotificationWrapper> wit
         child: Stack(
           children: [
             widget.child,
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: SlideTransition(
-                position: _offsetAnimation,
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Material(
-                      elevation: 16,
-                      shadowColor: Colors.black.withOpacity(0.4),
-                      borderRadius: BorderRadius.circular(16),
-                      color: Colors.white,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(16),
-                        onTap: () {
-                          _controller.reverse();
-                          if (_customOnTap != null) {
-                            _customOnTap!();
-                          } else if (_routeToOpen != null && navigatorKey.currentState != null) {
-                             navigatorKey.currentState!.pushNamed(_routeToOpen!);
-                          }
+            if (!_isDismissed)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: SlideTransition(
+                  position: _offsetAnimation,
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Dismissible(
+                        key: UniqueKey(),
+                        direction: DismissDirection.horizontal,
+                        onDismissed: (direction) {
+                          _hideTimer?.cancel();
+                          setState(() {
+                            _isDismissed = true;
+                          });
+                          _controller.reset();
                         },
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
+                        child: Material(
+                          elevation: 16,
+                          shadowColor: Colors.black.withOpacity(0.4),
+                          borderRadius: BorderRadius.circular(16),
+                          color: Colors.white,
+                          child: InkWell(
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.grey.withOpacity(0.2)),
-                          ),
-                          child: Row(
-                            children: [
-                              CircleAvatar(
-                                backgroundColor: const Color(0xFF5A67D8).withOpacity(0.1), // AppColors.primaryPurple fallback
-                                child: const Icon(Icons.notifications_active, color: Color(0xFF5A67D8)),
+                            onTap: () {
+                              _controller.reverse();
+                              if (_customOnTap != null) {
+                                _customOnTap!();
+                              } else if (_routeToOpen != null && navigatorKey.currentState != null) {
+                                 navigatorKey.currentState!.pushNamed(_routeToOpen!);
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: Colors.grey.withOpacity(0.2)),
                               ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      _title,
-                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    backgroundColor: const Color(0xFF5A67D8).withOpacity(0.1), // AppColors.primaryPurple fallback
+                                    child: const Icon(Icons.notifications_active, color: Color(0xFF5A67D8)),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          _title,
+                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          _message.replaceAll(RegExp(r'<[^>]*>'), ''), // strip any stray HTML
+                                          style: TextStyle(color: Colors.grey[700], fontSize: 14),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      _message.replaceAll(RegExp(r'<[^>]*>'), ''), // strip any stray HTML
-                                      style: TextStyle(color: Colors.grey[700], fontSize: 14),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
@@ -222,7 +237,6 @@ class _InAppNotificationWrapperState extends State<InAppNotificationWrapper> wit
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),

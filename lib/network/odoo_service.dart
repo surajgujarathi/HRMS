@@ -757,43 +757,60 @@ class OdooService {
     return response is int ? response : 0;
   }
 
-  /// Changes the user's password using the Odoo wizard workflow.
+  /// Changes the user's password using direct res.users methods.
   Future<void> changePassword({
+    required String db,
     required int userId,
     required String userLogin,
+    required String currentPassword,
     required String newPassword,
   }) async {
-    debugPrint('OdooService: changePassword userId=$userId login=$userLogin');
+    debugPrint('OdooService: changePassword userId=$userId login=$userLogin db=$db');
     
-    // 1. Create the wizard
-    final wizardId = await executeModelMethod(
-      'change.password.wizard',
-      'create',
-      [{}],
-    );
-
-    if (wizardId is! int) {
-      throw Exception('Failed to create change password wizard');
+    // 1. Check current credentials by authenticating against Odoo (bypasses _check_credentials remote check)
+    final tempClient = OdooClient(baseUrl);
+    try {
+      await tempClient.authenticate(db, userLogin, currentPassword);
+    } catch (e) {
+      throw Exception('Incorrect current password.');
+    } finally {
+      tempClient.close();
     }
 
-    // 2. Create the wizard line (change.password.user)
-    await executeModelMethod(
-      'change.password.user',
-      'create',
-      [{
-        'wizard_id': wizardId,
-        'user_id': userId,
-        'user_login': userLogin,
-        'new_passwd': newPassword,
-      }],
-    );
-
-    // 3. Execute the password change button
-    await executeModelMethod(
-      'change.password.wizard',
-      'change_password_button',
-      [[wizardId]],
-    );
+    // 2. Change password if verification succeeded
+    try {
+      await executeModelMethod(
+        'res.users',
+        '_change_password',
+        [[userId], newPassword],
+      );
+    } on OdooException catch (e) {
+      final errStr = e.toString();
+      // If _change_password is also blocked due to being a private method, try public change_password or wizard
+      if (errStr.contains('Private methods') || errStr.contains('AccessError')) {
+        debugPrint('OdooService: _change_password blocked. Trying public change_password method...');
+        try {
+          await executeModelMethod(
+            'res.users',
+            'change_password',
+            [currentPassword, newPassword],
+          );
+        } catch (fallbackErr) {
+          debugPrint('OdooService: Public change_password fallback failed: $fallbackErr. Retrying wizard...');
+          // Fallback to wizard
+          final wizardId = await executeModelMethod('change.password.wizard', 'create', [{}]);
+          await executeModelMethod('change.password.user', 'create', [{
+            'wizard_id': wizardId,
+            'user_id': userId,
+            'user_login': userLogin,
+            'new_passwd': newPassword,
+          }]);
+          await executeModelMethod('change.password.wizard', 'change_password_button', [[wizardId]]);
+        }
+      } else {
+        rethrow;
+      }
+    }
     
     debugPrint('OdooService: changePassword successful');
   }
@@ -919,5 +936,136 @@ class OdooService {
       },
     );
     return response is List ? response : [];
+  }
+
+  /// Fetches document records from documents.document.
+  Future<List<dynamic>> fetchDocuments({int? userId}) async {
+    final List<dynamic> domain = [
+      '|',
+      ['active', '=', true],
+      ['active', '=', false],
+    ];
+    if (userId != null) {
+      domain.add(['owner_id', '=', userId]);
+    }
+
+    final response = await executeModelMethod(
+      'documents.document',
+      'search_read',
+      [],
+      kwargs: {
+        'domain': domain,
+        'fields': [
+          'id',
+          'name',
+          'owner_id',
+          'folder_id',
+          'tag_ids',
+          'partner_id',
+          'type',
+          'url',
+          'create_uid',
+          'create_date',
+          'write_uid',
+          'write_date',
+          'active',
+          'company_id',
+          'thumbnail'
+        ],
+      },
+    );
+    return response is List ? response : [];
+  }
+
+  /// Fetches a single document's file data (datas).
+  Future<Map<String, dynamic>?> fetchDocumentData(int documentId) async {
+    final response = await executeModelMethod(
+      'documents.document',
+      'search_read',
+      [],
+      kwargs: {
+        'domain': [['id', '=', documentId]],
+        'fields': ['id', 'name', 'datas', 'type', 'url'],
+      },
+    );
+    if (response is List && response.isNotEmpty) {
+      return response.first as Map<String, dynamic>;
+    }
+    return null;
+  }
+
+  /// Creates a new document in documents.document.
+  Future<int> createDocument(Map<String, dynamic> data) async {
+    final response = await executeModelMethod(
+      'documents.document',
+      'create',
+      [data],
+    );
+    return response is int ? response : 0;
+  }
+
+  /// Updates an existing document (write).
+  Future<bool> writeDocument(int documentId, Map<String, dynamic> data) async {
+    final response = await executeModelMethod(
+      'documents.document',
+      'write',
+      [[documentId], data],
+    );
+    return response == true;
+  }
+
+  /// Deletes a document (unlink).
+  Future<bool> unlinkDocument(int documentId) async {
+    final response = await executeModelMethod(
+      'documents.document',
+      'unlink',
+      [[documentId]],
+    );
+    return response == true;
+  }
+
+  /// Download action for documents.document.
+  Future<dynamic> actionDownloadDocument(int documentId) async {
+    return await executeModelMethod(
+      'documents.document',
+      'action_download',
+      [[documentId]],
+    );
+  }
+
+  /// Open action for documents.document.
+  Future<dynamic> actionOpenDocument(int documentId) async {
+    return await executeModelMethod(
+      'documents.document',
+      'action_open',
+      [[documentId]],
+    );
+  }
+
+  /// Share action for documents.document.
+  Future<dynamic> actionShareDocument(int documentId) async {
+    return await executeModelMethod(
+      'documents.document',
+      'action_share',
+      [[documentId]],
+    );
+  }
+
+  /// Toggle active (Archive/Unarchive) for documents.document.
+  Future<dynamic> toggleActiveDocument(int documentId) async {
+    return await executeModelMethod(
+      'documents.document',
+      'toggle_active',
+      [[documentId]],
+    );
+  }
+
+  /// Checks access rights for documents.document.
+  Future<dynamic> checkAccessDocument() async {
+    return await executeModelMethod(
+      'documents.document',
+      'check_access_rights',
+      ['read'],
+    );
   }
 }

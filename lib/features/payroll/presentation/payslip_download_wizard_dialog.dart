@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/core/constants/app_colors.dart';
 import 'package:flutter_app/network/payroll_api_service.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
 class PayslipDownloadWizardDialog extends StatefulWidget {
   const PayslipDownloadWizardDialog({super.key});
@@ -180,6 +181,7 @@ class _PayslipDownloadWizardDialogState extends State<PayslipDownloadWizardDialo
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -196,7 +198,7 @@ class _PayslipDownloadWizardDialogState extends State<PayslipDownloadWizardDialo
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Payslip Download',
+                    l10n.download_payslip,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -216,7 +218,7 @@ class _PayslipDownloadWizardDialogState extends State<PayslipDownloadWizardDialo
               else ...[
                 // Download type selection
                 Text(
-                  'Download Option',
+                  l10n.download_option,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -228,7 +230,7 @@ class _PayslipDownloadWizardDialogState extends State<PayslipDownloadWizardDialo
                   children: [
                     Expanded(
                       child: ChoiceChip(
-                        label: const Text('Single Month (PDF)'),
+                        label: Text(l10n.single_month_pdf),
                         selected: _downloadType == 'single',
                         onSelected: (val) {
                           if (val) {
@@ -241,7 +243,7 @@ class _PayslipDownloadWizardDialogState extends State<PayslipDownloadWizardDialo
                     const SizedBox(width: 12),
                     Expanded(
                       child: ChoiceChip(
-                        label: const Text('Full Period (ZIP)'),
+                        label: Text(l10n.full_period_zip),
                         selected: _downloadType != 'single',
                         onSelected: (val) {
                           if (val) {
@@ -257,7 +259,7 @@ class _PayslipDownloadWizardDialogState extends State<PayslipDownloadWizardDialo
 
                 // Period Dropdown
                 Text(
-                  'Payroll Period',
+                  l10n.payroll_period,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,

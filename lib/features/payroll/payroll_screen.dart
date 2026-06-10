@@ -4,6 +4,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_app/core/constants/app_images.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 import 'package:flutter_app/features/payroll/presentation/payslip_download_wizard_dialog.dart';
 import 'package:flutter_app/features/payroll/payslip_current_month.dart';
 import 'package:flutter_app/features/payroll/Salary_breakdown.dart';
@@ -24,6 +25,7 @@ class _PayrollScreenState extends State<PayrollScreen> {
   List<dynamic> _allPayslips = [];
   int? _selectedPayslipId;
   PayrollApiService? _apiService;
+  bool _showSalary = false;
 
   @override
   void initState() {
@@ -201,6 +203,21 @@ class _PayrollScreenState extends State<PayrollScreen> {
     final employeeName = profileState.employee?.name ?? 'Employee';
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          AppLocalizations.of(context)!.my_pay,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.onSurface),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
+      ),
       backgroundColor: isDarkMode ? Colors.grey[900] : Colors.grey[50],
       body: SafeArea(
         child: SingleChildScrollView(
@@ -217,7 +234,7 @@ class _PayrollScreenState extends State<PayrollScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Hello, $employeeName',
+                          AppLocalizations.of(context)!.hello(employeeName),
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w800,
@@ -227,7 +244,7 @@ class _PayrollScreenState extends State<PayrollScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Manage your payslips & tax declarations',
+                          AppLocalizations.of(context)!.manage_payslips_declarations,
                           style: TextStyle(
                             fontSize: 12.5,
                             color: Colors.grey.shade500,
@@ -248,7 +265,7 @@ class _PayrollScreenState extends State<PayrollScreen> {
                   child: DropdownButtonFormField<int>(
                     value: _selectedPayslipId,
                     decoration: InputDecoration(
-                      labelText: 'Payslip Month',
+                      labelText: AppLocalizations.of(context)!.payslip_month,
                       labelStyle: TextStyle(
                         color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                         fontSize: 12,
@@ -325,7 +342,7 @@ class _PayrollScreenState extends State<PayrollScreen> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'No active contract or confirmed payslip found',
+                            AppLocalizations.of(context)!.no_active_contract_or_payslip,
                             style: TextStyle(
                               fontSize: 13,
                               color: isDarkMode ? Colors.amber[200] : Colors.amber[800],
@@ -337,17 +354,28 @@ class _PayrollScreenState extends State<PayrollScreen> {
                     ),
                   ),
                 // 1. Current Month Salary Card
-                CurrentMonthCard(payslipData: _payslipData),
+                CurrentMonthCard(
+                  payslipData: _payslipData,
+                  showSalary: _showSalary,
+                  onToggleShowSalary: () {
+                    setState(() {
+                      _showSalary = !_showSalary;
+                    });
+                  },
+                ),
                 const SizedBox(height: 16),
 
                 // 2. Salary Breakdown Card
-                SalaryBreakdownCard(payslipData: _payslipData),
+                SalaryBreakdownCard(
+                  payslipData: _payslipData,
+                  showSalary: _showSalary,
+                ),
               ],
               const SizedBox(height: 24),
 
               // 3. Odoo Payroll Services Actions
               Text(
-                'PAYROLL SERVICES',
+                AppLocalizations.of(context)!.payroll_services,
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
@@ -359,8 +387,8 @@ class _PayrollScreenState extends State<PayrollScreen> {
               
               _buildMenuCard(
                 context,
-                'Income Tax Declarations',
-                'Submit investment proof and tax saving details',
+                AppLocalizations.of(context)!.income_tax_declarations,
+                AppLocalizations.of(context)!.income_tax_declarations_desc,
                 Icons.description_outlined,
                 () => Navigator.pushNamed(context, Routes.itDeclarations),
               ),
@@ -373,8 +401,8 @@ class _PayrollScreenState extends State<PayrollScreen> {
               // ),
               _buildMenuCard(
                 context,
-                'Payslip Download',
-                'Retrieve ZIP batches or monthly payslip PDFs',
+                AppLocalizations.of(context)!.download_payslip,
+                AppLocalizations.of(context)!.payslip_download_desc,
                 Icons.file_download_outlined,
                 () {
                   showDialog(

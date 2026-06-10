@@ -68,7 +68,9 @@ class AttendanceActions extends StatelessWidget {
         crossAxisCount: ResponsiveUtil.getCrossAxisCount(context, mobile: 2, tablet: 4),
         crossAxisSpacing: 14,
         mainAxisSpacing: 14,
-        childAspectRatio: ResponsiveUtil.isTablet(context) ? 1.2 : 1.55,
+        childAspectRatio: ResponsiveUtil.isTablet(context) 
+            ? 1.2 
+            : (MediaQuery.of(context).size.height < 780 ? 2.25 : 1.55),
       ),
       itemBuilder: (context, index) {
         final action = actions[index];

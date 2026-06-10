@@ -31,8 +31,14 @@ class LoginCubit extends Cubit<LoginState> {
     emit(state.copyWith(obscurePassword: !state.obscurePassword));
   }
 
-  void toggleRememberMe(bool value) {
+  Future<void> toggleRememberMe(bool value) async {
     emit(state.copyWith(rememberMe: value));
+    final prefs = SharedPref();
+    await prefs.saveBool('rememberMe', value);
+    if (!value) {
+      await prefs.remove('saved_username');
+      await prefs.remove('saved_password');
+    }
   }
 
   Future<void> login({
@@ -202,8 +208,8 @@ class LoginCubit extends Cubit<LoginState> {
   Future<void> checkLoginStatus() async {
     final prefs = SharedPref();
     final rememberMe = await prefs.getBool('rememberMe') ?? false;
-    final savedUsername = await prefs.getString('saved_username') ?? '';
-    final savedPassword = await prefs.getString('saved_password') ?? '';
+    final savedUsername = rememberMe ? (await prefs.getString('saved_username') ?? '') : '';
+    final savedPassword = rememberMe ? (await prefs.getString('saved_password') ?? '') : '';
 
     // Initialize state with remembered credentials if available
     emit(state.copyWith(
@@ -268,7 +274,17 @@ class LoginCubit extends Cubit<LoginState> {
     debugPrint('--- Logout Process Started ---');
     final prefs = SharedPref();
     await _clearSessionData(prefs);
-    emit(state.copyWith(status: LoginStatus.initial));
+
+    final rememberMe = await prefs.getBool('rememberMe') ?? false;
+    final savedUsername = rememberMe ? (await prefs.getString('saved_username') ?? '') : '';
+    final savedPassword = rememberMe ? (await prefs.getString('saved_password') ?? '') : '';
+
+    emit(LoginState(
+      status: LoginStatus.initial,
+      rememberMe: rememberMe,
+      username: savedUsername,
+      password: savedPassword,
+    ));
     debugPrint('--- Logout Process Complete ---');
   }
 

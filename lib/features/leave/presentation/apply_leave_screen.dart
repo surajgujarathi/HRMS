@@ -51,7 +51,8 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
       }
 
       // 2. Check against balance
-      if (requestedDays > _selectedType!.remainingLeaves) {
+      final isUnpaid = _selectedType!.name.toLowerCase().contains('unpaid');
+      if (!isUnpaid && requestedDays > _selectedType!.remainingLeaves) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.insufficient_balance(requestedDays.toString(), _selectedType!.remainingLeaves.toString())),
@@ -199,7 +200,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
           hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
         ),
         items: state.leaveTypes
-            .where((type) => type.remainingLeaves > 0)
+            .where((type) => type.remainingLeaves > 0 || type.name.toLowerCase().contains('unpaid'))
             .map((type) {
           return DropdownMenuItem(value: type, child: Text(type.name));
         }).toList(),
