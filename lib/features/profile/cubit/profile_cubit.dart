@@ -17,6 +17,7 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   Future<void> fetchProfile() async {
+    if (isClosed) return;
     emit(state.copyWith(status: ProfileStatus.loading));
 
     try {
@@ -33,10 +34,16 @@ class ProfileCubit extends Cubit<ProfileState> {
       if (cachedData != null && cachedData is Map && cachedData.isNotEmpty) {
         final cachedId = cachedData['id']?.toString();
         if (cachedId == currentEmployeeId) {
-          debugPrint('Using cached profile data for employee: $currentEmployeeId');
+          debugPrint(
+            'Using cached profile data for employee: $currentEmployeeId',
+          );
           try {
-            final employee = Employee.fromJson(cachedData as Map<String, dynamic>);
-            emit(state.copyWith(status: ProfileStatus.success, employee: employee));
+            final employee = Employee.fromJson(
+              cachedData as Map<String, dynamic>,
+            );
+            emit(
+              state.copyWith(status: ProfileStatus.success, employee: employee),
+            );
           } catch (e) {
             debugPrint('Error parsing cached employee data: $e');
           }
@@ -74,7 +81,9 @@ class ProfileCubit extends Cubit<ProfileState> {
         userName: sessionData['userName']?.toString() ?? '',
         userLang: sessionData['userLang']?.toString() ?? "en_US",
         userTz: sessionData['userTz']?.toString() ?? "UTC",
-        isSystem: sessionData['isSystem'] is bool ? sessionData['isSystem'] : false,
+        isSystem: sessionData['isSystem'] is bool
+            ? sessionData['isSystem']
+            : false,
         dbName: sessionData['dbName']?.toString() ?? db,
         serverVersion: sessionData['serverVersion']?.toString() ?? "",
       );
@@ -82,7 +91,9 @@ class ProfileCubit extends Cubit<ProfileState> {
       final odooService = OdooService(baseUrl, session: session);
 
       try {
-        debugPrint('Fetching profile from server for employeeId: $currentEmployeeId');
+        debugPrint(
+          'Fetching profile from server for employeeId: $currentEmployeeId',
+        );
 
         final employeeResponse = await odooService.fetchEmployeeDetails(
           int.parse(currentEmployeeId),
@@ -114,9 +125,30 @@ class ProfileCubit extends Cubit<ProfileState> {
       } finally {
         odooService.close();
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('Profile Fetch Error: $e');
-      emit(state.copyWith(status: ProfileStatus.failure, errorMessage: e.toString()));
+      debugPrintStack(stackTrace: stackTrace);
+      if (!isClosed) {
+        emit(
+          state.copyWith(
+            status: ProfileStatus.failure,
+            errorMessage: _getErrorMessage(e),
+          ),
+        );
+      }
     }
+  }
+
+  String _getErrorMessage(Object e) {
+    if (e is OdooException) {
+      try {
+        final data = e.error;
+        if (data is Map && data['message'] != null) {
+          return data['message'].toString();
+        }
+      } catch (_) {}
+      return e.message;
+    }
+    return e.toString();
   }
 }

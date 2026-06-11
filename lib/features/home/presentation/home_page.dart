@@ -108,7 +108,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       {'title': l10n.job_details, 'route': Routes.jobdetails, 'icon': Icons.work},
       {'title': l10n.notifications, 'route': Routes.notifications, 'icon': Icons.notifications},
       {'title': l10n.events_list, 'route': Routes.events, 'icon': Icons.event_available},
-      {'title': 'Projects', 'route': Routes.projects, 'icon': Icons.assignment},
+      {'title': l10n.projects, 'route': Routes.projects, 'icon': Icons.assignment},
     ];
     
     final searchResults = _searchQuery.isEmpty 

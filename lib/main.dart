@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_app/l10n/app_localizations.dart';
-
 import 'package:flutter_app/splashscreen/splashscreen.dart';
 import 'package:flutter_app/features/auth/login/cubit/login_cubit.dart';
 import 'package:flutter_app/core/widget/network_wrapper.dart';

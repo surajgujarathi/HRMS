@@ -6,7 +6,6 @@ import 'package:flutter_app/core/utils/shared_pref.dart';
 import 'package:flutter_app/network/odoo_service.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 import 'package:odoo_rpc/odoo_rpc.dart';
 import 'attendance_state.dart';
 
