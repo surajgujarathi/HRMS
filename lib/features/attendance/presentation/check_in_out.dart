@@ -78,9 +78,15 @@ class CheckInOutCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white.withOpacity(0.08) : Colors.grey.shade200,
+                width: 1,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryPurple.withOpacity(0.08),
+                  color: Theme.of(context).brightness == Brightness.dark 
+                      ? AppColors.primaryPurple.withOpacity(0.15) 
+                      : AppColors.primaryPurple.withOpacity(0.12),
                   blurRadius: 24,
                   offset: const Offset(0, 8),
                 ),

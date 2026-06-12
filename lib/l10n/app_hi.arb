@@ -451,5 +451,8 @@
   "tap_plus_to_create": "बनाने के लिए + बटन दबाएं।",
   "investment_amount_inr": "निवेश राशि (₹)",
   "returned_label": "लौटाया गया",
-  "total": "कुल"
+  "total": "कुल",
+  "good_morning": "सुप्रभात",
+  "good_afternoon": "शुभ दोपहर",
+  "good_evening": "शुभ संध्या"
 }

@@ -430,9 +430,13 @@ class _ChannelTile extends StatelessWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark ? Colors.white.withOpacity(0.08) : Colors.grey.shade200,
+              width: 1,
+            ),
             boxShadow: [
               BoxShadow(
-                color: Theme.of(context).shadowColor.withOpacity(0.03),
+                color: Colors.black.withOpacity(isDark ? 0.2 : 0.08),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),

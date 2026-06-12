@@ -53,7 +53,7 @@ class AttendanceActions extends StatelessWidget {
         'routeName': Routes.events,
       },
       {
-        'title': 'My Projects',
+        'title': l10n.projects,
         'icon': Icons.assignment_rounded,
         'color': const Color(0xFF3F51B5), // AppColors.indigo equivalent
         'routeName': Routes.projects,
@@ -66,11 +66,9 @@ class AttendanceActions extends StatelessWidget {
       itemCount: actions.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: ResponsiveUtil.getCrossAxisCount(context, mobile: 2, tablet: 4),
-        crossAxisSpacing: 14,
-        mainAxisSpacing: 14,
-        childAspectRatio: ResponsiveUtil.isTablet(context) 
-            ? 1.2 
-            : (MediaQuery.of(context).size.height < 780 ? 2.25 : 1.55),
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: ResponsiveUtil.isTablet(context) ? 2.5 : 2.2,
       ),
       itemBuilder: (context, index) {
         final action = actions[index];

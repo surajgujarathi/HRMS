@@ -523,13 +523,13 @@ class _ItDeclarationPageState extends State<ItDeclarationPage> {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(isDark ? 0.2 : 0.03),
+                            color: Colors.black.withOpacity(isDark ? 0.2 : 0.08),
                             blurRadius: 16,
                             offset: const Offset(0, 6),
                           ),
                         ],
                         border: Border.all(
-                          color: isDark ? Colors.white.withOpacity(0.08) : Colors.grey.shade100,
+                          color: isDark ? Colors.white.withOpacity(0.08) : Colors.grey.shade200,
                         ),
                       ),
                       child: Theme(

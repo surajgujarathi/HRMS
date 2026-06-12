@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_app/core/utils/shared_pref.dart';
 import 'package:flutter_app/network/odoo_service.dart';
@@ -100,6 +101,45 @@ class ProfileCubit extends Cubit<ProfileState> {
           session.userId,
         );
 
+        // Fetch missing fields from standard search_read safely
+        Map<String, dynamic> extraFields = {};
+        final fieldsToFetch = [
+          'identification_id',
+          'passport_id',
+          'blood_group',
+          'emergency_contact',
+          'emergency_phone',
+          'coach_id',
+          'mobile_phone',
+          'permanent_address',
+          'x_permanent_address',
+          'permanent_street',
+          'employment_type',
+          'employee_type',
+          'emp_type',
+          'company_id'
+        ];
+        for (final field in fieldsToFetch) {
+          try {
+            final List<dynamic> res = await odooService.executeModelMethod(
+              'hr.employee',
+              'search_read',
+              [],
+              kwargs: {
+                'domain': [['id', '=', int.parse(currentEmployeeId)]],
+                'fields': [field],
+              },
+              silent: true,
+            );
+            if (res.isNotEmpty && res[0] is Map && res[0][field] != null && res[0][field] != false) {
+              extraFields[field] = res[0][field];
+            }
+          } catch (e) {
+            debugPrint('Field $field is not supported.');
+          }
+        }
+        debugPrint('Fetched extra employee fields successfully: $extraFields');
+
         // Fetch Resume and Skills in parallel
         final results = await Future.wait([
           odooService.getResumeLines(int.parse(currentEmployeeId)),
@@ -107,6 +147,11 @@ class ProfileCubit extends Cubit<ProfileState> {
         ]);
 
         final fullData = Map<String, dynamic>.from(employeeResponse);
+        extraFields.forEach((key, value) {
+          if (!fullData.containsKey(key) || fullData[key] == null || fullData[key] == false) {
+            fullData[key] = value;
+          }
+        });
         fullData['resume_line_ids'] = results[0];
         fullData['employee_skill_ids'] = results[1];
 
@@ -116,6 +161,7 @@ class ProfileCubit extends Cubit<ProfileState> {
         debugPrint('ID: ${employee.id}');
         debugPrint('Name: ${employee.name}');
         debugPrint('Code: ${employee.employeeCode}');
+        debugPrint('Full JSON data: ${jsonEncode(fullData)}');
         debugPrint('---------------------------');
 
         // Save fresh data keyed to the current user

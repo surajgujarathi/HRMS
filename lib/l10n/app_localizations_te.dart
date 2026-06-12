@@ -1417,4 +1417,13 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get total => 'మొత్తం';
+
+  @override
+  String get good_morning => 'శుభోదయం';
+
+  @override
+  String get good_afternoon => 'శుభ మధ్యాహ్నం';
+
+  @override
+  String get good_evening => 'శుభ సాయంత్రం';
 }

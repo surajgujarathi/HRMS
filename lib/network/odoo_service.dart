@@ -123,10 +123,14 @@ class OdooService {
       return await _client.callKw(payload);
     } catch (e) {
       String errorStr = e.toString().toLowerCase();
-      debugPrint('================ ODOO RPC EXCEPTION ================');
-      debugPrint('Payload: $payload');
-      debugPrint('Error: $e');
-      debugPrint('====================================================');
+      if (!silent) {
+        debugPrint('================ ODOO RPC EXCEPTION ================');
+        debugPrint('Payload: $payload');
+        debugPrint('Error: $e');
+        debugPrint('====================================================');
+      } else {
+        debugPrint('OdooService: executeModelMethod silent exception for $model.$method (${e.toString().split('\n').first})');
+      }
 
       if (!silent && (errorStr.contains('socketexception') || 
           errorStr.contains('connection refused') || 

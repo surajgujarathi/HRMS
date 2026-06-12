@@ -133,10 +133,57 @@ class LoginCubit extends Cubit<LoginState> {
       debugPrint(
         'Method: callKw(hr.employee, fetch_all_employees_info) - Fetching details for empId: $empId',
       );
-      final employee = await odooService.fetchEmployeeDetails(
+      final employeeResponse = await odooService.fetchEmployeeDetails(
         int.parse(empId),
         session.userId,
       );
+
+      // Fetch missing fields from standard search_read on login safely
+      Map<String, dynamic> extraFields = {};
+      final fieldsToFetch = [
+        'identification_id',
+        'passport_id',
+        'blood_group',
+        'emergency_contact',
+        'emergency_phone',
+        'coach_id',
+        'mobile_phone',
+        'permanent_address',
+        'x_permanent_address',
+        'permanent_street',
+        'employment_type',
+        'employee_type',
+        'emp_type',
+        'company_id'
+      ];
+      for (final field in fieldsToFetch) {
+        try {
+          final List<dynamic> res = await odooService.executeModelMethod(
+            'hr.employee',
+            'search_read',
+            [],
+            kwargs: {
+              'domain': [['id', '=', int.parse(empId)]],
+              'fields': [field],
+            },
+            silent: true,
+          );
+          if (res.isNotEmpty && res[0] is Map && res[0][field] != null && res[0][field] != false) {
+            extraFields[field] = res[0][field];
+          }
+        } catch (e) {
+          debugPrint('Odoo field $field is invalid or not supported on this instance.');
+        }
+      }
+      debugPrint('Fetched extra employee fields successfully on login: $extraFields');
+
+      final employee = Map<String, dynamic>.from(employeeResponse);
+      extraFields.forEach((key, value) {
+        if (!employee.containsKey(key) || employee[key] == null || employee[key] == false) {
+          employee[key] = value;
+        }
+      });
+
       debugPrint(
         'Method: callKw(hr.employee, fetch_all_employees_info) - Data Received: $employee',
       );

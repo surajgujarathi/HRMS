@@ -451,5 +451,8 @@
   "tap_plus_to_create": "సృష్టించడానికి + బటన్‌ను నొక్కండి.",
   "investment_amount_inr": "పెట్టుబడి మొత్తం (₹)",
   "returned_label": "తిరిగి పంపబడింది",
-  "total": "మొత్తం"
+  "total": "మొత్తం",
+  "good_morning": "శుభోదయం",
+  "good_afternoon": "శుభ మధ్యాహ్నం",
+  "good_evening": "శుభ సాయంత్రం"
 }

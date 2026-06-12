@@ -1413,4 +1413,13 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get total => 'कुल';
+
+  @override
+  String get good_morning => 'सुप्रभात';
+
+  @override
+  String get good_afternoon => 'शुभ दोपहर';
+
+  @override
+  String get good_evening => 'शुभ संध्या';
 }

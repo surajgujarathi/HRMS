@@ -190,17 +190,17 @@ class PayrollApiService {
 
   Future<bool> submitItDeclaration(int declarationId) async {
     debugPrint('PayrollApiService: submitItDeclaration id=$declarationId');
-    final response = await _odooService.executeModelMethod(
+    await _odooService.executeModelMethod(
       'emp.it.declaration',
       'action_submit',
       [[declarationId]],
     );
-    return response == true;
+    return true;
   }
 
   Future<bool> returnItDeclarationToDraft(int declarationId, String returnReason) async {
     debugPrint('PayrollApiService: returnItDeclarationToDraft id=$declarationId reason=$returnReason');
-    final response = await _odooService.executeModelMethod(
+    await _odooService.executeModelMethod(
       'emp.it.declaration',
       'action_return_to_draft',
       [[declarationId]],
@@ -208,7 +208,7 @@ class PayrollApiService {
         'context': {'return_reason': returnReason}
       }
     );
-    return response == true;
+    return true;
   }
 
   Future<String> downloadSubmissionPdf(int declarationId) async {
@@ -267,7 +267,16 @@ class PayrollApiService {
         'fields': ['id', 'name'],
       },
     );
-    return response is List ? response : [];
+    if (response is List) {
+      final List<dynamic> list = List<dynamic>.from(response);
+      list.sort((a, b) {
+        final aId = a['id'] as int? ?? 0;
+        final bId = b['id'] as int? ?? 0;
+        return bId.compareTo(aId);
+      });
+      return list;
+    }
+    return [];
   }
 
   Future<List<dynamic>> fetchPeriodLines(int periodId) async {
@@ -282,7 +291,16 @@ class PayrollApiService {
         'fields': ['id', 'name'],
       },
     );
-    return response is List ? response : [];
+    if (response is List) {
+      final List<dynamic> list = List<dynamic>.from(response);
+      list.sort((a, b) {
+        final aId = a['id'] as int? ?? 0;
+        final bId = b['id'] as int? ?? 0;
+        return bId.compareTo(aId);
+      });
+      return list;
+    }
+    return [];
   }
 
   Future<Map<String, dynamic>> createPayslipDownloadWizard(Map<String, dynamic> vals) async {

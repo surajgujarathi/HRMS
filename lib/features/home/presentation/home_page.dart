@@ -1,13 +1,7 @@
-// import 'dart:math' as math;
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/features/home/presentation/feature_search_delegate.dart';
 import 'package:flutter_app/features/notifications/cubit/notification_cubit.dart';
-import 'package:flutter_app/features/profile/cubit/profile_cubit.dart';
-import 'package:flutter_app/features/auth/login/cubit/login_cubit.dart';
 import 'package:flutter_app/features/projects/cubit/projects_cubit.dart';
-import 'package:flutter_app/features/projects/cubit/project_tasks_cubit.dart';
 import 'package:flutter_app/features/leave/cubit/leave_cubit.dart';
 import 'package:flutter_app/features/events/cubit/event_cubit.dart';
 import 'package:flutter_app/features/profile/cubit/holiday_cubit.dart';
@@ -16,19 +10,16 @@ import 'package:flutter_app/core/utils/shared_pref.dart';
 import 'package:flutter_app/core/constants/app_colors.dart';
 import 'package:flutter_app/core/widget/custome_search_bar.dart';
 import 'package:flutter_app/features/home/widgets/action_card.dart';
-import 'package:flutter_app/features/home/widgets/anniversary.dart';
-import 'package:flutter_app/features/home/widgets/birth_days.dart';
 import 'package:flutter_app/features/home/widgets/upcoming_events.dart';
 import 'package:flutter_app/features/home/widgets/upcoming_holidays.dart';
 
 import 'package:flutter_app/features/attendance/presentation/check_in_out.dart';
-import 'package:flutter_app/features/home/widgets/circular.dart';
-import 'package:flutter_bloc/flutter_bloc.dart' show ReadContext;
-
 import 'package:flutter_app/features/attendance/cubit/attendance_cubit.dart';
 import 'package:flutter_app/features/chat/cubit/chat_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_app/l10n/app_localizations.dart';
+import 'package:flutter_app/features/profile/cubit/profile_cubit.dart';
+import 'package:flutter_app/features/profile/cubit/profile_state.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -86,6 +77,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       debugPrint('HomePage: App resumed, refreshing attendance status...');
       _attendanceCubit.loadInitialStatus();
+    }
+  }
+
+  String _getGreeting(AppLocalizations l10n) {
+    final hour = DateTime.now().hour;
+    if (hour < 12) {
+      return "${l10n.good_morning} 🌅";
+    } else if (hour < 17) {
+      return "${l10n.good_afternoon} ☀️";
+    } else {
+      return "${l10n.good_evening} 🌙";
     }
   }
 
@@ -163,7 +165,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           right: -40,
                           child: CircleAvatar(
                             radius: 80,
-                            backgroundColor: Colors.white.withOpacity(0.05),
+                            backgroundColor: Colors.white.withValues(alpha: 0.05),
                           ),
                         ),
                         Positioned(
@@ -171,7 +173,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           left: -20,
                           child: CircleAvatar(
                             radius: 60,
-                            backgroundColor: Colors.white.withOpacity(0.03),
+                            backgroundColor: Colors.white.withValues(alpha: 0.03),
                           ),
                         ),
                         Column(
@@ -207,10 +209,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              l10n.welcome_prefix,
+                                              _getGreeting(l10n),
                                               style: TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.white.withOpacity(0.8),
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.white.withValues(alpha: 0.8),
+                                                letterSpacing: 0.5,
                                               ),
                                             ),
                                             Text(
@@ -247,7 +251,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   ),
                 ),
                 _searchQuery.isEmpty ? SliverPadding(
-                  padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).size.height < 780 ? 12 : 24, 20, 0), // Extra bottom padding for floating nav bar
+                  padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).size.height < 780 ? 12 : 10, 20, 0), // Extra bottom padding for floating nav bar
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
                       const CheckInOutCard(),
@@ -273,12 +277,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           child: ListTile(
                             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             leading: Container(
-                               padding: const EdgeInsets.all(8),
-                               decoration: BoxDecoration(
-                                 color: AppColors.brightBlue.withOpacity(0.1),
-                                 borderRadius: BorderRadius.circular(8),
-                               ),
-                               child: Icon(feature['icon'] as IconData, color: AppColors.brightBlue)
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.brightBlue.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(feature['icon'] as IconData, color: AppColors.brightBlue),
                             ),
                             title: Text(feature['title'] as String, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
                             trailing: const Icon(Icons.chevron_right, color: Colors.grey),
@@ -313,7 +317,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.notifications_none_rounded, color: Colors.white, size: 24),
@@ -351,21 +355,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       onTap: () {
         Navigator.pushNamed(context, Routes.personalinf);
       },
-      child: FutureBuilder<String?>(
-        future: _profilePicFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircleAvatar(
-              radius: 20,
-              backgroundColor: Colors.white24,
-              child: Padding(
-                padding: EdgeInsets.all(4.0),
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-              ),
-            );
-          }
-          final picData = snapshot.data;
-          if (snapshot.hasData && picData != null && picData.length > 50 && picData != 'false') {
+      child: BlocBuilder<ProfileCubit, ProfileState>(
+        builder: (context, state) {
+          final picData = state.employee?.image1920;
+          if (picData != null && picData.length > 50 && picData != 'false') {
             try {
               String cleanedPicData = picData.trim().replaceAll('\n', '').replaceAll('\r', '').replaceAll(' ', '');
               if (cleanedPicData.contains(',')) {
@@ -427,4 +420,3 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
     
   }
-

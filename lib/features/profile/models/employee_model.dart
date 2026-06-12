@@ -113,6 +113,32 @@ class Employee {
     return [];
   }
 
+  static DateTime? _parseDate(dynamic val) {
+    if (val == null || val == false || val.toString().isEmpty || val.toString().toLowerCase() == 'false' || val.toString().toLowerCase() == 'null') {
+      return null;
+    }
+    final strVal = val.toString().trim();
+    // Try standard ISO parsing
+    final parsed = DateTime.tryParse(strVal);
+    if (parsed != null) return parsed;
+
+    // Try parsing dd-MM-yyyy format
+    final parts = strVal.split('-');
+    if (parts.length == 3) {
+      final day = int.tryParse(parts[0]);
+      final month = int.tryParse(parts[1]);
+      final year = int.tryParse(parts[2]);
+      if (day != null && month != null && year != null) {
+        if (year > 1000) {
+          return DateTime(year, month, day);
+        } else if (day > 1000) {
+          return DateTime(day, month, year);
+        }
+      }
+    }
+    return null;
+  }
+
   factory Employee.fromJson(Map<String, dynamic> json) {
     return Employee(
       id: _toInt(json['id']),
@@ -134,13 +160,13 @@ class Employee {
       empType: ManyToOne.tryParse(json['emp_type']) ??
           (json['employment_type'] != null && json['employment_type'] != false
               ? ManyToOne(id: 0, name: json['employment_type'].toString())
-              : null),
+              : (json['employee_type'] != null && json['employee_type'] != false
+                  ? ManyToOne(id: 0, name: json['employee_type'].toString())
+                  : null)),
       workEmail: json['work_email']?.toString(),
       mobilePhone: json['mobile_phone']?.toString(),
       workPhone: json['work_phone']?.toString(),
-      doj: json['doj'] != null && json['doj'] != false
-          ? DateTime.tryParse(json['doj'].toString())
-          : null,
+      doj: _parseDate(json['doj']),
       companyId: ManyToOne.tryParse(json['company_id']) ??
           (json['company'] != null && json['company'] != false
               ? ManyToOne(id: 0, name: json['company'].toString())
@@ -179,9 +205,7 @@ class Employee {
               .toList()
           : [],
       gender: json['gender']?.toString(),
-      birthday: json['birthday'] != null && json['birthday'] != false
-          ? DateTime.tryParse(json['birthday'].toString())
-          : null,
+      birthday: _parseDate(json['birthday']),
       marital: json['marital']?.toString(),
       bloodGroup: json['blood_group']?.toString(),
       identificationId: json['identification_id']?.toString(),
@@ -194,7 +218,13 @@ class Employee {
       bankIfsc: json['bank_ifsc']?.toString(),
       bankAccountId: json['bank_account_id']?.toString(),
       address: json['address']?.toString(),
-      permanentAddress: json['permanent_address']?.toString(),
+      permanentAddress: json['permanent_street'] != null && json['permanent_street'] != false
+          ? json['permanent_street'].toString()
+          : (json['permanent_address'] != null && json['permanent_address'] != false
+              ? json['permanent_address'].toString()
+              : (json['x_permanent_address'] != null && json['x_permanent_address'] != false
+                  ? json['x_permanent_address'].toString()
+                  : null)),
     );
   }
 }

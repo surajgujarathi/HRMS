@@ -33,6 +33,13 @@ class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
   int selectedDay = DateTime.now().day;
   DateTime currentMonth = DateTime.now();
 
+  String _clean(String? val) {
+    if (val == null || val.isEmpty) return 'N/A';
+    final cleaned = val.trim().toLowerCase();
+    if (cleaned == "false" || cleaned == "null" || cleaned == "n/a") return 'N/A';
+    return val;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -274,6 +281,12 @@ class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.grey.shade200,
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
         ],
@@ -306,6 +319,12 @@ class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.grey.shade200,
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
         ],
@@ -398,7 +417,8 @@ class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
   }
 
   Widget _buildHolidayCard(HolidayModel holiday) {
-    final color = holiday.name.toLowerCase().contains('optional') ? Colors.amber : AppColors.indigo;
+    final holidayName = _clean(holiday.name);
+    final color = holidayName.toLowerCase().contains('optional') ? Colors.amber : AppColors.indigo;
     final dateStr = holiday.dateFrom != null ? DateFormat('EEEE, dd MMM').format(holiday.dateFrom!) : "N/A";
 
     return Container(
@@ -407,6 +427,12 @@ class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.grey.shade200,
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4)),
         ],
@@ -427,9 +453,9 @@ class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  holiday.name,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Theme.of(context).colorScheme.onSurface),
-                ),
+                holidayName,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Theme.of(context).colorScheme.onSurface),
+              ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
@@ -472,7 +498,7 @@ class _HolidayCalendarViewState extends State<_HolidayCalendarView> {
               const Icon(Icons.info_outline, size: 16, color: AppColors.red),
               const SizedBox(width: 8),
               Text(
-                "${selectedDay} ${DateFormat('MMM').format(currentMonth)}: ${selectedDateHolidays.first.name}",
+                "${selectedDay} ${DateFormat('MMM').format(currentMonth)}: ${_clean(selectedDateHolidays.first.name)}",
                 style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.red),
               ),
             ],

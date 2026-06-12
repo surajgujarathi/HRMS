@@ -46,6 +46,7 @@ class _DocBoxPageState extends State<DocBoxPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return BlocConsumer<DocumentCubit, DocumentState>(
       listener: (context, state) {
@@ -192,6 +193,8 @@ class _DocBoxPageState extends State<DocBoxPage> {
     );
   }
   Widget _buildHeader(BuildContext context, int totalCount, AppLocalizations l10n) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 12, 20, 20),
       decoration: const BoxDecoration(
@@ -235,11 +238,15 @@ class _DocBoxPageState extends State<DocBoxPage> {
                 child: Container(
                   height: 48,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark ? Theme.of(context).colorScheme.surface : Colors.white,
                     borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isDark ? Colors.white.withOpacity(0.08) : Colors.grey.shade200,
+                      width: 1,
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
+                        color: Colors.black.withOpacity(isDark ? 0.2 : 0.08),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -268,11 +275,15 @@ class _DocBoxPageState extends State<DocBoxPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? Theme.of(context).colorScheme.surface : Colors.white,
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isDark ? Colors.white.withOpacity(0.08) : Colors.grey.shade200,
+                    width: 1,
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
+                      color: Colors.black.withOpacity(isDark ? 0.2 : 0.08),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),

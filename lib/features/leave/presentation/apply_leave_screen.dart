@@ -187,7 +187,13 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.02), blurRadius: 10)],
+        border: Border.all(color: Colors.grey.shade200, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+          ),
+        ],
       ),
       child: DropdownButtonFormField<LeaveType>(
         value: _selectedType,
@@ -241,7 +247,13 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.02), blurRadius: 10)],
+          border: Border.all(color: Colors.grey.shade200, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 10,
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,7 +277,13 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
           decoration: BoxDecoration(
             color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.02), blurRadius: 10)],
+            border: Border.all(color: Colors.grey.shade200, width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 10,
+              ),
+            ],
           ),
           child: SwitchListTile(
             title: Text(l10n.half_day, style: TextStyle(fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface)),
@@ -301,7 +319,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
           decoration: BoxDecoration(
             color: isSelected ? AppColors.primaryPurple : Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: isSelected ? AppColors.primaryPurple : Theme.of(context).dividerColor.withOpacity(0.2)),
+            border: Border.all(color: isSelected ? AppColors.primaryPurple : Colors.grey.shade200),
           ),
           child: Text(label, 
             style: TextStyle(color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontWeight: FontWeight.bold, fontSize: 13)
@@ -316,7 +334,13 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.02), blurRadius: 10)],
+        border: Border.all(color: Colors.grey.shade200, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+          ),
+        ],
       ),
       child: TextFormField(
         controller: _descriptionController,

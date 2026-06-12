@@ -36,6 +36,17 @@ class ProfileScreen extends StatelessWidget {
         },
         builder: (context, state) {
           final l10n = AppLocalizations.of(context)!;
+          String cleanValue(dynamic value, {String defaultVal = "N/A"}) {
+            if (value == null) return defaultVal;
+            final valStr = value.toString().trim();
+            if (valStr.isEmpty ||
+                valStr.toLowerCase() == "false" ||
+                valStr.toLowerCase() == "null" ||
+                valStr.toLowerCase() == "n/a") {
+              return defaultVal;
+            }
+            return valStr;
+          }
           if (state.status == ProfileStatus.loading) {
             final isDark = Theme.of(context).brightness == Brightness.dark;
             return Shimmer.fromColors(
@@ -127,53 +138,104 @@ class ProfileScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       const SizedBox(height: 20),
-                      // ---------- HEADER CONTENT ----------
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.white.withOpacity(0.2),
-                              ),
-                              child: _buildAvatar(context, employee.image1920, radius: 45),
-                            ),
-                            const SizedBox(width: 20),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    employee.name ?? "User",
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 0.5,
-                                    ),
+                      GestureDetector(
+                        onTap: () {
+                          final picData = employee.image1920;
+                          if (picData != null && picData.length > 50) {
+                            try {
+                              String cleanedPicData = picData.toString().trim().replaceAll('\n', '').replaceAll('\r', '').replaceAll(' ', '');
+                              if (cleanedPicData.contains(',')) {
+                                cleanedPicData = cleanedPicData.split(',').last;
+                              }
+                              final bytes = base64Decode(cleanedPicData);
+                              showDialog(
+                                context: context,
+                                barrierDismissible: true,
+                                builder: (dialogContext) => Dialog(
+                                  backgroundColor: Colors.transparent,
+                                  insetPadding: const EdgeInsets.all(16),
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    alignment: Alignment.center,
+                                    children: [
+                                      InteractiveViewer(
+                                        panEnabled: true,
+                                        minScale: 0.5,
+                                        maxScale: 4.0,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(16),
+                                          child: Image.memory(
+                                            bytes,
+                                            fit: BoxFit.contain,
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: -40,
+                                        right: 0,
+                                        child: IconButton(
+                                          icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                                          onPressed: () => Navigator.of(dialogContext).pop(),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(height: 4),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.15),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      employee.jobTitle ?? "Employee",
+                                ),
+                              );
+                            } catch (e) {
+                              debugPrint('Error decoding avatar for zoom: $e');
+                            }
+                          }
+                        },
+                        behavior: HitTestBehavior.opaque,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withOpacity(0.2),
+                                ),
+                                child: _buildAvatar(context, employee.image1920, radius: 45),
+                              ),
+                              const SizedBox(width: 20),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      cleanValue(employee.name, defaultVal: "User"),
                                       style: const TextStyle(
                                         color: Colors.white,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.15),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        cleanValue(employee.jobTitle, defaultVal: "Employee"),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
 
@@ -301,36 +363,42 @@ class ProfileScreen extends StatelessWidget {
                               padding: EdgeInsets.zero,
                               child: Column(
                                 children: [
+                                  // _SettingTile(
+                                  //   icon: Icons.person_outline_outlined,
+                                  //   title: l10n.personal_details,
+                                  //   onTap: () => Navigator.pushNamed(context, Routes.personalinf),
+                                  // ),
+                                  // _buildDivider(context),
                                   _SettingTile(
                                     icon: Icons.badge_outlined,
                                     title: l10n.job_details,
                                     onTap: () => Navigator.pushNamed(context, Routes.jobdetails),
                                   ),
-                                  _buildDivider(),
+                                  _buildDivider(context),
                                   _SettingTile(
                                     icon: Icons.event_available_outlined,
                                     title: l10n.leave_balance,
                                     onTap: () => Navigator.pushNamed(context, Routes.leaveList),
                                   ),
-                                  _buildDivider(),
+                                  _buildDivider(context),
                                   _SettingTile(
                                     icon: Icons.calendar_month_outlined,
                                     title: l10n.holidays_calendar,
                                     onTap: () => Navigator.pushNamed(context, Routes.holidayCalendar),
                                   ),
-                                  _buildDivider(),
+                                  _buildDivider(context),
                                   _SettingTile(
                                     icon: Icons.receipt_long_outlined,
                                     title: l10n.reimbursements,
                                     onTap: () => Navigator.pushNamed(context, Routes.reimbursements),
                                   ),
-                                  _buildDivider(),
+                                  _buildDivider(context),
                                   _SettingTile(
                                     icon: Icons.school_outlined,
                                     title: l10n.training_learning,
                                     onTap: () => Navigator.pushNamed(context, Routes.learnTraing),
                                   ),
-                                  _buildDivider(),
+                                  _buildDivider(context),
                                   _SettingTile(
                                     icon: Icons.assignment_turned_in_outlined,
                                     title: l10n.assets_assigned,
@@ -422,13 +490,13 @@ class ProfileScreen extends StatelessWidget {
                                       );
                                     },
                                   ),
-                                  _buildDivider(),
+                                  _buildDivider(context),
                                   _SettingTile(
                                     icon: Icons.language_outlined,
                                     title: l10n.language,
                                     onTap: () => Navigator.pushNamed(context, Routes.language),
                                   ),
-                                  _buildDivider(),
+                                  _buildDivider(context),
                                   BlocBuilder<ThemeCubit, ThemeMode>(
                                     builder: (context, themeMode) {
                                       final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -458,7 +526,7 @@ class ProfileScreen extends StatelessWidget {
                                     title: l10n.change_password,
                                     onTap: () => Navigator.pushNamed(context, Routes.changepassword),
                                   ),
-                                  _buildDivider(),
+                                  _buildDivider(context),
                                   _SettingTile(
                                     icon: Icons.logout,
                                     title: l10n.logout,
@@ -536,8 +604,9 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDivider() {
-    return Divider(height: 1, indent: 50, color: Colors.grey.withOpacity(0.1));
+  Widget _buildDivider(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Divider(height: 1, indent: 50, color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey.shade200);
   }
 
   Widget _buildAvatar(BuildContext context, dynamic picData, {double radius = 28}) {
@@ -557,6 +626,7 @@ class ProfileScreen extends StatelessWidget {
               width: radius * 2,
               height: radius * 2,
               fit: BoxFit.cover,
+              gaplessPlayback: true,
               errorBuilder: (context, error, stackTrace) => Icon(
                 Icons.person,
                 size: radius * 1.2,
@@ -600,7 +670,7 @@ class _ProfileCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.2 : 0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

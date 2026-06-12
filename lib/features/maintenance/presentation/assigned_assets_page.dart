@@ -91,7 +91,7 @@ class AssignedAssetsPage extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -115,13 +115,13 @@ class AssignedAssetsPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: AppColors.indigo.withOpacity(0.05),
+              color: AppColors.indigo.withValues(alpha: 0.05),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.inventory_2_outlined, size: 80, color: AppColors.indigo.withOpacity(0.2)),
+            child: Icon(Icons.inventory_2_outlined, size: 80, color: AppColors.indigo.withValues(alpha: 0.2)),
           ),
           const SizedBox(height: 24),
-           Text(
+          Text(
             l10n.no_assets_found,
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold),
           ),
@@ -141,6 +141,13 @@ class _AssetCard extends StatelessWidget {
   final MaintenanceEquipment equipment;
   const _AssetCard({required this.equipment});
 
+  String _clean(String? val) {
+    if (val == null || val.isEmpty) return '---';
+    final cleaned = val.trim().toLowerCase();
+    if (cleaned == "false" || cleaned == "null" || cleaned == "n/a") return '---';
+    return val;
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isScrapped = equipment.scrapDate != null;
@@ -151,9 +158,15 @@ class _AssetCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.grey.shade200,
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).shadowColor.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -172,7 +185,7 @@ class _AssetCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.indigo.withOpacity(0.1),
+                        color: AppColors.indigo.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
@@ -205,14 +218,14 @@ class _AssetCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant ?? Theme.of(context).dividerColor.withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.surfaceVariant ?? Theme.of(context).dividerColor.withValues(alpha: 0.1),
                   border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildInfoItem(context, l10n.model, equipment.model ?? '---'),
-                    _buildInfoItem(context, l10n.serial_number, equipment.serialNo ?? '---'),
+                    _buildInfoItem(context, l10n.model, _clean(equipment.model)),
+                    _buildInfoItem(context, l10n.serial_number, _clean(equipment.serialNo)),
                     _buildInfoItem(context, l10n.cost, equipment.cost != null && equipment.cost! > 0 ? '\$${equipment.cost!.toStringAsFixed(0)}' : '---'),
                   ],
                 ),
@@ -228,7 +241,7 @@ class _AssetCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: (isScrapped ? AppColors.dangerRed : AppColors.successGreen).withOpacity(0.1),
+        color: (isScrapped ? AppColors.dangerRed : AppColors.successGreen).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
@@ -303,7 +316,7 @@ class _AssetDetailSheet extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: AppColors.indigo.withOpacity(0.1),
+                        color: AppColors.indigo.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.inventory_2_rounded, color: AppColors.indigo, size: 48),
@@ -342,7 +355,7 @@ class _AssetDetailSheet extends StatelessWidget {
                       padding: const EdgeInsets.all(16),
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceVariant ?? Theme.of(context).dividerColor.withOpacity(0.1),
+                        color: Theme.of(context).colorScheme.surfaceVariant ?? Theme.of(context).dividerColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(asset.note!, style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
@@ -369,7 +382,7 @@ class _AssetDetailSheet extends StatelessWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.indigo.withOpacity(0.1)),
+            border: Border.all(color: AppColors.indigo.withValues(alpha: 0.1)),
           ),
           child: Column(children: children),
         ),
@@ -378,11 +391,13 @@ class _AssetDetailSheet extends StatelessWidget {
   }
 
   Widget _buildDetailRow(BuildContext context, String label, String? value) {
-    if (value == null || value == 'null' || value.isEmpty) return const SizedBox.shrink();
+    if (value == null || value.isEmpty) return const SizedBox.shrink();
+    final cleaned = value.trim().toLowerCase();
+    if (cleaned == "false" || cleaned == "null" || cleaned == "n/a") return const SizedBox.shrink();
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.indigo.withOpacity(0.05))),
+        border: Border(bottom: BorderSide(color: AppColors.indigo.withValues(alpha: 0.05))),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

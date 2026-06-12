@@ -16,52 +16,66 @@ class AttendanceActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isShortScreen = MediaQuery.of(context).size.height < 780;
-    final double paddingVal = isShortScreen ? 10 : 16;
-    final double iconPaddingVal = isShortScreen ? 6 : 10;
-    final double iconSizeVal = isShortScreen ? 20 : 24;
-    final double fontSizeVal = isShortScreen ? 12 : 14;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.shade200,
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: onTap,
-          splashColor: color.withOpacity(0.1),
-          highlightColor: color.withOpacity(0.05),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: isShortScreen ? 8 : 12, vertical: isShortScreen ? 8 : paddingVal),
-            child: isShortScreen
-                ? Row(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(22),
+        child: Stack(
+          children: [
+            // Decorative background glow circle
+            Positioned(
+              top: -10,
+              right: -10,
+              child: Container(
+                width: 45,
+                height: 45,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: color.withValues(alpha: 0.06),
+                ),
+              ),
+            ),
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onTap,
+                splashColor: color.withValues(alpha: 0.08),
+                highlightColor: color.withValues(alpha: 0.04),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  child: Row(
                     children: [
                       Container(
-                        padding: EdgeInsets.all(iconPaddingVal),
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: color.withOpacity(0.12),
-                          shape: BoxShape.circle,
+                          color: color.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Icon(icon, color: color, size: iconSizeVal),
+                        child: Icon(icon, color: color, size: 20),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           title,
                           style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: fontSizeVal,
-                            letterSpacing: 0.1,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                           maxLines: 2,
@@ -69,33 +83,11 @@ class AttendanceActionCard extends StatelessWidget {
                         ),
                       ),
                     ],
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(iconPaddingVal),
-                        decoration: BoxDecoration(
-                          color: color.withOpacity(0.12),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(icon, color: color, size: iconSizeVal),
-                      ),
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: fontSizeVal,
-                          letterSpacing: 0.2,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
                   ),
-          ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

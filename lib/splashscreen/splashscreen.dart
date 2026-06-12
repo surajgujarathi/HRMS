@@ -83,9 +83,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             end: Alignment.bottomCenter,
             colors: isDark 
               ? [
-                  const Color(0xFF0A192F), // Dark Navy
-                  const Color(0xFF172A45), // Medium Navy
-                  const Color(0xFF0A192F), // Dark Navy
+                  const Color(0xFF0F172A), // Slate 900
+                  const Color(0xFF1E1B4B), // Deep Indigo (adds a premium blue-violet accent)
+                  const Color(0xFF0A0F1D), // Deep Dark Navy
                 ]
               : [
                   const Color(0xFF1E3A8A), // Deep Navy
@@ -105,7 +105,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 height: 300,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(isDark ? 0.01 : 0.03),
+                  color: isDark 
+                    ? Colors.blueAccent.withValues(alpha: 0.02) 
+                    : Colors.white.withValues(alpha: 0.03),
                 ),
               ),
             ),
@@ -117,7 +119,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(isDark ? 0.01 : 0.03),
+                  color: isDark 
+                    ? Colors.blueAccent.withValues(alpha: 0.02) 
+                    : Colors.white.withValues(alpha: 0.03),
                 ),
               ),
             ),
@@ -136,15 +140,23 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                         children: [
                           // Logo Container
                           Container(
-                            padding: const EdgeInsets.all(24),
+                            padding: const EdgeInsets.all(16), // Smaller padding to fit the logo proportionally
                             decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF172A45) : Colors.white,
+                              color: Colors.white, // White background in all modes to ensure logo stands out cleanly
                               shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isDark 
+                                  ? Colors.blueAccent.withValues(alpha: 0.5) 
+                                  : Colors.white,
+                                width: 3,
+                              ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
+                                  color: isDark 
+                                    ? Colors.blueAccent.withValues(alpha: 0.3)
+                                    : Colors.black.withValues(alpha: 0.1),
                                   blurRadius: 30,
-                                  spreadRadius: 5,
+                                  spreadRadius: 2,
                                 ),
                               ],
                             ),
@@ -166,10 +178,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                             ),
                           ),
                           const SizedBox(height: 8),
-                          Text(
+                           Text(
                             "Human Resource Management System",
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.6),
+                              color: Colors.white.withValues(alpha: 0.6),
                               fontSize: 14,
                               letterSpacing: 0.5,
                             ),
@@ -202,7 +214,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   Text(
                     l10n.powered_by,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2,

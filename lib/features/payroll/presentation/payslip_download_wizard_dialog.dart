@@ -96,7 +96,32 @@ class _PayslipDownloadWizardDialogState extends State<PayslipDownloadWizardDialo
       setState(() {
         _periodLines = lines;
         if (_periodLines.isNotEmpty) {
-          _selectedPeriodLineId = _periodLines.first['id'];
+          final now = DateTime.now();
+          final monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          final currentMonthAbbr = monthNames[now.month - 1].toLowerCase();
+          final shortYearStr = (now.year % 100).toString();
+
+          int? matchId;
+          // First attempt: match both month abbreviation and short year (e.g. Jun - 26)
+          for (final line in _periodLines) {
+            final name = (line['name'] ?? '').toString().toLowerCase();
+            if (name.contains(currentMonthAbbr) && name.contains(shortYearStr)) {
+              matchId = line['id'] as int?;
+              break;
+            }
+          }
+          // Second attempt fallback: match just the month abbreviation (e.g. Jun)
+          if (matchId == null) {
+            for (final line in _periodLines) {
+              final name = (line['name'] ?? '').toString().toLowerCase();
+              if (name.contains(currentMonthAbbr)) {
+                matchId = line['id'] as int?;
+                break;
+              }
+            }
+          }
+          
+          _selectedPeriodLineId = matchId ?? _periodLines.first['id'];
         } else {
           _selectedPeriodLineId = null;
         }

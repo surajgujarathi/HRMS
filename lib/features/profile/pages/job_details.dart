@@ -53,6 +53,18 @@ class JobDetailsPage extends StatelessWidget {
     );
   }
 
+  String _cleanValue(dynamic value, {String defaultVal = "N/A"}) {
+    if (value == null) return defaultVal;
+    final valStr = value.toString().trim();
+    if (valStr.isEmpty ||
+        valStr.toLowerCase() == "false" ||
+        valStr.toLowerCase() == "null" ||
+        valStr.toLowerCase() == "n/a") {
+      return defaultVal;
+    }
+    return valStr;
+  }
+
   Widget _buildHeader(BuildContext context, dynamic employee, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
@@ -95,12 +107,12 @@ class JobDetailsPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      employee.name ?? "User",
+                      _cleanValue(employee.name, defaultVal: "User"),
                       style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      employee.jobTitle ?? "Employee",
+                      _cleanValue(employee.jobTitle, defaultVal: "Employee"),
                       style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 14),
                     ),
                     const SizedBox(height: 8),
@@ -111,7 +123,7 @@ class JobDetailsPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        employee.employeeCode ?? "N/A",
+                        _cleanValue(employee.employeeCode, defaultVal: "N/A"),
                         style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -320,7 +332,9 @@ Widget _buildCard({required BuildContext context, required String title, require
 }
 
 Widget _detailRow(BuildContext context, String label, String? value) {
-  if (value == null || value == "false" || value.isEmpty) return const SizedBox.shrink();
+  if (value == null || value.isEmpty) return const SizedBox.shrink();
+  final cleaned = value.trim().toLowerCase();
+  if (cleaned == "false" || cleaned == "null" || cleaned == "n/a") return const SizedBox.shrink();
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8),
     child: Row(
